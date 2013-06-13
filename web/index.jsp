@@ -11,6 +11,9 @@
             pages = new ArrayList<Page>();
             pages.add(new Page("Page 1", 0));
             session.setAttribute("pages", pages);
+            session.setAttribute("currentNodeType", "question");
+            session.setAttribute("currentPageIndex", 0);
+            session.setAttribute("currentQuestionIndex", 0);
         } else {
             System.out.println("session persisted, " + pages.size() + " pages");
         }
@@ -22,7 +25,7 @@
         <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css"/>
         <link type="text/css" rel="stylesheet" href="css/main.css"/>
         <link type="text/css" rel="stylesheet" href="css/tree.css"/>
-        <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.10.1.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript" src="js/ajax.js"></script>
@@ -38,7 +41,7 @@
                 <div class="btn-group">
                     <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">Pages <span class="caret"></span></button>
                     <ul class="dropdown-menu">
-                        <li><a href="javascript:addPage();return false;">Add Page</a></li>
+                        <li><a href="javascript:addPage()">Add Page</a></li>
                         <li><a href="#">Remove Page</a></li>
                         <li><a href="#">Reorder Pages</a></li>
                     </ul>
@@ -53,19 +56,21 @@
                 </div>
             </div>
             <!-- tree -->
-            <div class="tree">
-                <ul class="icons-ul" id="tree">
-                    <% int pageIndex = -1;
+            <div>
+                <ul class="icons-ul tree" id="navigationTree">
+                    <%  int pageIndex = -1;
                         for (Page p : pages) {
                             pageIndex = p.pageIndex;
                     %>
-                    <li><i class="icon-li icon-minus collapsible clickable"></i><a href="javascript:switchToPage(<%= pageIndex%>);"> Page <%= pageIndex + 1%></a>
+                    <li>
+                        <i class="icon-li icon-minus collapsible clickable"></i>
+                        <a href="javascript:switchNode(<%= pageIndex%>, -1);"> Page <%= pageIndex + 1%></a>
                         <ul>
                             <% int questionIndex;
                                 for (Question q : p.questions) {
                                     questionIndex = q.questionIndex;
                             %>
-                            <li><a href="javascript:switchToQuestion(<%= pageIndex%>, <%= questionIndex%>);">Question <%= questionIndex + 1%></a></li>
+                            <li><a href="javascript:switchNode(<%= pageIndex%>, <%= questionIndex%>);">Question <%= questionIndex + 1%></a></li>
                             <%}%>
                         </ul>
                     </li>
@@ -81,6 +86,8 @@
     <script>
         $(document).ready(function() {
             $("#sidebar").height(Math.max($("#mainContent").height(),$("#sidebar").height()));
+            $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").addClass("nodeSelected");
+            $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").attr('href', "javascript:doNothing()");
             $(function () {
                 $('.collapsible').on('click', function (e) {
                     var parent = $(this).parent();

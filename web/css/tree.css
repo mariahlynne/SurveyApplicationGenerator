@@ -1,6 +1,32 @@
 ul {
     list-style: none !important;
 }
+
+.tree li {
+    line-height: 25px !important;
+}
+
+.tree li a:hover {
+    background-image: linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
+    background-image: -o-linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
+    background-image: -moz-linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
+    background-image: -webkit-linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
+    background-image: -ms-linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0.18, rgb(22,116,133)),
+        color-stop(0.5, rgb(53,156,184)),
+        color-stop(0.8, rgb(22,116,133))
+        );
+    color: #ffffff;
+    text-shadow: 1px 1px 1px #333333;
+    text-decoration: none;
+    padding: 2px 4px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
 /*
 .tree li {
     margin: 0px 0;

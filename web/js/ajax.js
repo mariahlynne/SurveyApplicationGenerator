@@ -1,16 +1,39 @@
-function switchToPage(pageIndex) {
-    alert("switching to page " + pageIndex);
-    ajaxCall("MainServlet?function=switch&pageIndex=" + pageIndex + "&questionIndex=-1");
+function switchNode(pageIndex, questionIndex) {
+    $.post("MainServlet", {
+        func:"switch", 
+        pageIndex:pageIndex, 
+        questionIndex:questionIndex
+    }, function(json) {
+        var previousNode;
+        var node;
+        if (json.previousNodeType == "page") {
+            previousNode = $("#navigationTree > li:nth-child(" + (json.previousPageIndex + 1) + ") > a");
+            previousNode.attr('href', "javascript:switchNode(" + json.previousPageIndex + ", -1);");
+        } else {
+            previousNode = $("#navigationTree > li:nth-child(" + (json.previousPageIndex + 1) + ") > ul > li:nth-child(" + 
+                (json.previousQuestionIndex + 1) + ") > a");
+            previousNode.attr('href', "javascript:switchNode(" + json.previousPageIndex + ", " + json.previousQuestionIndex + ");");
+        } 
+        previousNode.removeClass("nodeSelected");
+        if (questionIndex == -1) {
+            node = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
+        } else {
+            node = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
+        }
+        node.addClass("nodeSelected");
+        node.attr('href', "javascript:doNothing()");            
+    });
 }
 
-function switchToQuestion(pageIndex, questionIndex) {
-    alert("switching to page " + pageIndex + ", question " + questionIndex);
-    ajaxCall("MainServlet?function=switch&pageIndex=" + pageIndex + "&questionIndex=" + questionIndex);
+function doNothing() {
+    
 }
 
 function addPage() {
-    $.post('MainServlet', {func:"addPage"}, function(responseText) { 
-        document.getElementById('tree').innerHTML = responseText;         
+    $.post('MainServlet', {
+        func:"addPage"
+    }, function(responseText) { 
+        document.getElementById('navigationTree').innerHTML = responseText;         
     });
 }
 
