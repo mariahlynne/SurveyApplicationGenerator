@@ -32,8 +32,19 @@ function doNothing() {
 function addPage() {
     $.post('MainServlet', {
         func:"addPage"
-    }, function(responseText) { 
-        document.getElementById('navigationTree').innerHTML = responseText;         
+    }, function() { 
+        var pageIndex = $("#navigationTree > li").length;
+        $("#navigationTree > li:last").after(
+            '<li>' + 
+            '    <i class="icon-li icon-minus collapsible clickable"></i>' +
+            '    <a href="javascript:switchNode(' + pageIndex + ', -1);"> Page ' + (pageIndex + 1) + '</a>' +
+            '    <ul> ' + 
+            '        <li>' +
+            '            <a href="javascript:switchNode(' + pageIndex + ', 0);">Question 1</a>' +
+            '        </li>' + 
+            '    </ul>' +
+            '</li>'
+            );       
     });
 }
 

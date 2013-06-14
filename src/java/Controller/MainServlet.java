@@ -23,25 +23,10 @@ public class MainServlet extends HttpServlet {
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
             case "addPage":
-                response.setContentType("text/html;charset=UTF-8");
-                out = response.getWriter();
                 ArrayList<Page> pages = (ArrayList<Page>) session.getAttribute("pages");
                 int count = pages.size();
                 pages.add(new Page("Page " + count + 1, count));
                 session.setAttribute("pages", pages);
-                for (Page p : pages) {
-                    pageIndex = p.pageIndex;
-                    System.out.println("pageIndex=" + pageIndex);
-                    out.println("<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>");
-                    out.println("<ul>");
-                    for (Question q : p.questions) {
-                        questionIndex = q.questionIndex;
-                        System.out.println("questionIndex=" + questionIndex);
-                        out.println("<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>");
-                    }
-                    out.println("</ul>");
-                    out.println("</li>");
-                }
                 break;
             // </editor-fold>
 
