@@ -1,0 +1,100 @@
+root { 
+    display: block;
+}
+
+.checkboxes label {
+    display: block;
+    float: left;
+    padding-right: 10px;
+    white-space: nowrap;
+}
+
+.checkboxes input {
+    vertical-align: middle;
+}
+
+.checkboxes label span {
+    vertical-align: middle;
+}
+
+textarea {
+    resize: none;
+    columns: 50;
+}
+
+textArea {
+    columns: 50;
+}
+
+.boldLabel {
+    font-weight: bold;
+}
+
+.ui-accordion .ui-accordion-content {
+    padding: 0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    background: #fff;
+    color: #080000;
+}
+
+header#primary {
+    width: 100%;
+    height: 100px;
+    background: #313131;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#4d4d4d), to(#313131));
+    background-image: -moz-linear-gradient(#4d4d4d, #313131);
+    background-image: -o-linear-gradient(#4d4d4d, #313131);
+    background-image: linear-gradient(#4d4d4d, #313131);
+}
+header#primary h1
+{
+    margin: 0px 0px 0px 20px;
+    padding: 0px;
+    line-height: 100px;
+    color: #ffffff;
+}
+
+#sidebar {
+    float: left;
+    width: 220px;
+    background: #D6E0EB;
+    height: calc(100% - 100px);
+    overflow: auto;
+    padding: 10px;
+}
+
+#mainContent {
+    float: left;
+    height: calc(100% - 100px);
+    overflow: auto;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.nodeSelected, .nodeSelected :hover {
+    font-weight: bold !important;
+    cursor: default !important;
+    text-decoration: none !important;
+    background: #aaaaaa -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,0.25)), to(rgba(0,0,0,0))) !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 1px #333333 !important;
+    text-decoration: none !important;
+    padding: 2px 4px !important;
+    -webkit-border-radius: 3px !important;
+    border-radius: 3px !important;
+
+}
+
+.nodeSelected :hover {
+    pointer-events: none !important;
+}

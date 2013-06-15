@@ -20,11 +20,15 @@ public class MainServlet extends HttpServlet {
         HttpSession session = request.getSession();
         int pageIndex;
         int questionIndex;
+        ArrayList<Page> pages;
+        int count;
+        Page page;
+        String currentNodeType;
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
             case "addPage":
-                ArrayList<Page> pages = (ArrayList<Page>) session.getAttribute("pages");
-                int count = pages.size();
+                pages = (ArrayList<Page>) session.getAttribute("pages");
+                count = pages.size();
                 pages.add(new Page("Page " + count + 1, count));
                 session.setAttribute("pages", pages);
                 break;
@@ -32,16 +36,21 @@ public class MainServlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Add Question">
             case "addQuestion":
+                pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
+                pages = (ArrayList<Page>) session.getAttribute("pages");
+                page = pages.get(pageIndex);
+                count = page.questions.size();
+                page.addQuestion("Question " + (count + 1), count);
+                session.setAttribute("pages", pages);
                 break;
             // </editor-fold>
 
             // <editor-fold defaultstate="collapsed" desc="Remove Page">
-            case "removePage":
-                break;
-            // </editor-fold>
-
-            // <editor-fold defaultstate="collapsed" desc="Remove Question">
-            case "removeQuestion":
+            case "remove":
+                questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
+                pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
+                currentNodeType = (questionIndex == -1) ? "page" : "question";
+                pages = (ArrayList<Page>) session.getAttribute("pages");
                 break;
             // </editor-fold>
 
@@ -59,7 +68,7 @@ public class MainServlet extends HttpServlet {
             case "switch":
                 questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
-                
+
                 JSONObject jObject = new JSONObject();
                 jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());
                 jObject.put("previousPageIndex", new Integer(session.getAttribute("currentPageIndex").toString()));
@@ -67,7 +76,7 @@ public class MainServlet extends HttpServlet {
 
 //                System.out.println("switching from page: " + session.getAttribute("currentPageIndex").toString() + ", question: " + session.getAttribute("currentQuestionIndex").toString());
 //                System.out.println("to page: " + request.getParameter("pageIndex") + ", question: " + request.getParameter("questionIndex"));
-                String currentNodeType = (questionIndex == -1) ? "page" : "question";
+                currentNodeType = (questionIndex == -1) ? "page" : "question";
                 session.setAttribute("currentNodeType", currentNodeType);
                 session.setAttribute("currentPageIndex", pageIndex);
                 session.setAttribute("currentQuestionIndex", questionIndex);
