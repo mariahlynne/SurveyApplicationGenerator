@@ -49,8 +49,31 @@ public class MainServlet extends HttpServlet {
             case "remove":
                 questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
-                currentNodeType = (questionIndex == -1) ? "page" : "question";
                 pages = (ArrayList<Page>) session.getAttribute("pages");
+                page = pages.get(pageIndex);
+                if ((questionIndex == -1) || (page.questions.size() == 1)) {
+                    pages.remove(pageIndex);
+                } else {
+                    page.questions.remove(questionIndex);
+                    pages.set(pageIndex, page);
+                }
+                reindex(pages);
+                session.setAttribute("pages", pages);
+
+                //send back full (inner) html of tree
+                response.setContentType("text/html;charset=UTF-8");
+                out = response.getWriter();
+                for (Page p : pages) {
+                    pageIndex = p.pageIndex;
+                    out.println("<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>");
+                    out.println("<ul>");
+                    for (Question q : p.questions) {
+                        questionIndex = q.questionIndex;
+                        out.println("<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>");
+                    }
+                    out.println("</ul>");
+                    out.println("</li>");
+                }
                 break;
             // </editor-fold>
 
@@ -120,4 +143,16 @@ public class MainServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private void reindex(ArrayList<Page> pages) {
+            int pageIndex = 0;
+            int questionIndex;
+        for (Page p : pages) {
+            p.setPageIndex(pageIndex++);
+            questionIndex = 0;
+            for (Question q : p.questions) {
+                q.setQuestionIndex(questionIndex++);
+            }
+        }
+    }
 }

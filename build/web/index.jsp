@@ -7,7 +7,7 @@
     <%  session = request.getSession(true);
         ArrayList<Page> pages = (ArrayList<Page>) session.getAttribute("pages");
         if (pages == null || pages.size() == 0) {
-            System.out.println("creating pages");
+            //System.out.println("creating pages");
             pages = new ArrayList<Page>();
             pages.add(new Page("Page 1", 0));
             session.setAttribute("pages", pages);
@@ -15,7 +15,7 @@
             session.setAttribute("currentPageIndex", 0);
             session.setAttribute("currentQuestionIndex", 0);
         } else {
-            System.out.println("session persisted, " + pages.size() + " pages");
+            //System.out.println("session persisted, " + pages.size() + " pages");
         }
 
     %>
@@ -37,20 +37,17 @@
         </header>
         <div id="sidebar">
             <!--Sidebar content-->
+            <div id="sidebarErrorMessage" class="alert alert-error" style="display: none; font-weight: bold;">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
             <div class="btn-toolbar" style="margin-left: 10px;">
                 <div class="btn-group">
-                    <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">Pages <span class="caret"></span></button>
+                    <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li><a href="javascript:addPage()">Add Page</a></li>
-                        <li><a href="javascript:removeNode()">Remove Page</a></li>
-                        <li><a href="#">Reorder Pages</a></li>
-                    </ul>
-                </div>
-                <div class="btn-group" style="float: right; margin-right: 10px;">
-                    <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">Questions <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
                         <li><a href="javascript:addQuestion()">Add Question</a></li>
-                        <li><a href="javascript:removeNode()">Remove Question</a></li>
+                        <li><a href="javascript:removeNode()">Delete Selected</a></li>
+                        <li><a href="#">Reorder Pages</a></li>                        
                         <li><a href="#">Reorder Questions</a></li>
                     </ul>
                 </div>

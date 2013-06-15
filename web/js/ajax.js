@@ -11,12 +11,14 @@ function switchNode(pageIndex, questionIndex) {
         if (currentNodeType.val() == "page") {
             currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
             currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
-        } else {
+            currentNode.removeClass("nodeSelected");    
+        } else if (currentNodeType.val() == "question") {
             currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" + 
                 (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
             currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
+            currentNode.removeClass("nodeSelected");    
         } 
-        currentNode.removeClass("nodeSelected");
+        
         if (questionIndex == -1) {
             currentNodeType.val("page");
             currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
@@ -55,62 +57,78 @@ function addPage() {
 }
 
 function addQuestion() {
+    var errorMessage = $("#sidebarErrorMessage");
     var currentPageIndex = parseInt($("#currentPageIndex").val());
-    $.post('MainServlet', {
-        func:"addQuestion",
-        pageIndex:currentPageIndex
-    }, function() { 
-        var questionCount = $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li").length;
-        $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li:last").after(
-            '<li>' +
-            '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
-            '</li>' 
-            );       
-    });
+    
+    if (currentPageIndex == -1) {
+        errorMessage.text("You must first select a page to add a question to.");
+        errorMessage.show(0).delay(5000).hide(0);
+    } else {
+        $.post('MainServlet', {
+            func:"addQuestion",
+            pageIndex:currentPageIndex
+        }, function() { 
+            var questionCount = $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li").length;
+            $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li:last").after(
+                '<li>' +
+                '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
+                '</li>' 
+                );       
+        });
+    }
 }
 
 function removeNode() {
     var currentNodeType = $("#currentNodeType");
     var currentPageIndex = $("#currentPageIndex");
     var currentQuestionIndex = $("#currentQuestionIndex");
-    $.post('MainServlet', {
-        func:"addQuestion",
-        pageIndex:currentPageIndex
-    }, function() { 
-        var questionCount = $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li").length;
-        $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li:last").after(
-            '<li>' +
-            '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
-            '</li>' 
-            );       
-    });
-}
-
-function ajaxCall(url) {
-    var xmlhttp = GetXmlHttpObject();
-    if (xmlhttp == null)
-    {
-        alert ("Your browser does not support Ajax HTTP");
-        return;
+    var errorMessage = $("#sidebarErrorMessage");
+    var confirmationText;
+    
+    switch (currentNodeType.val()) {        
+        case "page":
+            if ($("#navigationTree > li").length == 1) {
+                //can't remove if it's the only page
+                errorMessage.text("This is the only page so it cannot be deleted.");
+                errorMessage.show(0).delay(5000).hide(0);
+                return;
+            } else {
+                confirmationText = "Are you sure you want to delete this page? All questions on it will also be deleted.";
+            }
+            break;
+            
+        case "question":
+            if ($("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li").length == 1) {
+                //can't remove it if it's the only question on the only page
+                if ($("#navigationTree > li").length == 1) {
+                    errorMessage.text("This is the only question on the only page so it cannot be deleted.");
+                    errorMessage.show(0).delay(5000).hide(0);
+                    return;
+                } else {
+                    confirmationText = "This is the only question on the page. Deleting it will also delete the page. " + 
+                "Are you sure you wish to delete this page?";
+                }
+            } else {
+                confirmationText = "Are you sure you want to delete this question?";
+            }
+            break;
+            
+        case "":
+            errorMessage.text("You must first select a page or question to delete.");
+            errorMessage.show(0).delay(5000).hide(0);
+            return;
     }
-    xmlhttp.onreadystatechange = getOutput(xmlhttp);
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send(null);
-}
-
-function getOutput(xmlhttp) {
-    if (xmlhttp.readyState == 4) {
-        return xmlhttp.responseText;
+    if (confirm(confirmationText)) {
+        $.post('MainServlet', {
+            func:"remove",
+            pageIndex:currentPageIndex.val(),
+            questionIndex:currentQuestionIndex.val()
+        }, function(treeHTML) { 
+            errorMessage.hide();
+            currentNodeType.val("");
+            currentPageIndex.val("-1");
+            currentQuestionIndex.val("-1");
+            document.getElementById("navigationTree").innerHTML = treeHTML;
+        });
     }
-    return "";
-}
-
-function GetXmlHttpObject() {
-    if (window.XMLHttpRequest) {
-        return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject) {
-        return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
 }
