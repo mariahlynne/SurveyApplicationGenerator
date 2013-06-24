@@ -5,16 +5,20 @@ import Model.Question;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class MainServlet extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException {
         String sFunction = request.getParameter("func");
         PrintWriter out;
         HttpSession session = request.getSession();
@@ -23,6 +27,7 @@ public class MainServlet extends HttpServlet {
         ArrayList<Page> pages;
         int count;
         Page page;
+        Question question;
         String currentNodeType;
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
@@ -91,52 +96,88 @@ public class MainServlet extends HttpServlet {
             case "switch":
                 questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
+                int currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
+                int currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
+                pages = (ArrayList<Page>) session.getAttribute("pages");
 
-                JSONObject jObject = new JSONObject();
-                jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());
-                jObject.put("previousPageIndex", new Integer(session.getAttribute("currentPageIndex").toString()));
-                jObject.put("previousQuestionIndex", new Integer(session.getAttribute("currentQuestionIndex").toString()));
+                if (currentQuestionIndex != -1) {
+                    page = pages.get(currentPageIndex);
+                    question = page.questions.get(currentQuestionIndex);
+                    JSONParser p = new JSONParser();
+                    JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
+                    question.questionText = o.get("questionText").toString();
+                    question.isRequired = (Boolean) o.get("isRequired");
+                    question.errorMessage = o.get("errorMessage").toString();
+                    question.questionType = o.get("questionType").toString();
+                    question.min = o.get("min").toString();
+                    question.max = o.get("max").toString();
+                    question.validCharacters = o.get("validCharacters").toString();
+
+                    session.setAttribute("pages", pages);
+                }
+
+                if (questionIndex != -1) {
+                    page = pages.get(pageIndex);
+                    question = page.questions.get(questionIndex);
+                    JSONObject o = new JSONObject();
+                    o.put("questionText", question.questionText);
+                    o.put("isRequired", question.isRequired);
+                    o.put("errorMessage", question.errorMessage);
+                    o.put("questionType", question.questionType);
+                    o.put("min", question.min);
+                    o.put("max", question.max);
+                    o.put("validCharacters", question.validCharacters);
+
+                    currentNodeType = (questionIndex == -1) ? "page" : "question";
+                    response.setContentType("application/json");
+                    response.getWriter().write(o.toJSONString());
+                }
+                break;
+        }
+
+        // </editor-fold>
+    }
+//                jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());
+//                jObject.put("previousPageIndex", new Integer(session.getAttribute("currentPageIndex").toString()));
+//                jObject.put("previousQuestionIndex", new Integer(session.getAttribute("currentQuestionIndex").toString()));
 
 //                System.out.println("switching from page: " + session.getAttribute("currentPageIndex").toString() + ", question: " + session.getAttribute("currentQuestionIndex").toString());
 //                System.out.println("to page: " + request.getParameter("pageIndex") + ", question: " + request.getParameter("questionIndex"));
-                currentNodeType = (questionIndex == -1) ? "page" : "question";
-                session.setAttribute("currentNodeType", currentNodeType);
-                session.setAttribute("currentPageIndex", pageIndex);
-                session.setAttribute("currentQuestionIndex", questionIndex);
-                response.setContentType("application/json");
-                response.getWriter().write(jObject.toJSONString());
-                break;
-            // </editor-fold>
-        }
-        //        response.setContentType("text/html;charset=UTF-8");
+    //        response.setContentType("text/html;charset=UTF-8");
 //        PrintWriter out = response.getWriter();
 //        try {
 //            /* TODO output your page here. You may use following sample code. */
 //            out.println("<html>");
 //            out.println("<head>");
-//            out.println("<title>Servlet MainServlet</title>");            
+//            out.println("<title>Servlet MainServlet</title>");
 //            out.println("</head>");
 //            out.println("<body>");
 //            out.println("<h1>Servlet MainServlet at " + request.getContextPath() + "</h1>");
 //            out.println("</body>");
 //            out.println("</html>");
-//        } finally {            
+//        } finally {
 //            out.close();
 //        }
-    }
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         System.out.println("in do get");
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ParseException ex) {
+            Logger.getLogger(MainServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ParseException ex) {
+            Logger.getLogger(MainServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -145,13 +186,13 @@ public class MainServlet extends HttpServlet {
     }// </editor-fold>
 
     private void reindex(ArrayList<Page> pages) {
-            int pageIndex = 0;
-            int questionIndex;
+        int pageIndex = 0;
+        int questionIndex;
         for (Page p : pages) {
             p.setPageIndex(pageIndex++);
             questionIndex = 0;
             for (Question q : p.questions) {
-                q.setQuestionIndex(questionIndex++);
+                q.questionIndex = questionIndex++;
             }
         }
     }
