@@ -10,12 +10,12 @@ public class Question implements Serializable {
 
     public String questionText = "";//all
     public boolean isRequired = false;//all
-    public String errorMessage = "This question is required";//all
     public String questionType = "none";//all
-    public String min = "";//textbox
-    public String max = "";//textbox
-    public String validationErrorMessage = "";
+    public String min = "";//textbox, whole number, decimal number
+    public String max = "";//textbox, whole number, decimal number
+    public String validationErrorMessage = "";//textbox, whole number, decimal number
     public String validCharacters = "";//textbox
+    public String decimalPlaces = "";//decimal number
 //    public boolean validateFormat;//textbox
 //    public boolean validateContents;//textbox
 

@@ -47,11 +47,46 @@ function getSettingsJSON() {
     json.isRequired = $("#isRequired").is(':checked');
     json.errorMessage = $("#requiredErrorMessage").text();
     json.questionType = $("#questionType").val();
-    json.min = -1;
-    json.max = -1;
-    json.validCharacters = "a-zA-Z";
+    switch (json.questionType) {
+        case "text":
+            json.min = $("#textValidateSpecificLengthMin").val();
+            json.max = $("#textValidateSpecificLengthMax").val();
+            json.validationErrorMessage = $("#textValidateErrorMessage").text();
+            json.validCharacters = getValidCharacters();
+            break;
+        case "wholeNumber":
+            break;
+        case "decimalNumber":
+            break;
+
+    }
 
     return JSON.stringify(json);
+}
+
+function getValidCharacters() {
+    var result = "";
+    if ($("#validCharsUppercase").is(':checked')) {
+        result += "A-Z";
+    }
+    if ($("#validCharsLowercase").is(':checked')) {
+        result += "a-z";
+    }
+    if ($("#validCharsDigits").is(':checked')) {
+        result += "0-9";
+    }
+    if ($("#validCharsSpecial").is(':checked')) {
+        result += ";;;" + $("#validCharsSpecialText").val();
+    }
+    return result;
+}
+
+function setValidCharacters(characters) {
+    $("#validCharsUppercase").prop('checked', characters.indexOf("A-Z") != -1);
+    $("#validCharsLowercase").prop('checked', characters.indexOf("a-z") != -1);
+    $("#validCharsDigits").prop('checked', characters.indexOf("0-9") != -1);
+    $("#validCharsSpecial").prop('checked', characters.indexOf(";;;") != -1);
+    $("#validCharsSpecialText").val(characters.substring(characters.indexOf(";;;")));
 }
 
 function setSettingsFromJSON(json) {
@@ -59,6 +94,19 @@ function setSettingsFromJSON(json) {
     $("#isRequired").prop('checked', json.isRequired);
     $("#requiredErrorMessage").text(json.errorMessage);
     $("#questionType").val(json.questionType).attr('selected', 'selected');
+    switch (json.questionType) {
+        case "text":
+            $("#textValidateSpecificLengthMin").val(json.min);
+            $("#textValidateSpecificLengthMax").val(json.max);
+            $("#textValidateErrorMessage").text(json.validationErrorMessage);
+            setValidCharacters(json.validCharacters);
+            break;
+        case "wholeNumber":
+            break;
+        case "decimalNumber":
+            break;
+
+    }
 
 }
 

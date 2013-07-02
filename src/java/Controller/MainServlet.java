@@ -107,11 +107,18 @@ public class MainServlet extends HttpServlet {
                     JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
                     question.questionText = o.get("questionText").toString();
                     question.isRequired = (Boolean) o.get("isRequired");
-                    question.errorMessage = o.get("errorMessage").toString();
                     question.questionType = o.get("questionType").toString();
-                    question.min = o.get("min").toString();
-                    question.max = o.get("max").toString();
-                    question.validCharacters = o.get("validCharacters").toString();
+                    switch (question.questionType) {
+                        case "text":
+                            question.min = o.get("min").toString();
+                            question.max = o.get("max").toString();
+                            question.validCharacters = o.get("validCharacters").toString();
+                            break;
+                        case "wholeNumber":
+                            break;
+                        case "decimalNumber":
+                            break;
+                    }
 
                     session.setAttribute("pages", pages);
                 }
@@ -122,11 +129,19 @@ public class MainServlet extends HttpServlet {
                     JSONObject o = new JSONObject();
                     o.put("questionText", question.questionText);
                     o.put("isRequired", question.isRequired);
-                    o.put("errorMessage", question.errorMessage);
                     o.put("questionType", question.questionType);
-                    o.put("min", question.min);
-                    o.put("max", question.max);
-                    o.put("validCharacters", question.validCharacters);
+                    switch (question.questionType) {
+                        case "text":
+                            o.put("min", question.min);
+                            o.put("max", question.max);
+                            o.put("validCharacters", question.validCharacters);
+                            break;
+                        case "wholeNumber":
+                            break;
+                        case "decimalNumber":
+                            break;
+                    }
+
 
                     currentNodeType = (questionIndex == -1) ? "page" : "question";
                     response.setContentType("application/json");

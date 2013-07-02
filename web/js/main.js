@@ -34,14 +34,6 @@ function showCorrectQuestionSettings() {
     }
 }
 
-function showHideRequiredSection() {
-    if (document.getElementById("isRequired").checked) {
-        $("#requiredSection").show();
-    } else {
-        $("#requiredSection").hide();
-    }
-}
-
 function showHideWholeNumberValidation() {
     $("#wholeNumberMinSection").hide();
     $("#wholeNumberMaxSection").hide();
