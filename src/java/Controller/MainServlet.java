@@ -105,6 +105,7 @@ public class MainServlet extends HttpServlet {
                     question = page.questions.get(currentQuestionIndex);
                     JSONParser p = new JSONParser();
                     JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
+                    question.clearAll();
                     question.questionText = o.get("questionText").toString();
                     question.isRequired = (Boolean) o.get("isRequired");
                     question.questionType = o.get("questionType").toString();
@@ -115,8 +116,15 @@ public class MainServlet extends HttpServlet {
                             question.validCharacters = o.get("validCharacters").toString();
                             break;
                         case "wholeNumber":
+                            question.min = o.get("min").toString();
+                            question.max = o.get("max").toString();
+                            question.validationType = o.get("validationType").toString();
                             break;
                         case "decimalNumber":
+                            question.min = o.get("min").toString();
+                            question.max = o.get("max").toString();
+                            question.decimalPlaces = o.get("decimalPlaces").toString();
+                            question.validationType = o.get("validationType").toString();
                             break;
                     }
 
@@ -137,8 +145,15 @@ public class MainServlet extends HttpServlet {
                             o.put("validCharacters", question.validCharacters);
                             break;
                         case "wholeNumber":
+                            o.put("min", question.min);
+                            o.put("max", question.max);
+                            o.put("validationType", question.validationType);
                             break;
                         case "decimalNumber":
+                            o.put("min", question.min);
+                            o.put("max", question.max);
+                            o.put("decimalPlaces", question.decimalPlaces);
+                            o.put("validationType", question.validationType);
                             break;
                     }
 

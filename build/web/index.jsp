@@ -82,7 +82,7 @@
             <div id="pageSection">
                 This will show how all of the questions for this page will appear.
             </div>
-            <div id="questionSection">
+            <div id="questionSection" style="margin-top: 10px;">
                 <label id="questionTextLabel" for="questionText" class="boldLabel">Question Text:</label>
                 <textarea id="questionText" rows="3" style="width: 97%"></textarea>
                 <br /><br />
@@ -92,174 +92,174 @@
                         <span>Require an answer for this question</span>
                     </label>
                 </div>
-            </div>
-            <br />
-            <div class="well well-small" id="questionTypeSection">
-                <label id="questionTypeLabel" for="questionType" class="boldLabel">Type:</label>
-                <select id="questionType" onchange="showCorrectQuestionSettings()" style="width: auto">
-                    <option label="Choose Question Type" value="none"/>
-                    <option label="Text" value="text"/>
-                    <option label="Whole Number" value="wholeNumber"/>
-                    <option label="Decimal Number" value="decimalNumber"/>
-                    <!--                        <option label="Date (MM/DD/YYYY)" value="date"/>-->
-                    <option label="Multiple Choice" value="multipleChoice"/>
-                </select>
-
-                <!-- Text Section -->
-                <div id="textSection" class="well well-small">
-                    <br />
-                    <table>
-                        <tr>
-                            <td><label class ="boldLabel" style="margin-right: 10px">At least </label></td>
-                            <td><input type="text" id="textValidateSpecificLengthMin"style="width: 40px" maxlength="5" /></td>
-                            <td><label class="boldLabel" style="margin-right: 10px; margin-left: 10px"> characters but no more than </label></td>
-                            <td><input type="text" id="textValidateSpecificLengthMax" style="width: 40px" maxlength="5" /></td>
-                            <td><label class="boldLabel" style="margin-left: 10px"> characters</label></td>
-                        </tr>
-                    </table>
-                    <br />
-                    <label class="boldLabel">Characters Allowed:</label>
-                    <div class="checkbox">
-                        <label for="validCharsUppercase">
-                            <input type="checkbox" id="validCharsUppercase" checked="checked" />
-                            <span>Uppercase Letters</span>
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label for="validCharsLowercase">
-                            <input type="checkbox" id="validCharsLowercase" checked="checked" />
-                            <span>Lowercase Letters</span>
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label for="validCharsDigits">
-                            <input type="checkbox" id="validCharsDigits" checked="checked" />
-                            <span>Digits</span>
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label for="validCharsSpecial">
-                            <input type="checkbox" id="validCharsSpecial" checked="checked" />
-                            <span>Special Characters:</span>
-                            <br />
-                            <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Whole Number Section -->
-                <div id="wholeNumberSection">
-                    <div class="well well-small">
-                        <label for="wholeNumberValidation" class="boldLabel">Validation:</label>
-                        <select id="wholeNumberValidation" onchange="showHideWholeNumberValidation()">
-                            <option value="none">None</option>
-                            <option value="setMin">Set minimum</option>
-                            <option value="setMax">Set maximum</option>
-                            <option value="setMinMax">Set minimum & maximum</option>
-                        </select>
-                        <div id="wholeNumberMinSection">
-                            <label id="lblWholeNumberMin" for="wholeNumberMin" class="boldLabel">Minimum:</label>
-                            <input type="text" id="txtWholeNumberMin" style="width: 160px" maxlength="20" />
-                        </div>
-                        <div id="wholeNumberMaxSection">
-                            <label id="lblWholeNumberMax" for="wholeNumberMax" class="boldLabel">Maximum:</label>
-                            <input type="text" id="txtWholeNumberMax" style="width: 160px" maxlength="19" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Decimal Number Section -->
-                <div id="decimalNumberSection">
-                    <br />
-                    <label for="decimalPlaces" class="boldLabel">Number of Decimal Places:</label>
-                    <select id="decimalPlaces" style="width: 50px;">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
+                <br />
+                <div class="well well-small" id="questionTypeSection">
+                    <label id="questionTypeLabel" for="questionType" class="boldLabel">Type:</label>
+                    <select id="questionType" onchange="showCorrectQuestionSettings()" style="width: auto">
+                        <option label="Choose Question Type" value="none"/>
+                        <option label="Text" value="text"/>
+                        <option label="Whole Number" value="wholeNumber"/>
+                        <option label="Decimal Number" value="decimalNumber"/>
+                        <!--                        <option label="Date (MM/DD/YYYY)" value="date"/>-->
+                        <option label="Multiple Choice" value="multipleChoice"/>
                     </select>
-                    <div class="well well-small">
-                        <label for="decimalNumberValidation" class="boldLabel">Validation:</label>
-                        <select id="decimalNumberValidation" onchange="showHideDecimalNumberValidation()">
-                            <option value="none">None</option>
-                            <option value="setMin">Set minimum</option>
-                            <option value="setMax">Set maximum</option>
-                            <option value="setMinMax">Set minimum & maximum</option>
-                        </select>
-                        <div id="decimalNumberMinSection">
-                            <label id="lblDecimalNumberMin" for="decimalNumberMin" class="boldLabel">Minimum:</label>
-                            <input type="text" id="txtDecimalNumberMin" style="width: 160px" maxlength="20" />
-                        </div>
-                        <div id="decimalNumberMaxSection">
-                            <label id="lblDecimalNumberMax" for="decimalNumberMax" class="boldLabel">Maximum:</label>
-                            <input type="text" id="txtDecimalNumberMax" style="width: 160px" maxlength="19" />
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Date Section -->
-                <!--                    <div id="dateSection" class="well well-small">
-                                        <span>Date Section</span>
-                                    </div>-->
-
-                <!-- Multiple Choice Section -->
-                <div id="multipleChoiceSection">
-                    <div id="multipleChoiceAmountSection">
-                        <label for="multipleChoiceAmount" class="boldLabel">Number of answers the user may select:</label>
-                        <select id="multipleChoiceAmount" onchange="showCorrectMultipleChoiceAmount()" style="width: auto">
-                            <option label="1 Answer" value="1"/>
-                            <option label="2 Answers" value="2"/>
-                            <option label="3 Answers" value="2"/>
-                            <option label="4 Answers" value="2"/>
-                            <option label="5 Answers" value="2"/>
-                            <option label="6 Answers" value="2"/>
-                            <option label="7 Answers" value="2"/>
-                            <option label="8 Answers" value="2"/>
-                            <option label="9 Answers" value="2"/>
-                            <option label="10 Answers" value="2"/>
-                            <option label="Unlimited Answers" value="unlimited"/>
-                        </select>
-                    </div>
-                    <div id="multipleChoiceTypeSection">
-                        <label id="multipleChoiceDisplayTypeLabel" for="multipleChoiceDisplayType" class="boldLabel">Display Type:</label>
-                        <select id="multipleChoiceDisplayType" onchange="showCorrectMultipleChoice()" style="width: auto">
-                            <option label="Radio Buttons" value="radio"/>
-                            <option label="Drop-down List" value="dropdown"/>
-                        </select>
-                    </div>
-
-                    <div class="well well-small">
-                        <label id="multipleChoiceChoicesLabel" for="multipleChoiceChoice" class="boldLabel">Answer choices:</label>
-                        <input type="text" id="multipleChoiceChoice" style="width: 95%" />
-                        <a id="addChoiceButton" class="btn btn-info pull-right" style="margin-top:3px" onclick="addChoice()">+
-                            <!--                          <i class="icon-white icon-plus"/>-->
-                        </a>
+                    <!-- Text Section -->
+                    <div id="textSection" class="well well-small">
                         <br />
-                        <select size="5" id="multipleChoiceChoices" style="width: 85%">
-                        </select>
-                        <div class="btn-group" style="float: right">
-                            <a class="btn btn-info" onclick="moveChoiceUp()">&lt;
-                                <!--                                <i class="icon-arrow-up icon-white" />-->
-                            </a>
-                            <a class="btn btn-info" onclick="moveChoiceDown()">&gt;
-                                <!--<i class="icon-arrow-down icon-white"/>-->
-                            </a>
-                            <a class="btn btn-danger" onclick="removeChoice()">x
-                                <!--<i class="icon-remove icon-white"/>-->
-                            </a>
+                        <table>
+                            <tr>
+                                <td><label class ="boldLabel" style="margin-right: 10px">At least </label></td>
+                                <td><input type="text" id="textValidateSpecificLengthMin"style="width: 40px" maxlength="5" /></td>
+                                <td><label class="boldLabel" style="margin-right: 10px; margin-left: 10px"> characters but no more than </label></td>
+                                <td><input type="text" id="textValidateSpecificLengthMax" style="width: 40px" maxlength="5" /></td>
+                                <td><label class="boldLabel" style="margin-left: 10px"> characters</label></td>
+                            </tr>
+                        </table>
+                        <br />
+                        <label class="boldLabel">Characters Allowed:</label>
+                        <div class="checkbox">
+                            <label for="validCharsUppercase">
+                                <input type="checkbox" id="validCharsUppercase" checked="checked" />
+                                <span>Uppercase Letters</span>
+                            </label>
                         </div>
+                        <div class="checkbox">
+                            <label for="validCharsLowercase">
+                                <input type="checkbox" id="validCharsLowercase" checked="checked" />
+                                <span>Lowercase Letters</span>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="validCharsDigits">
+                                <input type="checkbox" id="validCharsDigits" checked="checked" />
+                                <span>Digits</span>
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="validCharsSpecial">
+                                <input type="checkbox" id="validCharsSpecial" checked="checked" />
+                                <span>Special Characters:</span>
+                                <br />
+                                <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Whole Number Section -->
+                    <div id="wholeNumberSection">
                         <div class="well well-small">
-                            <div class="checkbox">
-                                <label for="multipleChoiceAddOther" class="boldLabel">
-                                    <input type="checkbox" id="multipleChoiceAddOther" onchange="showHideMultipleChoiceFieldOther()"/>
-                                    <span>Add "Other" choice (with textbox)</span>
-                                </label>
+                            <label for="wholeNumberValidation" class="boldLabel">Validation:</label>
+                            <select id="wholeNumberValidation" onchange="showHideWholeNumberValidation()">
+                                <option value="none">None</option>
+                                <option value="setMin">Set minimum</option>
+                                <option value="setMax">Set maximum</option>
+                                <option value="setMinMax">Set minimum & maximum</option>
+                            </select>
+                            <div id="wholeNumberMinSection">
+                                <label id="lblWholeNumberMin" for="wholeNumberMin" class="boldLabel">Minimum:</label>
+                                <input type="text" id="txtWholeNumberMin" style="width: 160px" maxlength="20" />
                             </div>
-                            <div id="multipleChoiceAddOtherFieldSection">
-                                <label id="multipleChoiceOtherAnswerTextLabel" for="multipleChoiceOtherAnswerText" class="boldLabel">Answer Label:</label>
-                                <input type="text" id="multipleChoiceOtherAnswerText" value="Other" style="width: 97%" />
-                                <p>***Put the text validation options here***</p>
+                            <div id="wholeNumberMaxSection">
+                                <label id="lblWholeNumberMax" for="wholeNumberMax" class="boldLabel">Maximum:</label>
+                                <input type="text" id="txtWholeNumberMax" style="width: 160px" maxlength="19" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decimal Number Section -->
+                    <div id="decimalNumberSection">
+                        <br />
+                        <label for="decimalPlaces" class="boldLabel">Number of Decimal Places:</label>
+                        <select id="decimalPlaces" style="width: 50px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <div class="well well-small">
+                            <label for="decimalNumberValidation" class="boldLabel">Validation:</label>
+                            <select id="decimalNumberValidation" onchange="showHideDecimalNumberValidation()">
+                                <option value="none" selected>None</option>
+                                <option value="setMin">Set minimum</option>
+                                <option value="setMax">Set maximum</option>
+                                <option value="setMinMax">Set minimum & maximum</option>
+                            </select>
+                            <div id="decimalNumberMinSection">
+                                <label id="lblDecimalNumberMin" for="decimalNumberMin" class="boldLabel">Minimum:</label>
+                                <input type="text" id="txtDecimalNumberMin" style="width: 160px" maxlength="20" />
+                            </div>
+                            <div id="decimalNumberMaxSection">
+                                <label id="lblDecimalNumberMax" for="decimalNumberMax" class="boldLabel">Maximum:</label>
+                                <input type="text" id="txtDecimalNumberMax" style="width: 160px" maxlength="19" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date Section -->
+                    <!--                    <div id="dateSection" class="well well-small">
+                                            <span>Date Section</span>
+                                        </div>-->
+
+                    <!-- Multiple Choice Section -->
+                    <div id="multipleChoiceSection">
+                        <div id="multipleChoiceAmountSection">
+                            <label for="multipleChoiceAmount" class="boldLabel">Number of answers the user may select:</label>
+                            <select id="multipleChoiceAmount" onchange="showCorrectMultipleChoiceAmount()" style="width: auto">
+                                <option label="1 Answer" value="1"/>
+                                <option label="2 Answers" value="2"/>
+                                <option label="3 Answers" value="2"/>
+                                <option label="4 Answers" value="2"/>
+                                <option label="5 Answers" value="2"/>
+                                <option label="6 Answers" value="2"/>
+                                <option label="7 Answers" value="2"/>
+                                <option label="8 Answers" value="2"/>
+                                <option label="9 Answers" value="2"/>
+                                <option label="10 Answers" value="2"/>
+                                <option label="Unlimited Answers" value="unlimited"/>
+                            </select>
+                        </div>
+                        <div id="multipleChoiceTypeSection">
+                            <label id="multipleChoiceDisplayTypeLabel" for="multipleChoiceDisplayType" class="boldLabel">Display Type:</label>
+                            <select id="multipleChoiceDisplayType" onchange="showCorrectMultipleChoice()" style="width: auto">
+                                <option label="Radio Buttons" value="radio"/>
+                                <option label="Drop-down List" value="dropdown"/>
+                            </select>
+                        </div>
+
+                        <div class="well well-small">
+                            <label id="multipleChoiceChoicesLabel" for="multipleChoiceChoice" class="boldLabel">Answer choices:</label>
+                            <input type="text" id="multipleChoiceChoice" style="width: 95%" />
+                            <a id="addChoiceButton" class="btn btn-info pull-right" style="margin-top:3px" onclick="addChoice()">+
+                                <!--                          <i class="icon-white icon-plus"/>-->
+                            </a>
+                            <br />
+                            <select size="5" id="multipleChoiceChoices" style="width: 85%">
+                            </select>
+                            <div class="btn-group" style="float: right">
+                                <a class="btn btn-info" onclick="moveChoiceUp()">&lt;
+                                    <!--                                <i class="icon-arrow-up icon-white" />-->
+                                </a>
+                                <a class="btn btn-info" onclick="moveChoiceDown()">&gt;
+                                    <!--<i class="icon-arrow-down icon-white"/>-->
+                                </a>
+                                <a class="btn btn-danger" onclick="removeChoice()">x
+                                    <!--<i class="icon-remove icon-white"/>-->
+                                </a>
+                            </div>
+                            <div class="well well-small">
+                                <div class="checkbox">
+                                    <label for="multipleChoiceAddOther" class="boldLabel">
+                                        <input type="checkbox" id="multipleChoiceAddOther" onchange="showHideMultipleChoiceFieldOther()"/>
+                                        <span>Add "Other" choice (with textbox)</span>
+                                    </label>
+                                </div>
+                                <div id="multipleChoiceAddOtherFieldSection">
+                                    <label id="multipleChoiceOtherAnswerTextLabel" for="multipleChoiceOtherAnswerText" class="boldLabel">Answer Label:</label>
+                                    <input type="text" id="multipleChoiceOtherAnswerText" value="Other" style="width: 97%" />
+                                    <p>***Put the text validation options here***</p>
+                                </div>
                             </div>
                         </div>
                     </div>

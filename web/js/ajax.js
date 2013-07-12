@@ -23,6 +23,9 @@ function switchNode(pageIndex, questionIndex) {
             currentNode.removeClass("nodeSelected");
         }
 
+        setSettingsFromJSON(json);
+        currentPageIndex.val(pageIndex);
+        currentQuestionIndex.val(questionIndex);
         if (questionIndex == -1) {
             currentNodeType.val("page");
             showPage();
@@ -32,9 +35,6 @@ function switchNode(pageIndex, questionIndex) {
             currentNodeType.val("question");
             currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
         }
-        setSettingsFromJSON(json);
-        currentPageIndex.val(pageIndex);
-        currentQuestionIndex.val(questionIndex);
         currentNode.addClass("nodeSelected");
         currentNode.attr('href', "javascript:doNothing()");
     });
@@ -45,23 +45,78 @@ function getSettingsJSON() {
 
     json.questionText = $("#questionText").val();
     json.isRequired = $("#isRequired").is(':checked');
-    json.errorMessage = $("#requiredErrorMessage").text();
     json.questionType = $("#questionType").val();
     switch (json.questionType) {
         case "text":
             json.min = $("#textValidateSpecificLengthMin").val();
             json.max = $("#textValidateSpecificLengthMax").val();
-            json.validationErrorMessage = $("#textValidateErrorMessage").text();
             json.validCharacters = getValidCharacters();
             break;
         case "wholeNumber":
+            json.min = $("#txtWholeNumberMin").val();
+            json.max = $("#txtWholeNumberMax").val();
+            json.validationType = $("#wholeNumberValidation").val();
             break;
         case "decimalNumber":
+            json.decimalPlaces = $("#decimalPlaces").val();
+            json.min = $("#txtDecimalNumberMin").val();
+            json.max = $("#txtDecimalNumberMax").val();
+            json.validationType = $("#decimalNumberValidation").val();
             break;
 
     }
 
     return JSON.stringify(json);
+}
+
+function setSettingsFromJSON(json) {
+    clearAllFields();
+    $("#questionText").val(json.questionText);
+    $("#isRequired").prop('checked', json.isRequired);
+    $("#questionType").val(json.questionType).attr('selected', 'selected');
+    switch (json.questionType) {
+        case "text":
+            $("#textValidateSpecificLengthMin").val(json.min);
+            $("#textValidateSpecificLengthMax").val(json.max);
+            $("#textValidateErrorMessage").text(json.validationErrorMessage);
+            setValidCharacters(json.validCharacters);
+            break;
+        case "wholeNumber":
+            $("#txtWholeNumberMin").val(json.min);
+            $("#txtWholeNumberMax").val(json.max);
+            $("#wholeNumberValidation").val(json.validationType);
+            break;
+        case "decimalNumber":
+            $("#decimalPlaces").val(json.decimalPlaces);
+            $("#txtDecimalNumberMin").val(json.min);
+            $("#txtDecimalNumberMax").val(json.max);
+            $("#decimalNumberValidation").val(json.validationType);
+            break;
+
+    }
+
+}
+
+function clearAllFields() {
+    $("#questionText").val("");
+    $("#isRequired").prop('checked', false);
+    $("#questionType").val("none").attr('selected', 'selected');
+
+    //text section
+    $("#textValidateSpecificLengthMin").val("");
+    $("#textValidateSpecificLengthMax").val("");
+    setValidCharacters("default");
+
+    //whole number section
+    $("#txtWholeNumberMin").val("");
+    $("#txtWholeNumberMax").val("");
+    $("#wholeNumberValidation").val("");
+
+    //decimal section
+    $("#decimalPlaces").val("1");
+    $("#txtDecimalNumberMin").val("");
+    $("#txtDecimalNumberMax").val("");
+    $("#decimalNumberValidation").val("");
 }
 
 function getValidCharacters() {
@@ -82,32 +137,19 @@ function getValidCharacters() {
 }
 
 function setValidCharacters(characters) {
-    $("#validCharsUppercase").prop('checked', characters.indexOf("A-Z") != -1);
-    $("#validCharsLowercase").prop('checked', characters.indexOf("a-z") != -1);
-    $("#validCharsDigits").prop('checked', characters.indexOf("0-9") != -1);
-    $("#validCharsSpecial").prop('checked', characters.indexOf(";;;") != -1);
-    $("#validCharsSpecialText").val(characters.substring(characters.indexOf(";;;")));
-}
-
-function setSettingsFromJSON(json) {
-    $("#questionText").val(json.questionText);
-    $("#isRequired").prop('checked', json.isRequired);
-    $("#requiredErrorMessage").text(json.errorMessage);
-    $("#questionType").val(json.questionType).attr('selected', 'selected');
-    switch (json.questionType) {
-        case "text":
-            $("#textValidateSpecificLengthMin").val(json.min);
-            $("#textValidateSpecificLengthMax").val(json.max);
-            $("#textValidateErrorMessage").text(json.validationErrorMessage);
-            setValidCharacters(json.validCharacters);
-            break;
-        case "wholeNumber":
-            break;
-        case "decimalNumber":
-            break;
-
+    if (characters == "default") {
+        $("#validCharsUppercase").prop('checked', true);
+        $("#validCharsLowercase").prop('checked', true);
+        $("#validCharsDigits").prop('checked', true);
+        $("#validCharsSpecial").prop('checked', true);
+        $("#validCharsSpecialText").val("~!@#$%^&*()-_=+|\\[]{};:' \",./?<>");
+    } else {
+        $("#validCharsUppercase").prop('checked', characters.indexOf("A-Z") != -1);
+        $("#validCharsLowercase").prop('checked', characters.indexOf("a-z") != -1);
+        $("#validCharsDigits").prop('checked', characters.indexOf("0-9") != -1);
+        $("#validCharsSpecial").prop('checked', characters.indexOf(";;;") != -1);
+        $("#validCharsSpecialText").val(characters.substring(characters.indexOf(";;;") + 3));
     }
-
 }
 
 function addPage() {

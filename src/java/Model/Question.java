@@ -13,9 +13,9 @@ public class Question implements Serializable {
     public String questionType = "none";//all
     public String min = "";//textbox, whole number, decimal number
     public String max = "";//textbox, whole number, decimal number
-    public String validationErrorMessage = "";//textbox, whole number, decimal number
     public String validCharacters = "";//textbox
     public String decimalPlaces = "";//decimal number
+    public String validationType = "none";//whole number, decimal number
 //    public boolean validateFormat;//textbox
 //    public boolean validateContents;//textbox
 
@@ -23,5 +23,15 @@ public class Question implements Serializable {
         this.name = name;
         this.questionIndex = questionIndex;
         this.pageIndex = pageIndex;
+    }
+
+    public void clearAll() {
+        questionText = "";
+        isRequired = false;
+        min = "";
+        max = "";
+        validCharacters = "";
+        decimalPlaces = "";
+        validationType = "none";
     }
 }
