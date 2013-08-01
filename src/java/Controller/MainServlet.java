@@ -126,6 +126,12 @@ public class MainServlet extends HttpServlet {
                             question.decimalPlaces = o.get("decimalPlaces").toString();
                             question.validationType = o.get("validationType").toString();
                             break;
+                        case "multipleChoice":
+                            question.answerChoices = o.get("answerChoices").toString();
+                            question.displayType = o.get("displayType").toString();
+                            question.otherChoice = o.get("otherChoice").toString();
+                            question.numberOfAnswers = o.get("numberOfAnswers").toString();
+                            question.validationType = o.get("validationType").toString();
                     }
 
                     session.setAttribute("pages", pages);
@@ -138,25 +144,15 @@ public class MainServlet extends HttpServlet {
                     o.put("questionText", question.questionText);
                     o.put("isRequired", question.isRequired);
                     o.put("questionType", question.questionType);
-                    switch (question.questionType) {
-                        case "text":
-                            o.put("min", question.min);
-                            o.put("max", question.max);
-                            o.put("validCharacters", question.validCharacters);
-                            break;
-                        case "wholeNumber":
-                            o.put("min", question.min);
-                            o.put("max", question.max);
-                            o.put("validationType", question.validationType);
-                            break;
-                        case "decimalNumber":
-                            o.put("min", question.min);
-                            o.put("max", question.max);
-                            o.put("decimalPlaces", question.decimalPlaces);
-                            o.put("validationType", question.validationType);
-                            break;
-                    }
-
+                    o.put("min", question.min);
+                    o.put("max", question.max);
+                    o.put("validCharacters", question.validCharacters);
+                    o.put("validationType", question.validationType);
+                    o.put("decimalPlaces", question.decimalPlaces);
+                    o.put("answerChoices", question.answerChoices);
+                    o.put("displayType", question.displayType);
+                    o.put("numberOfAnswers", question.numberOfAnswers);
+                    o.put("otherChoice", question.otherChoice);
 
                     currentNodeType = (questionIndex == -1) ? "page" : "question";
                     response.setContentType("application/json");

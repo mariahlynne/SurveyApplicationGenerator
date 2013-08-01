@@ -6,6 +6,10 @@ ul {
     line-height: 25px !important;
 }
 
+.tree li a {
+    padding: 2px 4px !important;
+}
+
 .tree li a:hover {
     background-image: linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
     background-image: -o-linear-gradient(top, rgb(22,116,133) 18%, rgb(53,156,184) 50%, rgb(22,116,133) 80%);
@@ -33,7 +37,7 @@ ul {
     list-style-type: none;
     position: relative;
     padding: 20px 5px 0px 5px;
-    
+
 }
 .tree li::before {
     content:'';

@@ -42,16 +42,11 @@ function showHideWholeNumberValidation() {
     var type = document.getElementById("wholeNumberValidation").value;
     if (type == "setMin") {
         $("#wholeNumberMinSection").show();
-        $("#wholeNumberErrorMessage").text("The number must be at least <minimum>");
     } else if (type == "setMax") {
         $("#wholeNumberMaxSection").show();
-        $("#wholeNumberErrorMessage").text("The number must be no more than <maximum>");
     } else if (type == "setMinMax") {
         $("#wholeNumberMinSection").show();
         $("#wholeNumberMaxSection").show();
-        $("#wholeNumberErrorMessage").text("The number must be at least <minimum> and no more than <maximum>");
-    } else {
-        $("#wholeNumberErrorMessageSection").hide();
     }
 }
 
@@ -63,17 +58,16 @@ function showHideDecimalNumberValidation() {
     var type = document.getElementById("decimalNumberValidation").value;
     if (type == "setMin") {
         $("#decimalNumberMinSection").show();
-        $("#decimalNumberErrorMessage").text("The number must be at least <minimum>");
     } else if (type == "setMax") {
         $("#decimalNumberMaxSection").show();
-        $("#decimalNumberErrorMessage").text("The number must be no more than <maximum>");
     } else if (type == "setMinMax") {
         $("#decimalNumberMinSection").show();
         $("#decimalNumberMaxSection").show();
-        $("#decimalNumberErrorMessage").text("The number must be at least <minimum> and no more than <maximum>");
-    } else {
-        $("#decimalNumberErrorMessageSection").hide();
     }
+}
+
+function showCorrectMultipleChoice() {
+
 }
 
 function showHideMultipleChoiceFieldOther() {
@@ -81,17 +75,6 @@ function showHideMultipleChoiceFieldOther() {
         $("#multipleChoiceAddOtherFieldSection").show();
     } else {
         $("#multipleChoiceAddOtherFieldSection").hide();
-    }
-}
-
-function showCorrectMultipleChoiceFieldType() {
-    $("#multipleChoiceOtherLineSection").hide();
-    $("#multipleChoiceOtherParagraphSection").hide();
-    var type = document.getElementById('multipleChoiceOtherFieldType').value;
-    if (type == "line") {
-        $("#multipleChoiceOtherLineSection").show();
-    } else {
-        $("#multipleChoiceOtherParagraphSection").show();
     }
 }
 
@@ -165,4 +148,9 @@ function showCorrectMultipleChoiceAmount() {
     } else {
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
     }
+}
+
+function generateApplication() {
+    //calling switch node will effectively save the node they're currently on - all others will already be saved
+    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
 }

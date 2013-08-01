@@ -15,7 +15,11 @@ public class Question implements Serializable {
     public String max = "";//textbox, whole number, decimal number
     public String validCharacters = "";//textbox
     public String decimalPlaces = "";//decimal number
-    public String validationType = "none";//whole number, decimal number
+    public String validationType = "none";//whole number, decimal number, multiple choice with other
+    public String answerChoices = "";//multiple choice
+    public String otherChoice = "";//multiple choice
+    public String displayType = "radioButtons";//multiple choice
+    public String numberOfAnswers = "1";//multiple choice
 //    public boolean validateFormat;//textbox
 //    public boolean validateContents;//textbox
 
@@ -33,5 +37,9 @@ public class Question implements Serializable {
         validCharacters = "";
         decimalPlaces = "";
         validationType = "none";
+        answerChoices = "";
+        otherChoice = "";
+        displayType = "radioButtons";
+        numberOfAnswers = "1";
     }
 }

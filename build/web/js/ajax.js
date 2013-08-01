@@ -63,7 +63,17 @@ function getSettingsJSON() {
             json.max = $("#txtDecimalNumberMax").val();
             json.validationType = $("#decimalNumberValidation").val();
             break;
-
+        case "multipleChoice":
+            json.numberOfAnswers = $("#multipleChoiceAmount").val();
+            json.displayType = $("#multipleChoiceDisplayType").val();
+            json.answerChoices = "";
+            if ($("#multipleChoiceAddOther").is(":checked")) {
+                json.otherChoice = $("#multipleChoiceOtherAnswerText").val();
+            } else {
+                json.otherChoice = "";
+            }
+            json.validationType = "";
+            break;
     }
 
     return JSON.stringify(json);
@@ -92,7 +102,18 @@ function setSettingsFromJSON(json) {
             $("#txtDecimalNumberMax").val(json.max);
             $("#decimalNumberValidation").val(json.validationType);
             break;
-
+        case "multipleChoice":
+            $("#multipleChoiceAmount").val(json.numberOfAnswers);
+            $("#multipleChoiceDisplayType").val(json.displayType);
+            json.answerChoices = "";
+            if (json.otherChoice == "") {
+                $("#multipleChoiceOtherAnswerText").val("Other");
+                $("#multipleChoiceAddOther").prop('checked', false);
+            } else {
+                $("#multipleChoiceOtherAnswerText").val(json.otherChoice);
+                $("#multipleChoiceAddOther").prop('checked', true);
+            }
+            break;
     }
 
 }
@@ -110,13 +131,19 @@ function clearAllFields() {
     //whole number section
     $("#txtWholeNumberMin").val("");
     $("#txtWholeNumberMax").val("");
-    $("#wholeNumberValidation").val("");
+    $("#wholeNumberValidation").val("none");
 
     //decimal section
     $("#decimalPlaces").val("1");
     $("#txtDecimalNumberMin").val("");
     $("#txtDecimalNumberMax").val("");
-    $("#decimalNumberValidation").val("");
+    $("#decimalNumberValidation").val("none");
+
+    //multiple choice section
+    $("#multipleChoiceChoice").val("");
+    $("#multipleChoiceAmount").val("1");
+    showCorrectMultipleChoiceAmount();
+    $("#multipleChoiceDisplayType").val("radioButtons");
 }
 
 function getValidCharacters() {

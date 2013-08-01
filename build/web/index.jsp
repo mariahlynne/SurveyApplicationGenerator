@@ -33,7 +33,9 @@
     </head>
     <body>
         <header id="primary">
-            <h1>Header</h1>
+            <button type="button" onclick="generateApplication();" style="float: right; height: 30px; margin: 35px;"
+                    class="btn btn-info ">Generate Application</button>
+            <h1 style="width: 500px; float: left;">Header</h1>
         </header>
         <!--Sidebar content-->
         <div id="sidebar">
@@ -79,6 +81,9 @@
         </div>
         <!--Body content-->
         <div id="mainContent" class="well well-small">
+            <div id="errorMessages" style="color: red; font-weight: bold;">
+                
+            </div>
             <div id="pageSection">
                 This will show how all of the questions for this page will appear.
             </div>
@@ -209,20 +214,20 @@
                             <select id="multipleChoiceAmount" onchange="showCorrectMultipleChoiceAmount()" style="width: auto">
                                 <option label="1 Answer" value="1"/>
                                 <option label="2 Answers" value="2"/>
-                                <option label="3 Answers" value="2"/>
-                                <option label="4 Answers" value="2"/>
-                                <option label="5 Answers" value="2"/>
-                                <option label="6 Answers" value="2"/>
-                                <option label="7 Answers" value="2"/>
-                                <option label="8 Answers" value="2"/>
-                                <option label="9 Answers" value="2"/>
-                                <option label="10 Answers" value="2"/>
+                                <option label="3 Answers" value="3"/>
+                                <option label="4 Answers" value="4"/>
+                                <option label="5 Answers" value="5"/>
+                                <option label="6 Answers" value="6"/>
+                                <option label="7 Answers" value="7"/>
+                                <option label="8 Answers" value="8"/>
+                                <option label="9 Answers" value="9"/>
+                                <option label="10 Answers" value="10"/>
                                 <option label="Unlimited Answers" value="unlimited"/>
                             </select>
                         </div>
                         <div id="multipleChoiceTypeSection">
                             <label id="multipleChoiceDisplayTypeLabel" for="multipleChoiceDisplayType" class="boldLabel">Display Type:</label>
-                            <select id="multipleChoiceDisplayType" onchange="showCorrectMultipleChoice()" style="width: auto">
+                            <select id="multipleChoiceDisplayType" style="width: auto">
                                 <option label="Radio Buttons" value="radio"/>
                                 <option label="Drop-down List" value="dropdown"/>
                             </select>
@@ -257,7 +262,7 @@
                                 </div>
                                 <div id="multipleChoiceAddOtherFieldSection">
                                     <label id="multipleChoiceOtherAnswerTextLabel" for="multipleChoiceOtherAnswerText" class="boldLabel">Answer Label:</label>
-                                    <input type="text" id="multipleChoiceOtherAnswerText" value="Other" style="width: 97%" />
+                                    <input type="text" id="multipleChoiceOtherAnswerText" value="Other (please specify)" style="width: 97%" />
                                     <p>***Put the text validation options here***</p>
                                 </div>
                             </div>
