@@ -82,10 +82,11 @@
         <!--Body content-->
         <div id="mainContent" class="well well-small">
             <div id="errorMessages" style="color: red; font-weight: bold;">
-                
+
             </div>
             <div id="pageSection">
                 This will show how all of the questions for this page will appear.
+
             </div>
             <div id="questionSection" style="margin-top: 10px;">
                 <label id="questionTextLabel" for="questionText" class="boldLabel">Question Text:</label>
