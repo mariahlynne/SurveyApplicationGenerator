@@ -108,3 +108,11 @@ header#primary h1 {
     overflow-y: scroll;
     padding: 15px;
 }
+
+[class^="icon-"], [class*=" icon-"]{
+    background:none!important;
+}
+
+.icon {
+    background:none;
+}

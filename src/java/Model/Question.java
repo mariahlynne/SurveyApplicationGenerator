@@ -8,6 +8,7 @@ public class Question implements Serializable {
     public int questionIndex;
     public int pageIndex;
 
+    public String questionName = "";
     public String questionText = "";//all
     public boolean isRequired = false;//all
     public String questionType = "none";//all
@@ -31,6 +32,7 @@ public class Question implements Serializable {
 
     public void clearAll() {
         questionText = "";
+        questionName = "";
         isRequired = false;
         min = "";
         max = "";

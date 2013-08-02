@@ -92,7 +92,7 @@ public class MainServlet extends HttpServlet {
                 break;
             // </editor-fold>
 
-            // <editor-fold defaultstate="collapsed" desc="Switch">
+            // <editor-fold defaultstate="collapsed" desc="Switch Node">
             case "switch":
                 questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
@@ -107,6 +107,7 @@ public class MainServlet extends HttpServlet {
                     JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
                     question.clearAll();
                     question.questionText = o.get("questionText").toString();
+                    question.questionName = o.get("questionName").toString();
                     question.isRequired = (Boolean) o.get("isRequired");
                     question.questionType = o.get("questionType").toString();
                     switch (question.questionType) {
@@ -142,6 +143,7 @@ public class MainServlet extends HttpServlet {
                     question = page.questions.get(questionIndex);
                     JSONObject o = new JSONObject();
                     o.put("questionText", question.questionText);
+                    o.put("questionName", question.questionName);
                     o.put("isRequired", question.isRequired);
                     o.put("questionType", question.questionType);
                     o.put("min", question.min);
@@ -159,9 +161,22 @@ public class MainServlet extends HttpServlet {
                     response.getWriter().write(o.toJSONString());
                 }
                 break;
-        }
 
-        // </editor-fold>
+            // </editor-fold>
+
+            // <editor-fold defaultstate="collapsed" desc="Generate Application">
+
+
+            case "generateApplication":
+                pages = (ArrayList<Page>) session.getAttribute("pages");
+                for (Page p : pages) {
+                    for (Question q : p.questions) {
+
+                    }
+                }
+                break;
+            //</editor-fold>
+        }
     }
 //                jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());
 //                jObject.put("previousPageIndex", new Integer(session.getAttribute("currentPageIndex").toString()));

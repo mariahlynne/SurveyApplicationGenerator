@@ -23,6 +23,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Survey Application Designer</title>
         <link type="text/css" rel="stylesheet" href="css/bootstrap.css"/>
+        <link type="text/css" rel="stylesheet" href="css/font-awesome.css"/>
         <link type="text/css" rel="stylesheet" href="css/main.css"/>
         <link type="text/css" rel="stylesheet" href="css/tree.css"/>
         <script type="text/javascript" src="js/jquery-1.10.1.js"></script>
@@ -91,6 +92,10 @@
             <div id="questionSection" style="margin-top: 10px;">
                 <label id="questionTextLabel" for="questionText" class="boldLabel">Question Text:</label>
                 <textarea id="questionText" rows="3" style="width: 97%"></textarea>
+                <br /><br />
+                <label id="questionNameLabel" for="questionName" class="boldLabel">Question Name:</label>
+                <input id="questionName" type="text" maxlength="50" />
+                <i class="icon-question-sign icon-2x" style="color: #424242" title="The question name will be the name of the column in the database table so it should be a short reminder of what question was asked. It will not be displayed on the screen and it must be alphanumeric."></i>
                 <br /><br />
                 <div class="checkbox">
                     <label for="isRequired" class="boldLabel">
@@ -236,24 +241,24 @@
 
                         <div class="well well-small">
                             <label id="multipleChoiceChoicesLabel" for="multipleChoiceChoice" class="boldLabel">Answer choices:</label>
-                            <input type="text" id="multipleChoiceChoice" style="width: 95%" />
-                            <a id="addChoiceButton" class="btn btn-info pull-right" style="margin-top:3px" onclick="addChoice()">+
-                                <!--                          <i class="icon-white icon-plus"/>-->
-                            </a>
+                            <input type="text" id="multipleChoiceChoice" style="width: 94%" />
+                            <button type="button" id="addChoiceButton" class="btn btn-info pull-right" style="margin-top:3px" onclick="addChoice()">
+                                <i class="icon-plus" style="color: white;"></i>
+                            </button>
                             <br />
                             <select size="5" id="multipleChoiceChoices" style="width: 85%">
-                            </select>
-                            <div class="btn-group" style="float: right">
-                                <a class="btn btn-info" onclick="moveChoiceUp()">&lt;
-                                    <!--                                <i class="icon-arrow-up icon-white" />-->
-                                </a>
-                                <a class="btn btn-info" onclick="moveChoiceDown()">&gt;
-                                    <!--<i class="icon-arrow-down icon-white"/>-->
-                                </a>
-                                <a class="btn btn-danger" onclick="removeChoice()">x
-                                    <!--<i class="icon-remove icon-white"/>-->
-                                </a>
-                            </div>
+                            </select><br />
+                            <div class="btn-group" style="float: left; clear: both;">
+                                <button type="button" class="btn btn-info" onclick="moveChoiceUp()">
+                                    <i class="icon-arrow-up" style="color: white;"></i>
+                                </button>
+                                <button type="button" class="btn btn-info" onclick="moveChoiceDown()">
+                                    <i class="icon-arrow-down" style="color: white;"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="removeChoice()">
+                                    <i class="icon-remove" style="color: white;"></i>
+                                </button>
+                            </div><br /><br /><br />
                             <div class="well well-small">
                                 <div class="checkbox">
                                     <label for="multipleChoiceAddOther" class="boldLabel">

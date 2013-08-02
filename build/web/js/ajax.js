@@ -43,6 +43,7 @@ function switchNode(pageIndex, questionIndex) {
 function getSettingsJSON() {
     var json = new Object();
 
+    json.questionName = $("#questionName").val();
     json.questionText = $("#questionText").val();
     json.isRequired = $("#isRequired").is(':checked');
     json.questionType = $("#questionType").val();
@@ -81,6 +82,7 @@ function getSettingsJSON() {
 
 function setSettingsFromJSON(json) {
     clearAllFields();
+    $("#questionName").val(json.questionName);
     $("#questionText").val(json.questionText);
     $("#isRequired").prop('checked', json.isRequired);
     $("#questionType").val(json.questionType).attr('selected', 'selected');
