@@ -68,6 +68,10 @@ function getSettingsJSON() {
             json.numberOfAnswers = $("#multipleChoiceAmount").val();
             json.displayType = $("#multipleChoiceDisplayType").val();
             json.answerChoices = "";
+            $("#multipleChoiceChoices option").each(function()
+            {
+                json.answerChoices += $(this).val() + ";;";
+            });
             if ($("#multipleChoiceAddOther").is(":checked")) {
                 json.otherChoice = $("#multipleChoiceOtherAnswerText").val();
             } else {
@@ -106,8 +110,15 @@ function setSettingsFromJSON(json) {
             break;
         case "multipleChoice":
             $("#multipleChoiceAmount").val(json.numberOfAnswers);
+            showCorrectMultipleChoiceAmount();
             $("#multipleChoiceDisplayType").val(json.displayType);
-            json.answerChoices = "";
+            var answers = json.answerChoices.split(";;");
+            var choices = document.getElementById('multipleChoiceChoices');
+            for (var i = 0; i < answers.length; i++) {
+                if (answers[i] != "") {
+                    choices.options[choices.options.length] = new Option(answers[i], answers[i]);
+                }
+            }
             if (json.otherChoice == "") {
                 $("#multipleChoiceOtherAnswerText").val("Other");
                 $("#multipleChoiceAddOther").prop('checked', false);
@@ -144,6 +155,7 @@ function clearAllFields() {
     //multiple choice section
     $("#multipleChoiceChoice").val("");
     $("#multipleChoiceAmount").val("1");
+    $("#multipleChoiceChoices").html("");
     showCorrectMultipleChoiceAmount();
     $("#multipleChoiceDisplayType").val("radioButtons");
 }

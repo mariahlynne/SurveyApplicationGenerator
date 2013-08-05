@@ -1,5 +1,6 @@
 package Controller;
 
+import Model.CodeGenerator;
 import Model.Page;
 import Model.Question;
 import java.io.IOException;
@@ -166,12 +167,24 @@ public class MainServlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Generate Application">
 
-
             case "generateApplication":
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 for (Page p : pages) {
                     for (Question q : p.questions) {
-
+                        switch (q.questionType) {
+                            case "text":
+                                System.out.println(CodeGenerator.getTextBoxCode(q.questionName, Integer.parseInt(q.max)));
+                                break;
+                            case "multipleChoice":
+                                ArrayList<String> answers = new ArrayList<String>();
+                                for (String answer : q.answerChoices.split(";;")) {
+                                    if (!answer.equals("")) {
+                                        answers.add(answer);
+                                    }
+                                }
+                                System.out.println(CodeGenerator.getMultipleChoiceCode(answers, q.questionName, q.displayType));
+                                break;
+                        }
                     }
                 }
                 break;

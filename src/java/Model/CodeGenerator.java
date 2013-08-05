@@ -8,7 +8,7 @@ public class CodeGenerator {
     public static String getMultipleChoiceCode(ArrayList<String> answers, String id, String type) {
         //incorporate the "other" answer & its validation
         String result = "";
-        switch (result) {
+        switch (type) {
             case "radio":
                 result += getRadioButtonListCode(answers, id);
                 break;
@@ -25,22 +25,22 @@ public class CodeGenerator {
     public static String getRadioButtonListCode(ArrayList<String> answers, String id) {
         String result = "";
         for (String answer : answers) {
-            result += "<div class=\"radio\">"
-                    + "    <label>"
-                    + "        <input type=\"radio\" name=\"" + id + "\" value=\"" + answer + "\">"
-                    + answer
-                    + "      </label>"
-                    + "</div>";
+            result += "<div class=\"radio\">\n"
+                    + "    <label>\n"
+                    + "        <input type=\"radio\" name=\"" + id + "\" value=\"" + answer + "\">\n"
+                    + answer + "\n"
+                    + "      </label>\n"
+                    + "</div>\n";
         }
         return result;
     }
 
     public static String getDropDownListCode(ArrayList<String> answers, String id) {
-        String result = "<select class=\"form-control\" id=\"" + id + "\">";
+        String result = "<select class=\"form-control\" id=\"" + id + "\">\n";
         for (String answer : answers) {
-            result += "<option>" + answer + "</option>";
+            result += "<option>" + answer + "</option>\n";
         }
-        result += "</select>";
+        result += "</select>\n";
         return result;
     }
 
@@ -48,23 +48,23 @@ public class CodeGenerator {
         String result = "";
         int ndx = 0;
         for (String answer : answers) {
-            result += "<div class=\"checkbox\">"
-                    + "    <label>"
-                    + "        <input type=\"checkbox\" id=\"" + ndx++ + "\" value=\"" + answer + "\">"
-                    + answer
-                    + "    </label>"
-                    + "</div>";
+            result += "<div class=\"checkbox\">\n"
+                    + "    <label>\n"
+                    + "        <input type=\"checkbox\" id=\"" + ndx++ + "\" value=\"" + answer + "\">\n"
+                    + answer + "\n"
+                    + "    </label>\n"
+                    + "</div>\n";
         }
         return result;
     }
 
-    public static String getTextBoxCode(String id) {
-        String result = "<input type=\"text\" id=\"" + id + "\" class=\"form-control\">";
+    public static String getTextBoxCode(String id, int maxlength) {
+        String result = "<input type=\"text\" id=\"" + id + "\" class=\"form-control\" maxlength=\"" + maxlength + "\">\n";
         return result;
     }
 
     public static String getTextAreaCode(String id) {
-        String result = "<textarea id=\"" + id + "\" class=\"form-control\" rows=\"3\"></textarea>";
+        String result = "<textarea id=\"" + id + "\" class=\"form-control\" rows=\"3\"></textarea>\n";
         return result;
     }
     // </editor-fold>

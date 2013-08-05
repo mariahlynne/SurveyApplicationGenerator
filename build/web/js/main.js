@@ -116,7 +116,7 @@ function removeChoice() {
 function addChoice() {
     var choices = document.getElementById('multipleChoiceChoices');
     var newChoice = document.getElementById('multipleChoiceChoice').value;
-    choices.options[choices.options.length] = new Option(newChoice, '1');
+    choices.options[choices.options.length] = new Option(newChoice, newChoice);
     document.getElementById('multipleChoiceChoice').value = "";
     document.getElementById('multipleChoiceChoice').focus();
 }
@@ -152,5 +152,10 @@ function showCorrectMultipleChoiceAmount() {
 
 function generateApplication() {
     //calling switch node will effectively save the node they're currently on - all others will already be saved
+    debugger;
     switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    $.post('MainServlet', {
+        func:"generateApplication"
+    }, function() {
+        });
 }
