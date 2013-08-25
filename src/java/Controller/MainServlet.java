@@ -1,8 +1,10 @@
 package Controller;
 
-import Model.CodeGenerator;
+import Model.CodeGen;
 import Model.Page;
 import Model.Question;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ public class MainServlet extends HttpServlet {
         int count;
         Page page;
         Question question;
-        String currentNodeType;
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
             case "addPage":
@@ -157,7 +158,6 @@ public class MainServlet extends HttpServlet {
                     o.put("numberOfAnswers", question.numberOfAnswers);
                     o.put("otherChoice", question.otherChoice);
 
-                    currentNodeType = (questionIndex == -1) ? "page" : "question";
                     response.setContentType("application/json");
                     response.getWriter().write(o.toJSONString());
                 }
@@ -168,12 +168,56 @@ public class MainServlet extends HttpServlet {
             // <editor-fold defaultstate="collapsed" desc="Generate Application">
 
             case "generateApplication":
+                String javascript = "";
+                int pageCount = 1;
+                int questionCount = 1;
                 pages = (ArrayList<Page>) session.getAttribute("pages");
+                BufferedWriter bw;
+                CodeGen body;
+                CodeGen partialJS;
                 for (Page p : pages) {
+                    body = new CodeGen();
+                    partialJS = new CodeGen();
+                    body.addLine(CodeGen.DIR.S, "<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\n");
+                    body.addLine(CodeGen.DIR.S, "<!DOCTYPE html>\n");
+                    body.addLine(CodeGen.DIR.S, "<html>\n");
+                    body.addLine(CodeGen.DIR.F, "<head>\n");
+                    body.addLine(CodeGen.DIR.F, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
+                    body.addLine(CodeGen.DIR.S, "<title>Generated Survey</title>\n");
+                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/bootstrap.css\"/>\n");
+                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/font-awesome.css\"/>\n");
+                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/main.css\"/>\n");
+                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/jquery-1.10.1.js\"></script>\n");
+                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/bootstrap.js\"></script>\n");
+                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/static.js\"></script>\n");
+                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/main.js\"></script>\n");
+                    body.addLine(CodeGen.DIR.B, "</head>\n");
+                    body.addLine(CodeGen.DIR.S, "<body>\n");
+                    body.addLine(CodeGen.DIR.F, "<header id=\"primary\">\n");
+                    body.addLine(CodeGen.DIR.F, "<h1>\n");
+                    body.addLine(CodeGen.DIR.F, "Survey Title\n");
+                    body.addLine(CodeGen.DIR.B, "</h1>\n");
+                    body.addLine(CodeGen.DIR.B, "</header>\n");
+                    body.addLine(CodeGen.DIR.S, "<form action=\"Servlet?Page=Page" + pageCount + "\" id=\"form\" onsubmit=\"return validatePage" + pageCount + "()\" method=\"POST\">\n");
+                    partialJS.addLine(CodeGen.DIR.S, "function validatePage" + pageCount + "() {\n");
+                    partialJS.addLine(CodeGen.DIR.F, "var result = true;\n");
+                    body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
+                    body.spaceCount += 4;
                     for (Question q : p.questions) {
+                        body.addLine(CodeGen.DIR.S, "<tr>\n");
+                        body.addLine(CodeGen.DIR.F, "<td>\n");
+                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionName + "ErrorMessage\" class=\"errorText\"></p>\n");
+                        body.addLine(CodeGen.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.questionText + "</span>\n");
+                        body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
+                        body.spaceCount += 4;
+                        if (q.isRequired) {
+                            partialJS.addLine(CodeGen.DIR.S, "result = isNotEmpty('" + q.questionName + "', '" + q.questionType + "') && result;\n");
+                        }
                         switch (q.questionType) {
                             case "text":
-                                System.out.println(CodeGenerator.getTextBoxCode(q.questionName, Integer.parseInt(q.max)));
+                                body.getTextBoxCode(q.questionName, Integer.parseInt(q.max));
+                                partialJS.addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                //todo validate that there are no invalid characters
                                 break;
                             case "multipleChoice":
                                 ArrayList<String> answers = new ArrayList<String>();
@@ -182,11 +226,67 @@ public class MainServlet extends HttpServlet {
                                         answers.add(answer);
                                     }
                                 }
-                                System.out.println(CodeGenerator.getMultipleChoiceCode(answers, q.questionName, q.displayType));
+                                body.getMultipleChoiceCode(answers, q.questionName, q.displayType);
+                                break;
+                            case "wholeNumber":
+                                body.getWholeNumberCode(q.questionName);
+                                switch (q.validationType) {
+                                    case "min":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', " + q.min + ", '') && result;\n");
+                                        break;
+                                    case "max":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', '', " + q.max + ") && result;\n");
+                                        break;
+                                    case "minMax":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                        break;
+                                }
+                                break;
+                            case "decimalNumber":
+                                body.getDecimalNumberCode(q.questionName, Integer.parseInt(q.decimalPlaces));
+                                switch (q.validationType) {
+                                    case "min":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', " + q.min + ", '') && result;\n");
+                                        break;
+                                    case "max":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', '', " + q.max + ") && result;\n");
+                                        break;
+                                    case "minMax":
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                        break;
+                                }
                                 break;
                         }
+                        body.addLine(CodeGen.DIR.B, "</div>\n");
+                        body.addLine(CodeGen.DIR.B, "</td>\n");
+                        body.addLine(CodeGen.DIR.B, "</tr>\n");
                     }
+                    partialJS.addLine(CodeGen.DIR.S, "return result;\n");
+                    partialJS.addLine(CodeGen.DIR.B, "}\n");
+                    javascript += partialJS.code + "\n";
+                    body.addLine(CodeGen.DIR.S, "<tr>\n");
+                    body.addLine(CodeGen.DIR.F, "<td align=\"center\">\n");
+                    if (pageCount < pages.size()) {
+                        body.addLine(CodeGen.DIR.F, "<button id=\"nextButton\" type=\"submit\" class=\"btn btn-info\">Next</button>\n");
+                    } else {
+                        body.addLine(CodeGen.DIR.F, "<button id=\"submitButton\" type=\"submit\" class=\"btn btn-info\">Submit</button>\n");
+                    }
+                    body.addLine(CodeGen.DIR.B, "</td>\n");
+                    body.addLine(CodeGen.DIR.B, "</tr>\n");
+                    body.addLine(CodeGen.DIR.B, "</table>\n");
+                    body.addLine(CodeGen.DIR.B, "</form>\n");
+                    body.addLine(CodeGen.DIR.B, "</body>\n");
+                    body.addLine(CodeGen.DIR.B, "</html>");
+                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\Page" + pageCount + ".jsp"));
+                    bw.write(body.code);
+                    bw.flush();
+                    bw.close();
+                    pageCount++;
                 }
+                bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\javascript.txt"));
+                bw.write(javascript);
+                bw.flush();
+                bw.close();
                 break;
             //</editor-fold>
         }
