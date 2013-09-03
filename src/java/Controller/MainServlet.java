@@ -31,6 +31,9 @@ public class MainServlet extends HttpServlet {
         int count;
         Page page;
         Question question;
+        int currentQuestionIndex;
+        int currentPageIndex;
+
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
             case "addPage":
@@ -98,8 +101,8 @@ public class MainServlet extends HttpServlet {
             case "switch":
                 questionIndex = Integer.parseInt(request.getParameter("questionIndex"));
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
-                int currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
-                int currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
+                currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
+                currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
                 pages = (ArrayList<Page>) session.getAttribute("pages");
 
                 if (currentQuestionIndex != -1) {
@@ -109,7 +112,7 @@ public class MainServlet extends HttpServlet {
                     JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
                     question.clearAll();
                     question.questionText = o.get("questionText").toString();
-                    question.questionName = o.get("questionName").toString();
+                    question.questionID = o.get("questionName").toString();
                     question.isRequired = (Boolean) o.get("isRequired");
                     question.questionType = o.get("questionType").toString();
                     switch (question.questionType) {
@@ -145,7 +148,7 @@ public class MainServlet extends HttpServlet {
                     question = page.questions.get(questionIndex);
                     JSONObject o = new JSONObject();
                     o.put("questionText", question.questionText);
-                    o.put("questionName", question.questionName);
+                    o.put("questionName", question.questionID);
                     o.put("isRequired", question.isRequired);
                     o.put("questionType", question.questionType);
                     o.put("min", question.min);
@@ -165,12 +168,161 @@ public class MainServlet extends HttpServlet {
 
             // </editor-fold>
 
+            // <editor-fold defaultstate="collapsed" desc="Validate">
+            case "validate":
+                pages = (ArrayList<Page>) session.getAttribute("pages");
+                currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
+                currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
+                System.out.println(currentPageIndex + "," + currentQuestionIndex);
+                String invalidNodes = "";
+                String errorMessage = "";
+                JSONObject o = new JSONObject();
+                for (Page p : pages) {
+                    for (Question q : p.questions) {
+                        if (q.questionText.trim().length() == 0) {
+                            errorMessage += "<li>Question Text is required</li>";
+                        }
+                        if (q.questionID.trim().length() == 0) {
+                            errorMessage += "<li>Question ID is required</li>";
+                        } else if (!q.questionID.matches("^[a-zA-Z0-9_]+$")) {
+                            errorMessage += "<li>Question ID can only contain letters, digits, and underscores</li>";
+                        }
+                        switch (q.questionType) {
+                            case "none":
+                                errorMessage += "<li>Question Type is required</li>";
+                                break;
+                            case "text":
+                                if (q.min.length() == 0) {
+                                    errorMessage += "<li>Character minimum is required</li>";
+                                } else if (!q.min.matches("^[0-9]+$")) {
+                                    errorMessage += "<li>Character minimum must be a whole number</li>";
+                                }
+                                if (q.max.length() == 0) {
+                                    errorMessage += "<li>Character maximum is required</li>";
+                                } else if (!q.max.matches("^[0-9]+$")) {
+                                    errorMessage += "<li>Character maximum must be a whole number</li>";
+                                }
+                                try {
+                                    if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
+                                        errorMessage += "<li>Character minimum cannot be less than character maximum</li>";
+                                    } else if (Integer.parseInt(q.max) == 0) {
+                                        errorMessage += "<li>Character maximum must be greater than 0</li>";
+                                    }
+                                } catch (Exception ex) {
+                                }
+                                //TODO characters allowed validation
+                                break;
+                            case "wholeNumber":
+                                switch (q.validationType) {
+                                    case "none":
+                                        break;
+                                    case "setMin":
+                                        if (q.min.length() == 0) {
+                                            errorMessage += "<li>Minimum is required</li>";
+                                        } else if (!q.min.matches("^[0-9]+$")) {
+                                            errorMessage += "<li>Minimum must be a whole number</li>";
+                                        }
+
+                                        break;
+                                    case "setMax":
+                                        if (q.max.length() == 0) {
+                                            errorMessage += "<li>Maximum is required</li>";
+                                        } else if (!q.max.matches("^[0-9]+$")) {
+                                            errorMessage += "<li>Maximum must be a whole number</li>";
+                                        }
+                                        try {
+                                            if (Integer.parseInt(q.max) == 0) {
+                                                errorMessage += "<li>Maximum must be greater than 0</li>";
+                                            }
+                                        } catch (Exception ex) {
+                                        }
+                                        break;
+                                    case "setMinMax":
+                                        if (q.min.length() == 0) {
+                                            errorMessage += "<li>Minimum is required</li>";
+                                        } else if (!q.min.matches("^[0-9]+$")) {
+                                            errorMessage += "<li>Minimum must be a whole number</li>";
+                                        }
+                                        if (q.max.length() == 0) {
+                                            errorMessage += "<li>Maximum is required</li>";
+                                        } else if (!q.max.matches("^[0-9]+$")) {
+                                            errorMessage += "<li>Maximum must be a whole number</li>";
+                                        }
+                                        try {
+                                            if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
+                                                errorMessage += "<li>Minimum cannot be less than maximum</li>";
+                                            }
+                                        } catch (Exception ex) {
+                                        }
+                                        break;
+                                }
+                                break;
+                            case "decimalNumber":
+                                switch (q.validationType) {
+                                    case "none":
+                                        break;
+                                    case "setMin":
+                                        if (q.min.length() == 0) {
+                                            errorMessage += "<li>Minimum is required</li>";
+                                        } else if (!q.min.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                            errorMessage += "<li>Minimum must be a decimal number</li>";
+                                        }
+
+                                        break;
+                                    case "setMax":
+                                        if (q.max.length() == 0) {
+                                            errorMessage += "<li>Maximum is required</li>";
+                                        } else if (!q.max.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                            errorMessage += "<li>Maximum must be a decimal number</li>";
+                                        }
+                                        break;
+                                    case "setMinMax":
+                                        if (q.min.length() == 0) {
+                                            errorMessage += "<li>Minimum is required</li>";
+                                        } else if (!q.min.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                            errorMessage += "<li>Minimum must be a decimal number</li>";
+                                        }
+                                        if (q.max.length() == 0) {
+                                            errorMessage += "<li>Maximum is required</li>";
+                                        } else if (!q.max.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                            errorMessage += "<li>Maximum must be a decimal number</li>";
+                                        }
+                                        try {
+                                            if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
+                                                errorMessage += "<li>Minimum cannot be less than maximum</li>";
+                                            }
+                                        } catch (Exception ex) {
+                                        }
+                                        break;
+                                }
+                                break;
+                            case "multipleChoice":
+                                break;
+                        }
+                        if (errorMessage.length() > 0) {
+                            invalidNodes += p.pageIndex + "," + q.questionIndex + ";";
+                            if (currentQuestionIndex == q.questionIndex && currentPageIndex == p.pageIndex) {
+                                o.put("errorMessage", errorMessage);
+
+                            }
+                            errorMessage = "";
+                        }
+                    }
+                }
+
+                o.put("invalidNodes", invalidNodes);
+                response.setContentType("application/json");
+                response.getWriter().write(o.toJSONString());
+                break;
+            // </editor-fold>
+
             // <editor-fold defaultstate="collapsed" desc="Generate Application">
 
             case "generateApplication":
                 String javascript = "";
                 int pageCount = 1;
                 int questionCount = 1;
+                int validationCount = 0;
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 BufferedWriter bw;
                 CodeGen body;
@@ -206,17 +358,21 @@ public class MainServlet extends HttpServlet {
                     for (Question q : p.questions) {
                         body.addLine(CodeGen.DIR.S, "<tr>\n");
                         body.addLine(CodeGen.DIR.F, "<td>\n");
-                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionName + "ErrorMessage\" class=\"errorText\"></p>\n");
+                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionID + "ErrorMessage\" class=\"errorText\"></p>\n");
                         body.addLine(CodeGen.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.questionText + "</span>\n");
                         body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
                         body.spaceCount += 4;
                         if (q.isRequired) {
-                            partialJS.addLine(CodeGen.DIR.S, "result = isNotEmpty('" + q.questionName + "', '" + q.questionType + "') && result;\n");
+                            validationCount++;
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "');\n");
+                            partialJS.addLine(CodeGen.DIR.S, "result = v" + validationCount + " && result;\n");
+                            partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
+                            partialJS.spaceCount += 4;
                         }
                         switch (q.questionType) {
                             case "text":
-                                body.getTextBoxCode(q.questionName, Integer.parseInt(q.max));
-                                partialJS.addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                body.getTextBoxCode(q.questionID, Integer.parseInt(q.max));
+                                partialJS.addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + q.questionID + "', 'text', " + q.min + ", " + q.max + ") && result;\n");
                                 //todo validate that there are no invalid characters
                                 break;
                             case "multipleChoice":
@@ -226,36 +382,39 @@ public class MainServlet extends HttpServlet {
                                         answers.add(answer);
                                     }
                                 }
-                                body.getMultipleChoiceCode(answers, q.questionName, q.displayType);
+                                body.getMultipleChoiceCode(answers, q.questionID, q.displayType);
                                 break;
                             case "wholeNumber":
-                                body.getWholeNumberCode(q.questionName);
+                                body.getWholeNumberCode(q.questionID);
                                 switch (q.validationType) {
                                     case "min":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', " + q.min + ", '') && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
                                         break;
                                     case "max":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', '', " + q.max + ") && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
                                         break;
                                     case "minMax":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
                                         break;
                                 }
                                 break;
                             case "decimalNumber":
-                                body.getDecimalNumberCode(q.questionName, Integer.parseInt(q.decimalPlaces));
+                                body.getDecimalNumberCode(q.questionID, Integer.parseInt(q.decimalPlaces));
                                 switch (q.validationType) {
                                     case "min":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', " + q.min + ", '') && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
                                         break;
                                     case "max":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', '', " + q.max + ") && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
                                         break;
                                     case "minMax":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionName + "', " + q.min + ", " + q.max + ") && result;\n");
+                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
                                         break;
                                 }
                                 break;
+                        }
+                        if (q.isRequired) {
+                            partialJS.addLine(CodeGen.DIR.B, "}\n");
                         }
                         body.addLine(CodeGen.DIR.B, "</div>\n");
                         body.addLine(CodeGen.DIR.B, "</td>\n");

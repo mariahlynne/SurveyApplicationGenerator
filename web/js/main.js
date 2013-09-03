@@ -144,18 +144,10 @@ function showCorrectMultipleChoiceValidationOptions() {
 function showCorrectMultipleChoiceAmount() {
     var type = document.getElementById('multipleChoiceAmount').value;
     if (type == "1") {
+        $("#tooltipMultipleChoiceDefault").show();
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"radio\">Radio Buttons</option><option value=\"dropdown\">Drop-down List</option>"
     } else {
+        $("#tooltipMultipleChoiceDefault").hide();
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
     }
-}
-
-function generateApplication() {
-    //calling switch node will effectively save the node they're currently on - all others will already be saved
-    debugger;
-    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
-    $.post('MainServlet', {
-        func:"generateApplication"
-    }, function() {
-        });
 }

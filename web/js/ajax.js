@@ -37,6 +37,7 @@ function switchNode(pageIndex, questionIndex) {
         }
         currentNode.addClass("nodeSelected");
         currentNode.attr('href', "javascript:doNothing()");
+        validate();
     });
 }
 
@@ -132,6 +133,8 @@ function setSettingsFromJSON(json) {
 }
 
 function clearAllFields() {
+    $("#questionErrorSection").hide();
+
     $("#questionText").val("");
     $("#isRequired").prop('checked', false);
     $("#questionType").val("none").attr('selected', 'selected');
@@ -291,4 +294,54 @@ function removeNode() {
 
 function doNothing() {
 
+}
+
+function generateApplication() {
+    //calling switch node will effectively save the node they're currently on - all others will already be saved
+    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    if (validate()) {
+        $.post('MainServlet', {
+            func:"generateApplication"
+        }, function() {
+            });
+    } else {
+    //show error message
+    }
+}
+
+function validate() {
+    var currentPageIndex = $("#currentPageIndex");
+    var currentQuestionIndex = $("#currentQuestionIndex");
+    $.post("MainServlet", {
+        func:"validate",
+        currentPageIndex:currentPageIndex.val(),
+        currentQuestionIndex:currentQuestionIndex.val()
+    }, function(json) {
+        clearAllErrorIcons();
+        var invalidNodes = json.invalidNodes.split(";");
+        var pages = "";
+        var currentNode;
+        for (var ndx = 0; ndx < invalidNodes.length; ndx++) {
+            if (invalidNodes[ndx].length > 0){
+                var pageIndex = invalidNodes[ndx].split(",")[0];
+                var questionIndex = invalidNodes[ndx].split(",")[1];
+                if (pages.indexOf(pageIndex) == -1) {
+                    currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > a");
+                    currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
+                    pages += pageIndex + ";";
+                }
+                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > ul > li:nth-child(" +
+                    (parseInt(questionIndex) + 1) + ") > a");
+                currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
+            }
+        }
+        if (json.errorMessage.length > 0) {
+            $("#questionErrorMessages").html(json.errorMessage);
+            $("#questionErrorSection").show();
+        }
+    });
+}
+
+function clearAllErrorIcons() {
+    $(".nodeErrorIcon").remove();
 }

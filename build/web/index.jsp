@@ -90,12 +90,31 @@
 
             </div>
             <div id="questionSection" style="margin-top: 10px;">
+                <div id="questionErrorSection" style="width: 60%; margin: 20px auto; background-color: #AAAAAA; color: red; font-weight: bold;">
+                    <table>
+                        <tr>
+                            <td valign="middle">
+                                <i class="icon-warning-sign icon-5x" style="display: inline-block; margin: 7px 10px 0px 10px"></i>
+                            </td>
+                            <td>
+                                <div style="padding: 5px 25px 5px 5px; font-size: 14px;">
+                                    Please correct the following:
+                                    <ul id="questionErrorMessages" style="padding-left: 20px; list-style-type: circle !important; padding-bottom: 0; margin-bottom: 0;">
+                                        <li>Question Text is required</li>
+                                        <li>Question ID is required</li>
+                                        <li>Question Type is required</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
                 <label id="questionTextLabel" for="questionText" class="boldLabel">Question Text:</label>
                 <textarea id="questionText" rows="3" style="width: 97%"></textarea>
                 <br /><br />
-                <label id="questionNameLabel" for="questionName" class="boldLabel">Question Name:</label>
+                <label id="questionNameLabel" for="questionName" class="boldLabel">Question ID:</label>
                 <input id="questionName" type="text" maxlength="50" />
-                <i class="icon-question-sign icon-2x" style="color: #424242" title="The question name will be the name of the column in the database table so it should be a short reminder of what question was asked. It will not be displayed on the screen and it must be alphanumeric."></i>
+                <i class="icon-question-sign icon-2x" style="color: #424242" title="The question ID will be the name of the column in the database table so it should be a short reminder of what question was asked. It will not be displayed on the screen and it must be alphanumeric."></i>
                 <br /><br />
                 <div class="checkbox">
                     <label for="isRequired" class="boldLabel">
@@ -105,7 +124,7 @@
                 </div>
                 <br />
                 <div class="well well-small" id="questionTypeSection">
-                    <label id="questionTypeLabel" for="questionType" class="boldLabel">Type:</label>
+                    <label id="questionTypeLabel" for="questionType" class="boldLabel">Question Type:</label>
                     <select id="questionType" onchange="showCorrectQuestionSettings()" style="width: auto">
                         <option label="Choose Question Type" value="none"/>
                         <option label="Text" value="text"/>
@@ -237,6 +256,7 @@
                                 <option label="Radio Buttons" value="radio"/>
                                 <option label="Drop-down List" value="dropdown"/>
                             </select>
+                            <i id="tooltipMultipleChoiceDefault" class="icon-question-sign icon-2x" style="color: #424242" title="The default answer will be the first answer choice. If you do not want a default answer, add something like '--Select an Option--' as the first answer choice."></i>
                         </div>
 
                         <div class="well well-small">
