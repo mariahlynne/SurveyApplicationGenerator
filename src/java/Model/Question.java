@@ -5,8 +5,7 @@ import java.io.Serializable;
 public class Question implements Serializable {
 
     public String name = "";
-    public int questionIndex;
-    public int pageIndex;
+    public int ID, questionIndex;
 
     public String questionID = "";
     public String questionText = "";//all
@@ -24,10 +23,10 @@ public class Question implements Serializable {
 //    public boolean validateFormat;//textbox
 //    public boolean validateContents;//textbox
 
-    public Question(String name, int pageIndex, int questionIndex) {
+    public Question(int id, String name, int questionIndex) {
+        this.ID = id;
         this.name = name;
         this.questionIndex = questionIndex;
-        this.pageIndex = pageIndex;
     }
 
     public void clearAll() {

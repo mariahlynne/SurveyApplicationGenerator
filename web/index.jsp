@@ -1,3 +1,7 @@
+<%@page import="java.util.Map.Entry"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="Model.DatabaseAccess"%>
 <%@page import="Model.Question"%>
 <%@page import="Model.Page"%>
 <%@page import="java.util.ArrayList"%>
@@ -6,18 +10,25 @@
 <html>
     <%  session = request.getSession(true);
         ArrayList<Page> pages = (ArrayList<Page>) session.getAttribute("pages");
+        boolean bNoProjects = false;
+        ResultSet rs = DatabaseAccess.ListSurveyApplications();
+        HashMap<Integer, String> projects = new HashMap<Integer, String>();
+        while (rs.next()) {
+            projects.put(rs.getInt("iApplicationID"), rs.getString("vchTitle"));
+        }
+        if (projects.size() == 0) {
+            bNoProjects = true;
+        }
         if (pages == null || pages.size() == 0) {
-            //System.out.println("creating pages");
             pages = new ArrayList<Page>();
-            pages.add(new Page("Page 1", 0));
+            Page p = new Page(-1, "Page 1", 0);
+            p.addQuestion(-1, "Question 1", 0);
+            pages.add(p);
             session.setAttribute("pages", pages);
             session.setAttribute("currentNodeType", "question");
             session.setAttribute("currentPageIndex", 0);
             session.setAttribute("currentQuestionIndex", 0);
-        } else {
-            //System.out.println("session persisted, " + pages.size() + " pages");
         }
-
     %>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -35,8 +46,10 @@
     <body>
         <header id="primary">
             <button type="button" onclick="generateApplication();" style="float: right; height: 30px; margin: 35px;"
-                    class="btn btn-info ">Generate Application</button>
-            <h1 style="width: 500px; float: left;">Header</h1>
+                    class="btn btn-info ">Generate Survey</button>
+            <button type="button" onclick="switchApplication(false);" style="float: right; height: 30px; margin: 35px 0px;"
+                    class="btn btn-info ">Switch Project</button>
+            <h1 id="projectName" style="width: 500px; float: left;">My Application</h1>
         </header>
         <!--Sidebar content-->
         <div id="sidebar">
@@ -90,7 +103,7 @@
 
             </div>
             <div id="questionSection" style="margin-top: 10px;">
-                <div id="questionErrorSection" style="width: 60%; margin: 20px auto; background-color: #AAAAAA; color: red; font-weight: bold;">
+                <div id="questionErrorSection" style="width: 60%; margin: 20px auto; background-color: transparent; border: 1px solid red; color: red; font-weight: bold;">
                     <table>
                         <tr>
                             <td valign="middle">
@@ -99,7 +112,7 @@
                             <td>
                                 <div style="padding: 5px 25px 5px 5px; font-size: 14px;">
                                     Please correct the following:
-                                    <ul id="questionErrorMessages" style="padding-left: 20px; list-style-type: circle !important; padding-bottom: 0; margin-bottom: 0;">
+                                    <ul id="questionErrorMessages" style="padding-left: 15px; list-style-type: circle !important; padding-bottom: 0; margin-bottom: 0;">
                                         <li>Question Text is required</li>
                                         <li>Question ID is required</li>
                                         <li>Question Type is required</li>
@@ -297,41 +310,72 @@
                 </div>
             </div>
         </div>
-    </div>
-</body>
-<script>
-    $(document).ready(function() {
-        $("#sidebar").height(Math.max($("#mainContent").height(),$("#sidebar").height()));
-        $("#mainContent").width($("#primary").width() - ($("#sidebar").width() + 40));
-        $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").addClass("nodeSelected");
-        $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").attr('href', "javascript:doNothing()");
-        showQuestion();
-        $(function () {
-            $('.collapsible').on('click', function (e) {
-                var parent = $(this).parent();
-                var children = parent.find('> ul > li');
-                if (children.is(":visible")) {
-                    children.hide('fast');
-                    $(this).removeClass("icon-minus");
-                    $(this).addClass("icon-plus");
-                }
-                else {
-                    children.show('fast');
-                    $(this).removeClass("icon-plus");
-                    $(this).addClass("icon-minus");
-                }
-                e.stopPropagation();
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button id="btnCancelSwitchX" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Select a Project</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>
+                            <input id="rbtnExistingProject" type="radio" name="rbgProjectType" value="existing"/> Existing Project:</label>
+                        <select id="ddlProject" style="margin-left: 15px;">
+                            <% if (!bNoProjects) {%>
+                            <% for (Entry<Integer, String> entry : projects.entrySet()) {%>
+                            <option value="<%= entry.getKey()%>"><%= entry.getValue()%></option>
+                            <%}
+                            } else {%>
+                            <option value="none" selected>None</option>
+                            <%}%>
+                        </select>
+                        <label><input id="rbtnNewProject" type="radio" name="rbgProjectType" value="new"/> New Project:
+                        </label>
+                        <input type="text" id="txtNewProject" maxlength="100" style="margin-left: 15px;" />
+                        <p id="lblSelectProjectError" style="color: red; font-weight: bold; text-align: center; margin: 10px 0;"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="btnSelectProject" type="button" class="btn btn-primary" onclick="selectProject()">Select Project</button>
+                        <button id="btnCancelSwitch" type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </body>
+    <script>
+        $(document).ready(function() {
+            $("#sidebar").height(Math.max($("#mainContent").height(),$("#sidebar").height()));
+            $("#mainContent").width($("#primary").width() - ($("#sidebar").width() + 40));
+            $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").addClass("nodeSelected");
+            $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").attr('href', "javascript:doNothing()");
+            showQuestion();
+            $(function () {
+                $('.collapsible').on('click', function (e) {
+                    var parent = $(this).parent();
+                    var children = parent.find('> ul > li');
+                    if (children.is(":visible")) {
+                        children.hide('fast');
+                        $(this).removeClass("icon-minus");
+                        $(this).addClass("icon-plus");
+                    }
+                    else {
+                        children.show('fast');
+                        $(this).removeClass("icon-plus");
+                        $(this).addClass("icon-minus");
+                    }
+                    e.stopPropagation();
+                });
             });
+            showCorrectQuestionSettings();
+            showHideMultipleChoiceFieldOther();
+            $("#multipleChoiceChoice").keypress(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    $("#addChoiceButton").click();
+                }
+            });
+            switchApplication(true, <%= bNoProjects %>);
         });
-        showCorrectQuestionSettings();
-        showHideMultipleChoiceFieldOther();
-        $("#multipleChoiceChoice").keypress(function (event) {
-            if (event.keyCode == 13) {
-                event.preventDefault();
-                $("#addChoiceButton").click();
-            }
-        });
-
-    });
-</script>
+    </script>
 </html>

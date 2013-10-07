@@ -1,3 +1,41 @@
+function switchProject(projectID, title) {
+    //calling switch node will effectively save the node they're currently on - all others will already be saved
+    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    $.post("MainServlet", {
+        func:"switchProject",
+        projectID:projectID,
+        title:title
+    }, function(json) {
+        //        var currentNode;
+        //        if (currentNodeType.val() == "page") {
+        //            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
+        //            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
+        //            currentNode.removeClass("nodeSelected");
+        //        } else if (currentNodeType.val() == "question") {
+        //            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
+        //                (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
+        //            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
+        //            currentNode.removeClass("nodeSelected");
+        //        }
+        //
+        //        setSettingsFromJSON(json);
+        //        currentPageIndex.val(pageIndex);
+        //        currentQuestionIndex.val(questionIndex);
+        //        if (questionIndex == -1) {
+        //            currentNodeType.val("page");
+        //            showPage();
+        //            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
+        //        } else {
+        //            showQuestion();
+        //            currentNodeType.val("question");
+        //            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
+        //        }
+        //        currentNode.addClass("nodeSelected");
+        //        currentNode.attr('href', "javascript:doNothing()");
+        //        validate();
+        });
+}
+
 function switchNode(pageIndex, questionIndex) {
     var currentNodeType = $("#currentNodeType");
     var currentPageIndex = $("#currentPageIndex");

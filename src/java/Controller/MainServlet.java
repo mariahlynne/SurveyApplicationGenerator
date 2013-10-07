@@ -1,12 +1,15 @@
 package Controller;
 
 import Model.CodeGen;
+import Model.DatabaseAccess;
 import Model.Page;
 import Model.Question;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,21 +28,23 @@ public class MainServlet extends HttpServlet {
         String sFunction = request.getParameter("func");
         PrintWriter out;
         HttpSession session = request.getSession();
-        int pageIndex;
-        int questionIndex;
+        int pageIndex, questionIndex, count, currentQuestionIndex, currentPageIndex, iProjectID, iPageID, iQuestionID;
         ArrayList<Page> pages;
-        int count;
         Page page;
         Question question;
-        int currentQuestionIndex;
-        int currentPageIndex;
+        ResultSet rs;
 
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
             case "addPage":
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 count = pages.size();
-                pages.add(new Page("Page " + count + 1, count));
+                iProjectID = (int) session.getAttribute("iProjectID");
+                iPageID = DatabaseAccess.InsertPage(iProjectID, "Page " + (count + 1), count);
+                page = new Page(iPageID, "Page " + (count + 1), count);
+                iQuestionID = DatabaseAccess.InsertQuestion(iPageID, "Question 1", 0);
+                page.addQuestion(iQuestionID, "Question 1", 0);
+                pages.add(page);
                 session.setAttribute("pages", pages);
                 break;
             // </editor-fold>
@@ -50,7 +55,8 @@ public class MainServlet extends HttpServlet {
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 page = pages.get(pageIndex);
                 count = page.questions.size();
-                page.addQuestion("Question " + (count + 1), count);
+                iQuestionID = DatabaseAccess.InsertQuestion(page.ID, "Question " + (count + 1), count);
+                page.addQuestion(iQuestionID, "Question " + (count + 1), count);
                 session.setAttribute("pages", pages);
                 break;
             // </editor-fold>
@@ -62,8 +68,10 @@ public class MainServlet extends HttpServlet {
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 page = pages.get(pageIndex);
                 if ((questionIndex == -1) || (page.questions.size() == 1)) {
+                    DatabaseAccess.DeletePage(page.ID);
                     pages.remove(pageIndex);
                 } else {
+                    DatabaseAccess.DeleteQuestion(page.getQuestionIDByIndex(questionIndex));
                     page.questions.remove(questionIndex);
                     pages.set(pageIndex, page);
                 }
@@ -108,39 +116,45 @@ public class MainServlet extends HttpServlet {
                 if (currentQuestionIndex != -1) {
                     page = pages.get(currentPageIndex);
                     question = page.questions.get(currentQuestionIndex);
-                    JSONParser p = new JSONParser();
-                    JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
-                    question.clearAll();
-                    question.questionText = o.get("questionText").toString();
-                    question.questionID = o.get("questionName").toString();
-                    question.isRequired = (Boolean) o.get("isRequired");
-                    question.questionType = o.get("questionType").toString();
-                    switch (question.questionType) {
-                        case "text":
-                            question.min = o.get("min").toString();
-                            question.max = o.get("max").toString();
-                            question.validCharacters = o.get("validCharacters").toString();
-                            break;
-                        case "wholeNumber":
-                            question.min = o.get("min").toString();
-                            question.max = o.get("max").toString();
-                            question.validationType = o.get("validationType").toString();
-                            break;
-                        case "decimalNumber":
-                            question.min = o.get("min").toString();
-                            question.max = o.get("max").toString();
-                            question.decimalPlaces = o.get("decimalPlaces").toString();
-                            question.validationType = o.get("validationType").toString();
-                            break;
-                        case "multipleChoice":
-                            question.answerChoices = o.get("answerChoices").toString();
-                            question.displayType = o.get("displayType").toString();
-                            question.otherChoice = o.get("otherChoice").toString();
-                            question.numberOfAnswers = o.get("numberOfAnswers").toString();
-                            question.validationType = o.get("validationType").toString();
+                    if (page.ID != -1 && question.ID != -1) {
+                        Question oldQuestion = question;
+                        JSONParser p = new JSONParser();
+                        JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
+                        question.clearAll();
+                        question.ID = oldQuestion.ID;
+                        question.name = oldQuestion.name;
+                        question.questionIndex = oldQuestion.questionIndex;
+                        question.questionText = o.get("questionText").toString();
+                        question.questionID = o.get("questionName").toString();
+                        question.isRequired = (Boolean) o.get("isRequired");
+                        question.questionType = o.get("questionType").toString();
+                        switch (question.questionType) {
+                            case "text":
+                                question.min = o.get("min").toString();
+                                question.max = o.get("max").toString();
+                                question.validCharacters = o.get("validCharacters").toString();
+                                break;
+                            case "wholeNumber":
+                                question.min = o.get("min").toString();
+                                question.max = o.get("max").toString();
+                                question.validationType = o.get("validationType").toString();
+                                break;
+                            case "decimalNumber":
+                                question.min = o.get("min").toString();
+                                question.max = o.get("max").toString();
+                                question.decimalPlaces = o.get("decimalPlaces").toString();
+                                question.validationType = o.get("validationType").toString();
+                                break;
+                            case "multipleChoice":
+                                question.answerChoices = o.get("answerChoices").toString();
+                                question.displayType = o.get("displayType").toString();
+                                question.otherChoice = o.get("otherChoice").toString();
+                                question.numberOfAnswers = o.get("numberOfAnswers").toString();
+                                question.validationType = o.get("validationType").toString();
+                        }
+                        DatabaseAccess.UpdateQuestion(question);
+                        session.setAttribute("pages", pages);
                     }
-
-                    session.setAttribute("pages", pages);
                 }
 
                 if (questionIndex != -1) {
@@ -168,12 +182,66 @@ public class MainServlet extends HttpServlet {
 
             // </editor-fold>
 
+            // <editor-fold defaultstate="collapsed" desc="Switch Project">
+            case "switchProject":
+                iProjectID = Integer.parseInt(request.getParameter("projectID"));
+                String title = request.getParameter("title");
+                pages = new ArrayList<Page>();
+                if (iProjectID == -1) {
+                    iProjectID = DatabaseAccess.InsertSurveyApplication(title);
+                    iPageID = DatabaseAccess.InsertPage(iProjectID, "Page 1", 0);
+                    page = new Page(iPageID, "Page 1", 0);
+                    iQuestionID = DatabaseAccess.InsertQuestion(iPageID, "Question 1", 0);
+                    page.addQuestion(iQuestionID, "Question 1", 0);
+                    pages.add(page);
+                } else {
+                    ResultSet rsQuestions;
+                    rs = DatabaseAccess.ListPages(iProjectID);
+                    try {
+                        while (rs.next()) {
+                            page = new Page(rs.getInt("iPageID"), getNullSafeString(rs.getString("vchName")), rs.getInt("iIndex"));
+                            rsQuestions = DatabaseAccess.ListQuestions(page.ID);
+                            while (rsQuestions.next()) {
+                                question = new Question(rsQuestions.getInt("iQuestionID"), getNullSafeString(rsQuestions.getString("vchName")),
+                                        rsQuestions.getInt("iIndex"));
+                                question.questionText = getNullSafeString(rsQuestions.getString("vchQuestionText"));
+                                question.questionID = getNullSafeString(rsQuestions.getString("vchQuestionID"));
+                                question.questionType = getNullSafeString(rsQuestions.getString("vchQuestionType"));
+                                question.isRequired = rsQuestions.getBoolean("bRequired");
+                                question.min = getNullSafeString(rsQuestions.getString("vchMin"));
+                                question.max = getNullSafeString(rsQuestions.getString("vchMax"));
+                                question.validCharacters = getNullSafeString(rsQuestions.getString("vchValidCharacters"));
+                                question.decimalPlaces = getNullSafeString(rsQuestions.getString("vchDecimalPlaces"));
+                                question.validationType = getNullSafeString(rsQuestions.getString("vchValidationType"));
+                                question.answerChoices = getNullSafeString(rsQuestions.getString("vchAnswerChoices"));
+                                question.otherChoice = getNullSafeString(rsQuestions.getString("vchOtherChoice"));
+                                question.displayType = getNullSafeString(rsQuestions.getString("vchDisplayType"));
+                                question.numberOfAnswers = getNullSafeString(rsQuestions.getString("vchNumberOfAnswers"));
+                                page.questions.add(question);
+                            }
+                            pages.add(page);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                session.setAttribute("pages", pages);
+                session.setAttribute("iProjectID", iProjectID);
+//                pages = (ArrayList<Page>) session.getAttribute("pages");
+//                question = page.questions.get(questionIndex);
+//                JSONObject o = new JSONObject();
+//                session.setAttribute("pages", pages);
+//                response.setContentType("application/json");
+//                response.getWriter().write(o.toJSONString());
+                break;
+
+            //</editor-fold>
+
             // <editor-fold defaultstate="collapsed" desc="Validate">
             case "validate":
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
-                System.out.println(currentPageIndex + "," + currentQuestionIndex);
                 String invalidNodes = "";
                 String errorMessage = "";
                 JSONObject o = new JSONObject();
@@ -475,11 +543,12 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("in do get");
         try {
             processRequest(request, response);
+
+
         } catch (ParseException ex) {
-            Logger.getLogger(MainServlet.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -488,8 +557,10 @@ public class MainServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             processRequest(request, response);
+
+
         } catch (ParseException ex) {
-            Logger.getLogger(MainServlet.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -502,11 +573,19 @@ public class MainServlet extends HttpServlet {
         int pageIndex = 0;
         int questionIndex;
         for (Page p : pages) {
-            p.setPageIndex(pageIndex++);
+            p.pageIndex = pageIndex++;
             questionIndex = 0;
             for (Question q : p.questions) {
                 q.questionIndex = questionIndex++;
             }
+        }
+    }
+
+    private String getNullSafeString(String s) {
+        if (s == null) {
+            return "";
+        } else {
+            return s;
         }
     }
 }

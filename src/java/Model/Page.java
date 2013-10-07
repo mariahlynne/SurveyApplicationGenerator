@@ -7,41 +7,21 @@ public class Page implements Serializable {
 
     public String name;
     public ArrayList<Question> questions;
-    public int pageIndex;
+    public int pageIndex, ID;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Page(int id, String name, int pageIndex) {
+        this.ID = id;
         this.name = name;
-    }
-
-    public ArrayList<Question> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(ArrayList<Question> questions) {
-        this.questions = questions;
-    }
-
-    public int getPageIndex() {
-        return pageIndex;
-    }
-
-    public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
-    }
-
-    public Page(String name, int index) {
-        this.name = name;
-        pageIndex = index;
         questions = new ArrayList<Question>();
-        addQuestion("Question 1", 0);
     }
 
-    public void addQuestion(String name, int qIndex) {
-        questions.add(new Question(name, pageIndex, qIndex));
+    public void addQuestion(int id, String name, int questionIndex) {
+        questions.add(new Question(id, name, questionIndex));
+    }
+
+    public int getQuestionIDByIndex(int index) {
+        return questions.get(index).ID;
     }
 
     public Question getQuestion(String name) {

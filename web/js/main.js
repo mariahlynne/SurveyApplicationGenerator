@@ -151,3 +151,52 @@ function showCorrectMultipleChoiceAmount() {
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
     }
 }
+
+function switchApplication(bForce, bNoProjects) {
+    $('#myModal').modal({
+        backdrop: "static"
+    });
+    if (bForce) {
+        $("#btnCancelSwitch").attr('disabled', 'disabled');
+        $("#btnCancelSwitchX").attr('disabled', 'disabled');
+        $("#rbtnExistingProject").attr('checked', 'checked');
+        if (bNoProjects) {
+            $("#rbtnExistingProject").attr('disabled', 'disabled');
+            $("#rbtnExistingProject").parent().css('color', 'lightgray');
+            $("#rbtnNewProject").attr('checked', 'checked');
+            $("#ddlProject").attr('disabled', 'disabled');
+        }
+    } else {
+        $("#btnCancelSwitch").removeAttr('disabled');
+        $("#btnCancelSwitchX").removeAttr('disabled');
+    }
+    $('#myModal').modal('show');
+}
+
+function selectProject() {
+    if ($("#ddlProject").val() == "none") {
+        if ($("#txtNewProject").val() == "") {
+            $("#lblSelectProjectError").text("You must enter the name of the new project").show();
+        } else {
+            $("#lblSelectProjectError").hide();
+            switchProject(-1, $("#txtNewProject").val());
+            $("#txtNewProject").val("");
+            $('#myModal').modal('hide');
+        }
+    } else if ($("#rbtnExistingProject").is(':checked')) {
+        $("#lblSelectProjectError").hide();
+        switchProject($("#ddlProject").val(), $("#ddlProject option:selected").text());
+        $("#txtNewProject").val("");
+        $('#myModal').modal('hide');
+    } else {
+        if ($("#txtNewProject").val() == "") {
+            $("#lblSelectProjectError").text("You must enter the name of the new project OR use an existing project").show();
+            return;
+        } else {
+            $("#lblSelectProjectError").hide();
+            switchProject(-1, $("#txtNewProject").val());
+            $("#txtNewProject").val("");
+            $('#myModal').modal('hide');
+        }
+    }
+}
