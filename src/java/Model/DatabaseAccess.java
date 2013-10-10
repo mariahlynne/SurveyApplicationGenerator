@@ -113,13 +113,12 @@ public class DatabaseAccess {
     public static void UpdateQuestion(Question q) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cStmt.setInt("iQuestionID", q.ID);
             cStmt.setInt("iIndex", q.questionIndex);
-            cStmt.setString("vchName", q.name);
             cStmt.setString("vchQuestionText", q.questionText);
-            cStmt.setString("vchQuestionText", q.questionText);
-            cStmt.setString("vchQuestionText", q.questionText);
+            cStmt.setString("vchQuestionID", q.questionID);
+            cStmt.setString("vchQuestionType", q.questionType);
             cStmt.setBoolean("bRequired", q.isRequired);
             cStmt.setString("vchMin", q.min);
             cStmt.setString("vchMax", q.max);

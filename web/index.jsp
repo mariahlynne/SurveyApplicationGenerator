@@ -23,12 +23,11 @@
             pages = new ArrayList<Page>();
             Page p = new Page(-1, "Page 1", 0);
             p.addQuestion(-1, "Question 1", 0);
-            pages.add(p);
-            session.setAttribute("pages", pages);
-            session.setAttribute("currentNodeType", "question");
-            session.setAttribute("currentPageIndex", 0);
-            session.setAttribute("currentQuestionIndex", 0);
-        }
+            pages.add(p);%>
+            <input id="hfIsSessionEmpty" type="hidden" value="true" />
+    <%  } else {%>
+            <input id="hfIsSessionEmpty" type="hidden" value="false" />
+    <%  }
     %>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">

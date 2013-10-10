@@ -33,6 +33,7 @@ public class MainServlet extends HttpServlet {
         Page page;
         Question question;
         ResultSet rs;
+        JSONObject o;
 
         switch (sFunction) {
             // <editor-fold defaultstate="collapsed" desc="Add Page">
@@ -119,7 +120,7 @@ public class MainServlet extends HttpServlet {
                     if (page.ID != -1 && question.ID != -1) {
                         Question oldQuestion = question;
                         JSONParser p = new JSONParser();
-                        JSONObject o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
+                        o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
                         question.clearAll();
                         question.ID = oldQuestion.ID;
                         question.name = oldQuestion.name;
@@ -160,7 +161,7 @@ public class MainServlet extends HttpServlet {
                 if (questionIndex != -1) {
                     page = pages.get(pageIndex);
                     question = page.questions.get(questionIndex);
-                    JSONObject o = new JSONObject();
+                    o = new JSONObject();
                     o.put("questionText", question.questionText);
                     o.put("questionName", question.questionID);
                     o.put("isRequired", question.isRequired);
@@ -227,12 +228,41 @@ public class MainServlet extends HttpServlet {
                 }
                 session.setAttribute("pages", pages);
                 session.setAttribute("iProjectID", iProjectID);
-//                pages = (ArrayList<Page>) session.getAttribute("pages");
-//                question = page.questions.get(questionIndex);
-//                JSONObject o = new JSONObject();
-//                session.setAttribute("pages", pages);
-//                response.setContentType("application/json");
-//                response.getWriter().write(o.toJSONString());
+                o = new JSONObject();
+                o.put("projectTitle", title);
+                page = pages.get(0);
+                question = page.questions.get(0);
+                o.put("questionText", question.questionText);
+                o.put("questionName", question.questionID);
+                o.put("isRequired", question.isRequired);
+                o.put("questionType", question.questionType);
+                o.put("min", question.min);
+                o.put("max", question.max);
+                o.put("validCharacters", question.validCharacters);
+                o.put("validationType", question.validationType);
+                o.put("decimalPlaces", question.decimalPlaces);
+                o.put("answerChoices", question.answerChoices);
+                o.put("displayType", question.displayType);
+                o.put("numberOfAnswers", question.numberOfAnswers);
+                o.put("otherChoice", question.otherChoice);
+
+                //send back full (inner) html of tree
+                String treeHTML = "";
+                for (Page p : pages) {
+                    pageIndex = p.pageIndex;
+                    treeHTML += "<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>\n";
+                    treeHTML += "<ul>\n";
+                    for (Question q : p.questions) {
+                        questionIndex = q.questionIndex;
+                        treeHTML += "<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>\n";
+                    }
+                    treeHTML += "</ul>\n";
+                    treeHTML += "</li>\n";
+                }
+                o.put("treeHTML", treeHTML);
+
+                response.setContentType("application/json");
+                response.getWriter().write(o.toJSONString());
                 break;
 
             //</editor-fold>
@@ -244,7 +274,7 @@ public class MainServlet extends HttpServlet {
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
                 String invalidNodes = "";
                 String errorMessage = "";
-                JSONObject o = new JSONObject();
+                o = new JSONObject();
                 for (Page p : pages) {
                     for (Question q : p.questions) {
                         if (q.questionText.trim().length() == 0) {
@@ -369,12 +399,12 @@ public class MainServlet extends HttpServlet {
                         }
                         if (errorMessage.length() > 0) {
                             invalidNodes += p.pageIndex + "," + q.questionIndex + ";";
-                            if (currentQuestionIndex == q.questionIndex && currentPageIndex == p.pageIndex) {
-                                o.put("errorMessage", errorMessage);
-
-                            }
-                            errorMessage = "";
                         }
+                        if (currentQuestionIndex == q.questionIndex && currentPageIndex == p.pageIndex) {
+                            o.put("errorMessage", errorMessage);
+
+                        }
+                        errorMessage = "";
                     }
                 }
 

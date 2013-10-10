@@ -1,39 +1,41 @@
 function switchProject(projectID, title) {
     //calling switch node will effectively save the node they're currently on - all others will already be saved
-    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    if ($("#hfIsSessionEmpty").val() == "false") {
+        switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    }
     $.post("MainServlet", {
         func:"switchProject",
         projectID:projectID,
         title:title
     }, function(json) {
-        //        var currentNode;
-        //        if (currentNodeType.val() == "page") {
-        //            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
-        //            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
-        //            currentNode.removeClass("nodeSelected");
-        //        } else if (currentNodeType.val() == "question") {
-        //            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
-        //                (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
-        //            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
-        //            currentNode.removeClass("nodeSelected");
-        //        }
-        //
-        //        setSettingsFromJSON(json);
-        //        currentPageIndex.val(pageIndex);
-        //        currentQuestionIndex.val(questionIndex);
-        //        if (questionIndex == -1) {
-        //            currentNodeType.val("page");
-        //            showPage();
-        //            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
-        //        } else {
-        //            showQuestion();
-        //            currentNodeType.val("question");
-        //            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
-        //        }
-        //        currentNode.addClass("nodeSelected");
-        //        currentNode.attr('href', "javascript:doNothing()");
-        //        validate();
-        });
+        $("#hfIsSessionEmpty").val("true");
+        $("#projectName").text(json.projectTitle);
+        document.getElementById("navigationTree").innerHTML = json.treeHTML;
+        var currentNode;
+        var currentNodeType = $("#currentNodeType");
+        var currentPageIndex = $("#currentPageIndex");
+        var currentQuestionIndex = $("#currentQuestionIndex");
+        if (currentNodeType.val() == "page") {
+            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
+            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
+            currentNode.removeClass("nodeSelected");
+        } else if (currentNodeType.val() == "question") {
+            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
+                (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
+            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
+            currentNode.removeClass("nodeSelected");
+        }
+
+        setSettingsFromJSON(json);
+        currentPageIndex.val(0);
+        currentQuestionIndex.val(0);
+        showQuestion();
+        currentNodeType.val("question");
+        currentNode = $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a");
+        currentNode.addClass("nodeSelected");
+        currentNode.attr('href', "javascript:doNothing()");
+        validate();
+    });
 }
 
 function switchNode(pageIndex, questionIndex) {
@@ -373,7 +375,7 @@ function validate() {
                 currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
             }
         }
-        if (json.errorMessage.length > 0) {
+        if (json.errorMessage != undefined && json.errorMessage.length > 0) {
             $("#questionErrorMessages").html(json.errorMessage);
             $("#questionErrorSection").show();
         }
