@@ -9,10 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -230,6 +227,7 @@ public class MainServlet extends HttpServlet {
                 session.setAttribute("iProjectID", iProjectID);
                 o = new JSONObject();
                 o.put("projectTitle", title);
+                o.put("projectID", iProjectID);
                 page = pages.get(0);
                 question = page.questions.get(0);
                 o.put("questionText", question.questionText);
@@ -301,8 +299,8 @@ public class MainServlet extends HttpServlet {
                                     errorMessage += "<li>Character maximum must be a whole number</li>";
                                 }
                                 try {
-                                    if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
-                                        errorMessage += "<li>Character minimum cannot be less than character maximum</li>";
+                                    if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                        errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
                                     } else if (Integer.parseInt(q.max) == 0) {
                                         errorMessage += "<li>Character maximum must be greater than 0</li>";
                                     }
@@ -347,8 +345,8 @@ public class MainServlet extends HttpServlet {
                                             errorMessage += "<li>Maximum must be a whole number</li>";
                                         }
                                         try {
-                                            if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
-                                                errorMessage += "<li>Minimum cannot be less than maximum</li>";
+                                            if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
                                             }
                                         } catch (Exception ex) {
                                         }
@@ -386,8 +384,8 @@ public class MainServlet extends HttpServlet {
                                             errorMessage += "<li>Maximum must be a decimal number</li>";
                                         }
                                         try {
-                                            if (Integer.parseInt(q.min) < Integer.parseInt(q.max)) {
-                                                errorMessage += "<li>Minimum cannot be less than maximum</li>";
+                                            if (Double.parseDouble(q.min) > Double.parseDouble(q.max)) {
+                                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
                                             }
                                         } catch (Exception ex) {
                                         }

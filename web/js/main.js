@@ -169,6 +169,12 @@ function switchApplication(bForce, bNoProjects) {
     } else {
         $("#btnCancelSwitch").removeAttr('disabled');
         $("#btnCancelSwitchX").removeAttr('disabled');
+        $("#rbtnExistingProject").attr('checked', 'checked');
+        $("#rbtnExistingProject").removeAttr('disabled');
+        $("#rbtnExistingProject").parent().css('color', 'black');
+        $("#rbtnNewProject").removeAttr('disabled');
+        $("#ddlProject").removeAttr('disabled');
+        $("#ddlProject option[value='none']").remove();
     }
     $('#myModal').modal('show');
 }

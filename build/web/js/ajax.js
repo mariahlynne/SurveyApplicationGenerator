@@ -10,6 +10,9 @@ function switchProject(projectID, title) {
     }, function(json) {
         $("#hfIsSessionEmpty").val("true");
         $("#projectName").text(json.projectTitle);
+        if ($("#ddlProject option[value='" + json.projectID + "']").length == 0) {
+            $("#ddlProject").append('<option value="' + json.projectID + '">' + json.projectTitle + '</option>');
+        }
         document.getElementById("navigationTree").innerHTML = json.treeHTML;
         var currentNode;
         var currentNodeType = $("#currentNodeType");
