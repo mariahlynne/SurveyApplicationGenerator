@@ -113,7 +113,7 @@ public class DatabaseAccess {
     public static void UpdateQuestion(Question q) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cStmt.setInt("iQuestionID", q.ID);
             cStmt.setInt("iIndex", q.questionIndex);
             cStmt.setString("vchQuestionText", q.questionText);
@@ -122,7 +122,9 @@ public class DatabaseAccess {
             cStmt.setBoolean("bRequired", q.isRequired);
             cStmt.setString("vchMin", q.min);
             cStmt.setString("vchMax", q.max);
-            cStmt.setString("vchValidCharacters", q.validCharacters);
+            cStmt.setBoolean("bValidateText", q.validateText);
+            cStmt.setString("vchAllowTypes", q.allowTypes);
+            cStmt.setString("vchValidSpecialCharacters", q.validSpecialCharacters);
             cStmt.setString("vchDecimalPlaces", q.decimalPlaces);
             cStmt.setString("vchValidationType", q.validationType);
             cStmt.setString("vchAnswerChoices", q.answerChoices);

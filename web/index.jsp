@@ -24,9 +24,9 @@
             Page p = new Page(-1, "Page 1", 0);
             p.addQuestion(-1, "Question 1", 0);
             pages.add(p);%>
-            <input id="hfIsSessionEmpty" type="hidden" value="true" />
+    <input id="hfIsSessionEmpty" type="hidden" value="true" />
     <%  } else {%>
-            <input id="hfIsSessionEmpty" type="hidden" value="false" />
+    <input id="hfIsSessionEmpty" type="hidden" value="false" />
     <%  }
     %>
     <head>
@@ -61,8 +61,8 @@
                         <li><a href="javascript:addPage()">Add Page</a></li>
                         <li><a href="javascript:addQuestion()">Add Question</a></li>
                         <li><a href="javascript:removeNode()">Delete Selected</a></li>
-                        <li><a href="#">Reorder Pages</a></li>
-                        <li><a href="#">Reorder Questions</a></li>
+                        <!--                        <li><a href="#">Reorder Pages</a></li>
+                                                <li><a href="#">Reorder Questions</a></li>-->
                     </ul>
                 </div>
             </div>
@@ -159,32 +159,40 @@
                             </tr>
                         </table>
                         <br />
-                        <label class="boldLabel">Characters Allowed:</label>
                         <div class="checkbox">
-                            <label for="validCharsUppercase">
-                                <input type="checkbox" id="validCharsUppercase" checked="checked" />
-                                <span>Uppercase Letters</span>
+                            <label for="validateText" class="boldLabel">
+                                <input type="checkbox" id="validateText" onchange="showHideValidateTextSection()" />
+                                <span>Validate text</span>
                             </label>
                         </div>
-                        <div class="checkbox">
-                            <label for="validCharsLowercase">
-                                <input type="checkbox" id="validCharsLowercase" checked="checked" />
-                                <span>Lowercase Letters</span>
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label for="validCharsDigits">
-                                <input type="checkbox" id="validCharsDigits" checked="checked" />
-                                <span>Digits</span>
-                            </label>
-                        </div>
-                        <div class="checkbox">
-                            <label for="validCharsSpecial">
-                                <input type="checkbox" id="validCharsSpecial" checked="checked" />
-                                <span>Special Characters:</span>
-                                <br />
-                                <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
-                            </label>
+                        <div id="validateTextSection" style="padding-left: 20px">
+                            <label class="boldLabel">Characters Allowed:</label>
+                            <div class="checkbox">
+                                <label for="validCharsUppercase">
+                                    <input type="checkbox" id="validCharsUppercase" checked="checked" />
+                                    <span>Uppercase Letters</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label for="validCharsLowercase">
+                                    <input type="checkbox" id="validCharsLowercase" checked="checked" />
+                                    <span>Lowercase Letters</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label for="validCharsDigits">
+                                    <input type="checkbox" id="validCharsDigits" checked="checked" />
+                                    <span>Digits</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label for="validCharsSpecial">
+                                    <input type="checkbox" id="validCharsSpecial" checked="checked" />
+                                    <span>Special Characters:</span>
+                                    <br />
+                                    <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -268,7 +276,6 @@
                                 <option label="Radio Buttons" value="radio"/>
                                 <option label="Drop-down List" value="dropdown"/>
                             </select>
-                            <i id="tooltipMultipleChoiceDefault" class="icon-question-sign icon-2x" style="color: #424242" title="The default answer will be the first answer choice. If you do not want a default answer, add something like '--Select an Option--' as the first answer choice."></i>
                         </div>
 
                         <div class="well well-small">
@@ -374,7 +381,7 @@
                     $("#addChoiceButton").click();
                 }
             });
-            switchApplication(true, <%= bNoProjects %>);
+            switchApplication(true, <%= bNoProjects%>);
         });
     </script>
 </html>

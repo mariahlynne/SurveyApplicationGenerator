@@ -130,7 +130,11 @@ public class MainServlet extends HttpServlet {
                             case "text":
                                 question.min = o.get("min").toString();
                                 question.max = o.get("max").toString();
-                                question.validCharacters = o.get("validCharacters").toString();
+                                question.validateText = (Boolean) o.get("validateText");
+                                if (question.validateText) {
+                                    question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
+                                    question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                }
                                 break;
                             case "wholeNumber":
                                 question.min = o.get("min").toString();
@@ -165,7 +169,12 @@ public class MainServlet extends HttpServlet {
                     o.put("questionType", question.questionType);
                     o.put("min", question.min);
                     o.put("max", question.max);
-                    o.put("validCharacters", question.validCharacters);
+                    o.put("validateText", question.validateText);
+                    o.put("allowUpper", question.allowTypes.split(", ")[0]);
+                    o.put("allowLower", question.allowTypes.split(", ")[1]);
+                    o.put("allowDigits", question.allowTypes.split(", ")[2]);
+                    o.put("allowSpecial", question.allowTypes.split(", ")[3]);
+                    o.put("validSpecialCharacters", question.validSpecialCharacters);
                     o.put("validationType", question.validationType);
                     o.put("decimalPlaces", question.decimalPlaces);
                     o.put("answerChoices", question.answerChoices);
@@ -208,7 +217,9 @@ public class MainServlet extends HttpServlet {
                                 question.isRequired = rsQuestions.getBoolean("bRequired");
                                 question.min = getNullSafeString(rsQuestions.getString("vchMin"));
                                 question.max = getNullSafeString(rsQuestions.getString("vchMax"));
-                                question.validCharacters = getNullSafeString(rsQuestions.getString("vchValidCharacters"));
+                                question.validateText = rsQuestions.getBoolean("bValidateText");
+                                question.allowTypes = rsQuestions.getString("vchAllowTypes");
+                                question.validSpecialCharacters = getNullSafeString(rsQuestions.getString("vchValidSpecialCharacters"));
                                 question.decimalPlaces = getNullSafeString(rsQuestions.getString("vchDecimalPlaces"));
                                 question.validationType = getNullSafeString(rsQuestions.getString("vchValidationType"));
                                 question.answerChoices = getNullSafeString(rsQuestions.getString("vchAnswerChoices"));
@@ -236,7 +247,12 @@ public class MainServlet extends HttpServlet {
                 o.put("questionType", question.questionType);
                 o.put("min", question.min);
                 o.put("max", question.max);
-                o.put("validCharacters", question.validCharacters);
+                o.put("validateText", question.validateText);
+                o.put("allowUpper", question.allowTypes.split(", ")[0]);
+                o.put("allowLower", question.allowTypes.split(", ")[1]);
+                o.put("allowDigits", question.allowTypes.split(", ")[2]);
+                o.put("allowSpecial", question.allowTypes.split(", ")[3]);
+                o.put("validSpecialCharacters", question.validSpecialCharacters);
                 o.put("validationType", question.validationType);
                 o.put("decimalPlaces", question.decimalPlaces);
                 o.put("answerChoices", question.answerChoices);

@@ -95,7 +95,12 @@ function getSettingsJSON() {
         case "text":
             json.min = $("#textValidateSpecificLengthMin").val();
             json.max = $("#textValidateSpecificLengthMax").val();
-            json.validCharacters = getValidCharacters();
+            json.validateText = $("#validateText").is(":checked");
+            json.allowUpper = $("#validCharsUppercase").is(":checked");
+            json.allowLower = $("#validCharsLowercase").is(":checked");
+            json.allowDigits = $("#validCharsDigits").is(":checked");
+            json.allowSpecial = $("#validCharsSpecial").is(":checked");
+            json.validSpecialCharacters = $("#validCharsSpecialText").val();
             break;
         case "wholeNumber":
             json.min = $("#txtWholeNumberMin").val();
@@ -139,7 +144,14 @@ function setSettingsFromJSON(json) {
             $("#textValidateSpecificLengthMin").val(json.min);
             $("#textValidateSpecificLengthMax").val(json.max);
             $("#textValidateErrorMessage").text(json.validationErrorMessage);
-            setValidCharacters(json.validCharacters);
+            debugger;
+            $("#validateText").prop('checked', json.validateText);
+            showHideValidateTextSection();
+            $("#validCharsUppercase").prop('checked', json.allowUpper == 'true');
+            $("#validCharsLowercase").prop('checked', json.allowLower == 'true');
+            $("#validCharsDigits").prop('checked', json.allowDigits == 'true');
+            $("#validCharsSpecial").prop('checked', json.allowSpecial == 'true');
+            $("#validCharsSpecialText").val(json.validSpecialCharacters);
             break;
         case "wholeNumber":
             $("#txtWholeNumberMin").val(json.min);
@@ -185,7 +197,12 @@ function clearAllFields() {
     //text section
     $("#textValidateSpecificLengthMin").val("");
     $("#textValidateSpecificLengthMax").val("");
-    setValidCharacters("default");
+    $("#validateText").prop("checked", false);
+    $("#validCharsUppercase").prop('checked', true);
+    $("#validCharsLowercase").prop('checked', true);
+    $("#validCharsDigits").prop('checked', true);
+    $("#validCharsSpecial").prop('checked', true);
+    $("#validCharsSpecialText").val("~!@#$%^&*()-_=+|\\[]{};:' \",./?<>");
 
     //whole number section
     $("#txtWholeNumberMin").val("");
@@ -204,39 +221,6 @@ function clearAllFields() {
     $("#multipleChoiceChoices").html("");
     showCorrectMultipleChoiceAmount();
     $("#multipleChoiceDisplayType").val("radioButtons");
-}
-
-function getValidCharacters() {
-    var result = "";
-    if ($("#validCharsUppercase").is(':checked')) {
-        result += "A-Z";
-    }
-    if ($("#validCharsLowercase").is(':checked')) {
-        result += "a-z";
-    }
-    if ($("#validCharsDigits").is(':checked')) {
-        result += "0-9";
-    }
-    if ($("#validCharsSpecial").is(':checked')) {
-        result += ";;;" + $("#validCharsSpecialText").val();
-    }
-    return result;
-}
-
-function setValidCharacters(characters) {
-    if (characters == "default") {
-        $("#validCharsUppercase").prop('checked', true);
-        $("#validCharsLowercase").prop('checked', true);
-        $("#validCharsDigits").prop('checked', true);
-        $("#validCharsSpecial").prop('checked', true);
-        $("#validCharsSpecialText").val("~!@#$%^&*()-_=+|\\[]{};:' \",./?<>");
-    } else {
-        $("#validCharsUppercase").prop('checked', characters.indexOf("A-Z") != -1);
-        $("#validCharsLowercase").prop('checked', characters.indexOf("a-z") != -1);
-        $("#validCharsDigits").prop('checked', characters.indexOf("0-9") != -1);
-        $("#validCharsSpecial").prop('checked', characters.indexOf(";;;") != -1);
-        $("#validCharsSpecialText").val(characters.substring(characters.indexOf(";;;") + 3));
-    }
 }
 
 function addPage() {

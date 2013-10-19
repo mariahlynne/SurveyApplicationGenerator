@@ -20,6 +20,7 @@ function showCorrectQuestionSettings() {
     var type = document.getElementById("questionType").value;
     if (type == "text") {
         $("#textSection").show();
+        showHideValidateTextSection();
     } else if (type == "wholeNumber") {
         $("#wholeNumberSection").show();
         showHideWholeNumberValidation();
@@ -31,6 +32,14 @@ function showCorrectQuestionSettings() {
     } else if (type == "multipleChoice") {
         $("#multipleChoiceSection").show();
         showCorrectMultipleChoice();
+    }
+}
+
+function showHideValidateTextSection() {
+    if ($("#validateText").is(":checked")) {
+        $("#validateTextSection").show();
+    } else {
+        $("#validateTextSection").hide();
     }
 }
 
@@ -67,7 +76,7 @@ function showHideDecimalNumberValidation() {
 }
 
 function showCorrectMultipleChoice() {
-
+    showCorrectMultipleChoiceAmount();
 }
 
 function showHideMultipleChoiceFieldOther() {
@@ -118,9 +127,11 @@ function removeChoice() {
 function addChoice() {
     var choices = document.getElementById('multipleChoiceChoices');
     var newChoice = document.getElementById('multipleChoiceChoice').value;
-    choices.options[choices.options.length] = new Option(newChoice, newChoice);
-    document.getElementById('multipleChoiceChoice').value = "";
-    document.getElementById('multipleChoiceChoice').focus();
+    if (newChoice.trim() != "") {
+        choices.options[choices.options.length] = new Option(newChoice, newChoice);
+        document.getElementById('multipleChoiceChoice').value = "";
+        document.getElementById('multipleChoiceChoice').focus();
+    }
 }
 
 function showCorrectMultipleChoiceValidationOptions() {
@@ -146,10 +157,8 @@ function showCorrectMultipleChoiceValidationOptions() {
 function showCorrectMultipleChoiceAmount() {
     var type = document.getElementById('multipleChoiceAmount').value;
     if (type == "1") {
-        $("#tooltipMultipleChoiceDefault").show();
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"radio\">Radio Buttons</option><option value=\"dropdown\">Drop-down List</option>"
     } else {
-        $("#tooltipMultipleChoiceDefault").hide();
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
     }
 }

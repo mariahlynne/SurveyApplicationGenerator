@@ -13,7 +13,9 @@ public class Question implements Serializable {
     public String questionType = "none";//all
     public String min = "";//textbox, whole number, decimal number
     public String max = "";//textbox, whole number, decimal number
-    public String validCharacters = "";//textbox
+    public boolean validateText = false;//textbox
+    public String allowTypes = "true, true, true, true";
+    public String validSpecialCharacters = "~!@#$%^&*()-_=+|\\[]{};:' \",./?<>";//textbox
     public String decimalPlaces = "";//decimal number
     public String validationType = "none";//whole number, decimal number, multiple choice with other
     public String answerChoices = "";//multiple choice
@@ -35,7 +37,9 @@ public class Question implements Serializable {
         isRequired = false;
         min = "";
         max = "";
-        validCharacters = "";
+        validateText = false;
+        allowTypes = "true, true, true, true";
+        validSpecialCharacters = "~!@#$%^&*()-_=+|\\[]{};:' \",./?<>";
         decimalPlaces = "";
         validationType = "none";
         answerChoices = "";
