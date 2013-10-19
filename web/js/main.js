@@ -109,7 +109,9 @@ function removeChoice() {
     $("#multipleChoiceChoices option:selected").remove();
     if (index == size - 1 && size > 1)
         index--;
-    $('#multipleChoiceChoices option')[index].selected = true;//todo this throws an arrow when last one is removed
+    if (size != 1) {
+        $('#multipleChoiceChoices option')[index].selected = true;
+    }
     $('#multipleChoiceChoices').focus();
 }
 
