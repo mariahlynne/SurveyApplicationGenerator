@@ -319,10 +319,18 @@ public class MainServlet extends HttpServlet {
                                         errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
                                     } else if (Integer.parseInt(q.max) == 0) {
                                         errorMessage += "<li>Character maximum must be greater than 0</li>";
+                                    } else if (Integer.parseInt(q.min) == 0 && q.isRequired) {
+                                        errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
                                     }
                                 } catch (Exception ex) {
                                 }
-                                //TODO characters allowed validation
+                                if (q.validateText) {
+                                    if (!q.allowTypes.contains("true")) {
+                                        errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
+                                    } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
+                                        errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                                    }
+                                }
                                 break;
                             case "wholeNumber":
                                 switch (q.validationType) {

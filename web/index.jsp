@@ -190,8 +190,8 @@
                                     <input type="checkbox" id="validCharsSpecial" checked="checked" />
                                     <span>Special Characters:</span>
                                     <br />
-                                    <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
                                 </label>
+                                <input type="text" id="validCharsSpecialText" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
                             </div>
                         </div>
                     </div>
