@@ -14,51 +14,72 @@ public class CodeGen {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HTML Elements (with bootstrap)">
-    public void getMultipleChoiceCode(ArrayList<String> answers, String id, String type) {
+    public void getMultipleChoiceCode(ArrayList<String> answers, String id, String type, String otherChoice) {
         //incorporate the "other" answer & its validation
         switch (type) {
             case "radio":
-                getRadioButtonListCode(answers, id);
+                getRadioButtonListCode(answers, id, otherChoice);
                 break;
             case "dropdown":
-                getDropDownListCode(answers, id);
+                getDropDownListCode(answers, id, otherChoice);
                 break;
             case "checkbox":
-                getCheckBoxListCode(answers, id);
+                getCheckBoxListCode(answers, id, otherChoice);
                 break;
         }
     }
 
-    public void getRadioButtonListCode(ArrayList<String> answers, String id) {
-        String result = "";
+    public void getRadioButtonListCode(ArrayList<String> answers, String id, String otherChoice) {
+        int ndx = 0;
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"radio\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"radio\" name=\"" + id + "\" value=\"" + answer + "\">\n");
+            addLine(DIR.F, "<input type=\"radio\" id=\"" + id + "_" + ndx + "\" name=\"" + id + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "_" + ndx + "', '" + id + "_" + ndx++ + "OtherChoice', 'radio');\">\n");
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
         }
-        code += result;
+        if (otherChoice.length() > 0) {
+            addLine(DIR.S, "<div class=\"radio\">\n");
+            addLine(DIR.F, "<label>\n");
+            addLine(DIR.F, "<input type=\"radio\" id=\"" + id + "otherChoice(specify)\" name=\"" + id + "\" value=\"" + otherChoice + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "_" + ndx + "', '" + id + "_" + ndx + "OtherChoice', 'radio');\">\n");
+            addLine(DIR.S, otherChoice + "\n");
+            addLine(DIR.B, "</label>\n");
+            addLine(DIR.B, "</div>\n");
+            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+        }
     }
 
-    public void getDropDownListCode(ArrayList<String> answers, String id) {
-        addLine(DIR.S, "<select class=\"form-control\" id=\"" + id + "\">\n");
+    public void getDropDownListCode(ArrayList<String> answers, String id, String otherChoice) {
+        addLine(DIR.S, "<select class=\"form-control\" id=\"" + id + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "', '" + id + "OtherChoice', 'checkbox');\">\n");
         for (String answer : answers) {
             addLine(DIR.FB, "<option>" + answer + "</option>\n");
         }
+        if (otherChoice.length() > 0) {
+            addLine(DIR.FB, "<option value=\"otherChoice(specify)\">" + otherChoice + "</option>");
+        }
         addLine(DIR.S, "</select>\n");
+        if (otherChoice.length() > 0) {
+            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+        }
     }
 
-    public void getCheckBoxListCode(ArrayList<String> answers, String id) {
-        String result = "";
+    public void getCheckBoxListCode(ArrayList<String> answers, String id, String otherChoice) {
         int ndx = 0;
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"checkbox\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + ndx++ + "\" value=\"" + answer + "\">\n");
+            if (otherChoice.length() > 0) {
+                addLine(DIR.F, "<input type=\"checkbox\" id=\"" + id + "_" + ndx + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "_" + ndx + "', '" + id + "_" + ndx + "OtherChoice', 'checkbox');\">\n");
+            } else {
+                addLine(DIR.F, "<input type=\"checkbox\" id=\"" + id + "_" + ndx++ + "\" value=\"" + answer + "\">\n");
+            }
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
+            if (otherChoice.length() > 0) {
+                addLine(DIR.S, "<option value=\"otherChoice(specify)\">" + otherChoice + "</option>");
+                addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+            }
             addLine(DIR.B, "</div>\n");
         }
     }

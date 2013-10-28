@@ -308,7 +308,41 @@
                                 <div id="multipleChoiceAddOtherFieldSection">
                                     <label id="multipleChoiceOtherAnswerTextLabel" for="multipleChoiceOtherAnswerText" class="boldLabel">Answer Label:</label>
                                     <input type="text" id="multipleChoiceOtherAnswerText" value="Other (please specify)" style="width: 97%" />
-                                    <p>***Put the text validation options here***</p>
+                                    <div class="checkbox">
+                                        <label for="validateTextMC" class="boldLabel">
+                                            <input type="checkbox" id="validateTextMC" onchange="showHideValidateTextMCSection()" />
+                                            <span>Validate text</span>
+                                        </label>
+                                    </div>
+                                    <div id="validateTextSectionMC" style="padding-left: 20px">
+                                        <label class="boldLabel">Characters Allowed:</label>
+                                        <div class="checkbox">
+                                            <label for="validCharsUppercaseMC">
+                                                <input type="checkbox" id="validCharsUppercaseMC" checked="checked" />
+                                                <span>Uppercase Letters</span>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label for="validCharsLowercaseMC">
+                                                <input type="checkbox" id="validCharsLowercaseMC" checked="checked" />
+                                                <span>Lowercase Letters</span>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label for="validCharsDigitsMC">
+                                                <input type="checkbox" id="validCharsDigitsMC" checked="checked" />
+                                                <span>Digits</span>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label for="validCharsSpecialMC">
+                                                <input type="checkbox" id="validCharsSpecialMC" checked="checked" />
+                                                <span>Special Characters:</span>
+                                                <br />
+                                            </label>
+                                            <input type="text" id="validCharsSpecialTextMC" value="~!@#$%^&*()-_=+|\[]{};:' &quot;,./?<>" style="margin-left: 20px;"/>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

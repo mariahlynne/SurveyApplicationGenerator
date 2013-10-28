@@ -152,7 +152,11 @@ public class MainServlet extends HttpServlet {
                                 question.displayType = o.get("displayType").toString();
                                 question.otherChoice = o.get("otherChoice").toString();
                                 question.numberOfAnswers = o.get("numberOfAnswers").toString();
-                                question.validationType = o.get("validationType").toString();
+                                question.validateText = (Boolean) o.get("validateText");
+                                if (question.validateText) {
+                                    question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
+                                    question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                }
                         }
                         DatabaseAccess.UpdateQuestion(question);
                         session.setAttribute("pages", pages);
@@ -417,6 +421,16 @@ public class MainServlet extends HttpServlet {
                                 }
                                 break;
                             case "multipleChoice":
+                                if (q.answerChoices.length() == 0) {
+                                    errorMessage += "<li>There must be at least one answer choice</li>";
+                                }
+                                if (q.otherChoice.length() > 0 && q.validateText) {
+                                    if (!q.allowTypes.contains("true")) {
+                                        errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
+                                    } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
+                                        errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                                    }
+                                }
                                 break;
                         }
                         if (errorMessage.length() > 0) {
@@ -493,7 +507,23 @@ public class MainServlet extends HttpServlet {
                             case "text":
                                 body.getTextBoxCode(q.questionID, Integer.parseInt(q.max));
                                 partialJS.addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + q.questionID + "', 'text', " + q.min + ", " + q.max + ") && result;\n");
-                                //todo validate that there are no invalid characters
+                                if (q.validateText) {
+                                    String validChars = "";
+                                    String[] allowTypes = q.allowTypes.split(", ");
+                                    if (allowTypes[0].equals("true")) {
+                                        validChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                                    }
+                                    if (allowTypes[1].equals("true")) {
+                                        validChars += "abcdefghijklmnopqrstuvwxyz";
+                                    }
+                                    if (allowTypes[2].equals("true")) {
+                                        validChars += "0123456789";
+                                    }
+                                    if (allowTypes[3].equals("true")) {
+                                        validChars += q.validSpecialCharacters;
+                                    }
+                                    partialJS.addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
+                                }
                                 break;
                             case "multipleChoice":
                                 ArrayList<String> answers = new ArrayList<String>();
@@ -502,7 +532,24 @@ public class MainServlet extends HttpServlet {
                                         answers.add(answer);
                                     }
                                 }
-                                body.getMultipleChoiceCode(answers, q.questionID, q.displayType);
+                                body.getMultipleChoiceCode(answers, q.questionID, q.displayType, q.otherChoice);
+                                if (q.otherChoice.length() > 0 && q.validateText) {
+                                    String validChars = "";
+                                    String[] allowTypes = q.allowTypes.split(", ");
+                                    if (allowTypes[0].equals("true")) {
+                                        validChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                                    }
+                                    if (allowTypes[1].equals("true")) {
+                                        validChars += "abcdefghijklmnopqrstuvwxyz";
+                                    }
+                                    if (allowTypes[2].equals("true")) {
+                                        validChars += "0123456789";
+                                    }
+                                    if (allowTypes[3].equals("true")) {
+                                        validChars += q.validSpecialCharacters;
+                                    }
+                                    partialJS.addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
+                                }
                                 break;
                             case "wholeNumber":
                                 body.getWholeNumberCode(q.questionID);

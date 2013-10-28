@@ -18,20 +18,26 @@ function showCorrectQuestionSettings() {
 
     //show selected section
     var type = document.getElementById("questionType").value;
-    if (type == "text") {
-        $("#textSection").show();
-        showHideValidateTextSection();
-    } else if (type == "wholeNumber") {
-        $("#wholeNumberSection").show();
-        showHideWholeNumberValidation();
-    } else if (type == "decimalNumber") {
-        $("#decimalNumberSection").show();
-        showHideDecimalNumberValidation();
-    //    } else if (type == "date") {
-    //        $("#dateSection").show();
-    } else if (type == "multipleChoice") {
-        $("#multipleChoiceSection").show();
-        showCorrectMultipleChoice();
+    switch (type) {
+        case "text":
+            $("#textSection").show();
+            showHideValidateTextSection();
+            break;
+        case "wholeNumber":
+            $("#wholeNumberSection").show();
+            showHideWholeNumberValidation();
+            break;
+        case "decimalNumber":
+            $("#decimalNumberSection").show();
+            showHideDecimalNumberValidation();
+            break;
+        case "date":
+            $("#dateSection").show();
+            break;
+        case "multipleChoice":
+            $("#multipleChoiceSection").show();
+            showCorrectMultipleChoice();
+            break;
     }
 }
 
@@ -77,10 +83,12 @@ function showHideDecimalNumberValidation() {
 
 function showCorrectMultipleChoice() {
     showCorrectMultipleChoiceAmount();
+    showHideMultipleChoiceFieldOther();
+    showHideValidateTextMCSection();
 }
 
 function showHideMultipleChoiceFieldOther() {
-    if (document.getElementById("multipleChoiceAddOther").checked) {
+    if ($("#multipleChoiceAddOther").is(':checked')) {
         $("#multipleChoiceAddOtherFieldSection").show();
     } else {
         $("#multipleChoiceAddOtherFieldSection").hide();
@@ -134,32 +142,20 @@ function addChoice() {
     }
 }
 
-function showCorrectMultipleChoiceValidationOptions() {
-    $("#multipleChoiceOtherValidateSpecificLength").hide();
-    $("#multipleChoiceOtherValidateWholeNumber").hide();
-    $("#multipleChoiceOtherValidateDecimalNumber").hide();
-    $("#multipleChoiceOtherValidateDate").hide();
-    $("#multipleChoiceOtherValidateErrorMessageSection").show();
-    var type = document.getElementById('multipleChoiceOtherValidate').value;
-    if (type == "specificLength") {
-        $("#multipleChoiceOtherValidateSpecificLength").show();
-    } else if (type == "wholeNumber") {
-        $("#multipleChoiceOtherValidateWholeNumber").show();
-    } else if (type == "decimalNumber") {
-        $("#multipleChoiceOtherValidateDecimalNumber").show();
-    } else if (type == "date") {
-        $("#multipleChoiceOtherValidateDate").show();
-    } else {
-        $("#multipleChoiceOtherValidateErrorMessageSection").hide();
+function showCorrectMultipleChoiceAmount() {
+    var type = document.getElementById('multipleChoiceAmount').value;
+    if (type == "1" && $("#multipleChoiceDisplayType option[value='checkbox']").length > 0) {
+        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"radio\">Radio Buttons</option><option value=\"dropdown\">Drop-down List</option>"
+    } else if (type != "1" && $("#multipleChoiceDisplayType option[value='radio']").length > 0) {
+        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
     }
 }
 
-function showCorrectMultipleChoiceAmount() {
-    var type = document.getElementById('multipleChoiceAmount').value;
-    if (type == "1") {
-        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"radio\">Radio Buttons</option><option value=\"dropdown\">Drop-down List</option>"
+function showHideValidateTextMCSection() {
+    if ($("#validateTextMC").is(":checked")) {
+        $("#validateTextSectionMC").show();
     } else {
-        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
+        $("#validateTextSectionMC").hide();
     }
 }
 
