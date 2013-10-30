@@ -287,6 +287,7 @@ public class MainServlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Validate">
             case "validate":
+                System.out.println("validating");
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
@@ -453,6 +454,7 @@ public class MainServlet extends HttpServlet {
             // <editor-fold defaultstate="collapsed" desc="Generate Application">
 
             case "generateApplication":
+                System.out.println("generating application");
                 String javascript = "";
                 int pageCount = 1;
                 int questionCount = 1;

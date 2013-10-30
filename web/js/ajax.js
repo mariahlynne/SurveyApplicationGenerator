@@ -3,41 +3,46 @@ function switchProject(projectID, title) {
     if ($("#hfIsSessionEmpty").val() == "false") {
         switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
     }
-    $.post("MainServlet", {
-        func:"switchProject",
-        projectID:projectID,
-        title:title
-    }, function(json) {
-        $("#hfIsSessionEmpty").val("true");
-        $("#projectName").text(json.projectTitle);
-        if ($("#ddlProject option[value='" + json.projectID + "']").length == 0) {
-            $("#ddlProject").append('<option value="' + json.projectID + '">' + json.projectTitle + '</option>');
-        }
-        document.getElementById("navigationTree").innerHTML = json.treeHTML;
-        var currentNode;
-        var currentNodeType = $("#currentNodeType");
-        var currentPageIndex = $("#currentPageIndex");
-        var currentQuestionIndex = $("#currentQuestionIndex");
-        if (currentNodeType.val() == "page") {
-            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
-            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
-            currentNode.removeClass("nodeSelected");
-        } else if (currentNodeType.val() == "question") {
-            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
-                (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
-            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
-            currentNode.removeClass("nodeSelected");
-        }
+    $.ajax({
+        async: false,
+        url: "MainServlet",
+        data: {
+            func:"switchProject",
+            projectID:projectID,
+            title:title
+        },
+        success: function(json) {
+            $("#hfIsSessionEmpty").val("true");
+            $("#projectName").text(json.projectTitle);
+            if ($("#ddlProject option[value='" + json.projectID + "']").length == 0) {
+                $("#ddlProject").append('<option value="' + json.projectID + '">' + json.projectTitle + '</option>');
+            }
+            document.getElementById("navigationTree").innerHTML = json.treeHTML;
+            var currentNode;
+            var currentNodeType = $("#currentNodeType");
+            var currentPageIndex = $("#currentPageIndex");
+            var currentQuestionIndex = $("#currentQuestionIndex");
+            if (currentNodeType.val() == "page") {
+                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
+                currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
+                currentNode.removeClass("nodeSelected");
+            } else if (currentNodeType.val() == "question") {
+                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
+                    (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
+                currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
+                currentNode.removeClass("nodeSelected");
+            }
 
-        setSettingsFromJSON(json);
-        currentPageIndex.val(0);
-        currentQuestionIndex.val(0);
-        showQuestion();
-        currentNodeType.val("question");
-        currentNode = $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a");
-        currentNode.addClass("nodeSelected");
-        currentNode.attr('href', "javascript:doNothing()");
-        validate();
+            setSettingsFromJSON(json);
+            currentPageIndex.val(0);
+            currentQuestionIndex.val(0);
+            showQuestion();
+            currentNodeType.val("question");
+            currentNode = $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a");
+            currentNode.addClass("nodeSelected");
+            currentNode.attr('href', "javascript:doNothing()");
+            validate();
+        }
     });
 }
 
@@ -46,42 +51,49 @@ function switchNode(pageIndex, questionIndex) {
     var currentPageIndex = $("#currentPageIndex");
     var currentQuestionIndex = $("#currentQuestionIndex");
     var settingsJSON = getSettingsJSON();
-    $.post("MainServlet", {
-        func:"switch",
-        pageIndex:pageIndex,
-        questionIndex:questionIndex,
-        currentPageIndex:currentPageIndex.val(),
-        currentQuestionIndex:currentQuestionIndex.val(),
-        settingsJSON:settingsJSON
-    }, function(json) {
-        var currentNode;
-        if (currentNodeType.val() == "page") {
-            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
-            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
-            currentNode.removeClass("nodeSelected");
-        } else if (currentNodeType.val() == "question") {
-            currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
-                (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
-            currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
-            currentNode.removeClass("nodeSelected");
-        }
+    var validated = false;
+    $.ajax({
+        async: false,
+        url: "MainServlet",
+        data: {
+            func:"switch",
+            pageIndex:pageIndex,
+            questionIndex:questionIndex,
+            currentPageIndex:currentPageIndex.val(),
+            currentQuestionIndex:currentQuestionIndex.val(),
+            settingsJSON:settingsJSON
+        },
+        success: function(json) {
+            var currentNode;
+            if (currentNodeType.val() == "page") {
+                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > a");
+                currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", -1);");
+                currentNode.removeClass("nodeSelected");
+            } else if (currentNodeType.val() == "question") {
+                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(currentPageIndex.val()) + 1) + ") > ul > li:nth-child(" +
+                    (parseInt(currentQuestionIndex.val()) + 1) + ") > a");
+                currentNode.attr('href', "javascript:switchNode(" + currentPageIndex.val() + ", " + currentQuestionIndex.val() + ");");
+                currentNode.removeClass("nodeSelected");
+            }
 
-        setSettingsFromJSON(json);
-        currentPageIndex.val(pageIndex);
-        currentQuestionIndex.val(questionIndex);
-        if (questionIndex == -1) {
-            currentNodeType.val("page");
-            showPage();
-            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
-        } else {
-            showQuestion();
-            currentNodeType.val("question");
-            currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
+            setSettingsFromJSON(json);
+            currentPageIndex.val(pageIndex);
+            currentQuestionIndex.val(questionIndex);
+            if (questionIndex == -1) {
+                currentNodeType.val("page");
+                showPage();
+                currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
+            } else {
+                showQuestion();
+                currentNodeType.val("question");
+                currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
+            }
+            currentNode.addClass("nodeSelected");
+            currentNode.attr('href', "javascript:doNothing()");
+            validated = validate();
         }
-        currentNode.addClass("nodeSelected");
-        currentNode.attr('href', "javascript:doNothing()");
-        validate();
     });
+    return validated;
 }
 
 function getSettingsJSON() {
@@ -132,7 +144,6 @@ function getSettingsJSON() {
             json.allowDigits = $("#validCharsDigitsMC").is(":checked");
             json.allowSpecial = $("#validCharsSpecialMC").is(":checked");
             json.validSpecialCharacters = $("#validCharsSpecialTextMC").val();
-
             break;
     }
 
@@ -245,21 +256,26 @@ function clearAllFields() {
 }
 
 function addPage() {
-    $.post('MainServlet', {
-        func:"addPage"
-    }, function() {
-        var pageIndex = $("#navigationTree > li").length;
-        $("#navigationTree > li:last").after(
-            '<li>' +
-            '    <i class="icon-li icon-minus collapsible clickable"></i>' +
-            '    <a href="javascript:switchNode(' + pageIndex + ', -1);"> Page ' + (pageIndex + 1) + '</a>' +
-            '    <ul> ' +
-            '        <li>' +
-            '            <a href="javascript:switchNode(' + pageIndex + ', 0);">Question 1</a>' +
-            '        </li>' +
-            '    </ul>' +
-            '</li>'
-            );
+    $.ajax({
+        async: false,
+        url: 'MainServlet',
+        data: {
+            func:"addPage"
+        },
+        success: function() {
+            var pageIndex = $("#navigationTree > li").length;
+            $("#navigationTree > li:last").after(
+                '<li>' +
+                '    <i class="icon-li icon-minus collapsible clickable"></i>' +
+                '    <a href="javascript:switchNode(' + pageIndex + ', -1);"> Page ' + (pageIndex + 1) + '</a>' +
+                '    <ul> ' +
+                '        <li>' +
+                '            <a href="javascript:switchNode(' + pageIndex + ', 0);">Question 1</a>' +
+                '        </li>' +
+                '    </ul>' +
+                '</li>'
+                );
+        }
     });
 }
 
@@ -271,16 +287,21 @@ function addQuestion() {
         errorMessage.text("You must first select a page to add a question to.");
         errorMessage.show(0).delay(5000).hide(0);
     } else {
-        $.post('MainServlet', {
-            func:"addQuestion",
-            pageIndex:currentPageIndex
-        }, function() {
-            var questionCount = $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li").length;
-            $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li:last").after(
-                '<li>' +
-                '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
-                '</li>'
-                );
+        $.ajax({
+            async: false,
+            url: 'MainServlet',
+            data: {
+                func:"addQuestion",
+                pageIndex:currentPageIndex
+            },
+            success: function() {
+                var questionCount = $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li").length;
+                $("#navigationTree > li:nth-child(" + (currentPageIndex + 1) + ") > ul > li:last").after(
+                    '<li>' +
+                    '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
+                    '</li>'
+                    );
+            }
         });
     }
 }
@@ -326,16 +347,21 @@ function removeNode() {
             return;
     }
     if (confirm(confirmationText)) {
-        $.post('MainServlet', {
-            func:"remove",
-            pageIndex:currentPageIndex.val(),
-            questionIndex:currentQuestionIndex.val()
-        }, function(treeHTML) {
-            errorMessage.hide();
-            currentNodeType.val("");
-            currentPageIndex.val("-1");
-            currentQuestionIndex.val("-1");
-            document.getElementById("navigationTree").innerHTML = treeHTML;
+        $.ajax({
+            async: false,
+            url: 'MainServlet',
+            data: {
+                func:"remove",
+                pageIndex:currentPageIndex.val(),
+                questionIndex:currentQuestionIndex.val()
+            },
+            success: function(treeHTML) {
+                errorMessage.hide();
+                currentNodeType.val("");
+                currentPageIndex.val("-1");
+                currentQuestionIndex.val("-1");
+                document.getElementById("navigationTree").innerHTML = treeHTML;
+            }
         });
     }
 }
@@ -346,50 +372,63 @@ function doNothing() {
 
 function generateApplication() {
     //calling switch node will effectively save the node they're currently on - all others will already be saved
-    switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
-    if (validate()) {
-        $.post('MainServlet', {
-            func:"generateApplication"
-        }, function() {
-            });
+    var validated = switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
+    if (validated) {
+        $.ajax({
+            url:'MainServlet',
+            data: {
+                func:"generateApplication"
+            },
+            success: function() {
+                alert('Your survey has been generated successfully!');
+            },
+            async: false
+        });
     } else {
-    //show error message
+        alert('You must resolve all errors before the survey can be generated.')
     }
 }
 
 function validate() {
     var currentPageIndex = $("#currentPageIndex");
     var currentQuestionIndex = $("#currentQuestionIndex");
-    $.post("MainServlet", {
-        func:"validate",
-        currentPageIndex:currentPageIndex.val(),
-        currentQuestionIndex:currentQuestionIndex.val()
-    }, function(json) {
-        clearAllErrorIcons();
-        var invalidNodes = json.invalidNodes.split(";");
-        var pages = "";
-        var currentNode;
-        for (var ndx = 0; ndx < invalidNodes.length; ndx++) {
-            if (invalidNodes[ndx].length > 0){
-                var pageIndex = invalidNodes[ndx].split(",")[0];
-                var questionIndex = invalidNodes[ndx].split(",")[1];
-                if (pages.indexOf(pageIndex) == -1) {
-                    currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > a");
+    var validated = false;
+    $.ajax({
+        async: false,
+        url: "MainServlet",
+        data: {
+            func:"validate",
+            currentPageIndex:currentPageIndex.val(),
+            currentQuestionIndex:currentQuestionIndex.val()
+        },
+        success: function(json) {
+            clearAllErrorIcons();
+            var invalidNodes = json.invalidNodes.split(";");
+            var pages = "";
+            var currentNode;
+            for (var ndx = 0; ndx < invalidNodes.length; ndx++) {
+                if (invalidNodes[ndx].length > 0){
+                    var pageIndex = invalidNodes[ndx].split(",")[0];
+                    var questionIndex = invalidNodes[ndx].split(",")[1];
+                    if (pages.indexOf(pageIndex) == -1) {
+                        currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > a");
+                        currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
+                        pages += pageIndex + ";";
+                    }
+                    currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > ul > li:nth-child(" +
+                        (parseInt(questionIndex) + 1) + ") > a");
                     currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
-                    pages += pageIndex + ";";
                 }
-                currentNode = $("#navigationTree > li:nth-child(" + (parseInt(pageIndex) + 1) + ") > ul > li:nth-child(" +
-                    (parseInt(questionIndex) + 1) + ") > a");
-                currentNode.after("<i class=\"icon-warning-sign nodeErrorIcon\" style=\"color: red; margin-left: 10px;\"></i>");
             }
+            if (json.errorMessage != undefined && json.errorMessage.length > 0) {
+                $("#questionErrorMessages").html(json.errorMessage);
+                $("#questionErrorSection").show();
+            }
+            validated = invalidNodes.length == 0;
         }
-        if (json.errorMessage != undefined && json.errorMessage.length > 0) {
-            $("#questionErrorMessages").html(json.errorMessage);
-            $("#questionErrorSection").show();
-            return false;
-        }
-        return true;
     });
+    //returns whether or not ANY errors are present
+    return validated;
 }
 
 function clearAllErrorIcons() {
