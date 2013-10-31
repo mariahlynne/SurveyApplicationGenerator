@@ -240,6 +240,7 @@ public class MainServlet extends HttpServlet {
                 }
                 session.setAttribute("pages", pages);
                 session.setAttribute("iProjectID", iProjectID);
+                session.setAttribute("sProjectTitle", title);
                 o = new JSONObject();
                 o.put("projectTitle", title);
                 o.put("projectID", iProjectID);
@@ -344,7 +345,7 @@ public class MainServlet extends HttpServlet {
                                     case "setMin":
                                         if (q.min.length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^[0-9]+$")) {
+                                        } else if (!q.min.matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Minimum must be a whole number</li>";
                                         }
 
@@ -352,7 +353,7 @@ public class MainServlet extends HttpServlet {
                                     case "setMax":
                                         if (q.max.length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^[0-9]+$")) {
+                                        } else if (!q.max.matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Maximum must be a whole number</li>";
                                         }
                                         try {
@@ -365,12 +366,12 @@ public class MainServlet extends HttpServlet {
                                     case "setMinMax":
                                         if (q.min.length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^[0-9]+$")) {
+                                        } else if (!q.min.matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Minimum must be a whole number</li>";
                                         }
                                         if (q.max.length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^[0-9]+$")) {
+                                        } else if (!q.max.matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Maximum must be a whole number</li>";
                                         }
                                         try {
@@ -389,7 +390,7 @@ public class MainServlet extends HttpServlet {
                                     case "setMin":
                                         if (q.min.length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.min.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Minimum must be a decimal number</li>";
                                         }
 
@@ -397,19 +398,19 @@ public class MainServlet extends HttpServlet {
                                     case "setMax":
                                         if (q.max.length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.max.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Maximum must be a decimal number</li>";
                                         }
                                         break;
                                     case "setMinMax":
                                         if (q.min.length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.min.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Minimum must be a decimal number</li>";
                                         }
                                         if (q.max.length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.max.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Maximum must be a decimal number</li>";
                                         }
                                         try {
@@ -466,27 +467,7 @@ public class MainServlet extends HttpServlet {
                 for (Page p : pages) {
                     body = new CodeGen();
                     partialJS = new CodeGen();
-                    body.addLine(CodeGen.DIR.S, "<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\n");
-                    body.addLine(CodeGen.DIR.S, "<!DOCTYPE html>\n");
-                    body.addLine(CodeGen.DIR.S, "<html>\n");
-                    body.addLine(CodeGen.DIR.F, "<head>\n");
-                    body.addLine(CodeGen.DIR.F, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
-                    body.addLine(CodeGen.DIR.S, "<title>Generated Survey</title>\n");
-                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/bootstrap.css\"/>\n");
-                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/font-awesome.css\"/>\n");
-                    body.addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/main.css\"/>\n");
-                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/jquery-1.10.1.js\"></script>\n");
-                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/bootstrap.js\"></script>\n");
-                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/static.js\"></script>\n");
-                    body.addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/main.js\"></script>\n");
-                    body.addLine(CodeGen.DIR.B, "</head>\n");
-                    body.addLine(CodeGen.DIR.S, "<body>\n");
-                    body.addLine(CodeGen.DIR.F, "<header id=\"primary\">\n");
-                    body.addLine(CodeGen.DIR.F, "<h1>\n");
-                    body.addLine(CodeGen.DIR.F, "Survey Title\n");
-                    body.addLine(CodeGen.DIR.B, "</h1>\n");
-                    body.addLine(CodeGen.DIR.B, "</header>\n");
-                    body.addLine(CodeGen.DIR.S, "<form action=\"Servlet?Page=Page" + pageCount + "\" id=\"form\" onsubmit=\"return validatePage" + pageCount + "()\" method=\"POST\">\n");
+                    body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
                     partialJS.addLine(CodeGen.DIR.S, "function validatePage" + pageCount + "() {\n");
                     partialJS.addLine(CodeGen.DIR.F, "var result = true;\n");
                     body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
@@ -508,24 +489,8 @@ public class MainServlet extends HttpServlet {
                         switch (q.questionType) {
                             case "text":
                                 body.getTextBoxCode(q.questionID, Integer.parseInt(q.max));
-                                partialJS.addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + q.questionID + "', 'text', " + q.min + ", " + q.max + ") && result;\n");
-                                if (q.validateText) {
-                                    String validChars = "";
-                                    String[] allowTypes = q.allowTypes.split(", ");
-                                    if (allowTypes[0].equals("true")) {
-                                        validChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                                    }
-                                    if (allowTypes[1].equals("true")) {
-                                        validChars += "abcdefghijklmnopqrstuvwxyz";
-                                    }
-                                    if (allowTypes[2].equals("true")) {
-                                        validChars += "0123456789";
-                                    }
-                                    if (allowTypes[3].equals("true")) {
-                                        validChars += q.validSpecialCharacters;
-                                    }
-                                    partialJS.addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
-                                }
+                                partialJS.getMeetsLengthRequirementsCode(q.questionID, q.min, q.max);
+                                partialJS.getTextValidationCode(q);
                                 break;
                             case "multipleChoice":
                                 ArrayList<String> answers = new ArrayList<String>();
@@ -535,51 +500,15 @@ public class MainServlet extends HttpServlet {
                                     }
                                 }
                                 body.getMultipleChoiceCode(answers, q.questionID, q.displayType, q.otherChoice);
-                                if (q.otherChoice.length() > 0 && q.validateText) {
-                                    String validChars = "";
-                                    String[] allowTypes = q.allowTypes.split(", ");
-                                    if (allowTypes[0].equals("true")) {
-                                        validChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                                    }
-                                    if (allowTypes[1].equals("true")) {
-                                        validChars += "abcdefghijklmnopqrstuvwxyz";
-                                    }
-                                    if (allowTypes[2].equals("true")) {
-                                        validChars += "0123456789";
-                                    }
-                                    if (allowTypes[3].equals("true")) {
-                                        validChars += q.validSpecialCharacters;
-                                    }
-                                    partialJS.addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
-                                }
+                                partialJS.getTextValidationCode(q);
                                 break;
                             case "wholeNumber":
                                 body.getWholeNumberCode(q.questionID);
-                                switch (q.validationType) {
-                                    case "min":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
-                                        break;
-                                    case "max":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
-                                        break;
-                                    case "minMax":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
-                                        break;
-                                }
+                                partialJS.getWholeNumberValidationCode(q);
                                 break;
                             case "decimalNumber":
                                 body.getDecimalNumberCode(q.questionID, Integer.parseInt(q.decimalPlaces));
-                                switch (q.validationType) {
-                                    case "min":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
-                                        break;
-                                    case "max":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
-                                        break;
-                                    case "minMax":
-                                        partialJS.addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
-                                        break;
-                                }
+                                partialJS.getDecimalValidationCode(q);
                                 break;
                         }
                         if (q.isRequired) {
@@ -595,9 +524,9 @@ public class MainServlet extends HttpServlet {
                     body.addLine(CodeGen.DIR.S, "<tr>\n");
                     body.addLine(CodeGen.DIR.F, "<td align=\"center\">\n");
                     if (pageCount < pages.size()) {
-                        body.addLine(CodeGen.DIR.F, "<button id=\"nextButton\" type=\"submit\" class=\"btn btn-info\">Next</button>\n");
+                        body.getNextButtonCode();
                     } else {
-                        body.addLine(CodeGen.DIR.F, "<button id=\"submitButton\" type=\"submit\" class=\"btn btn-info\">Submit</button>\n");
+                        body.getSubmitButtonCode();
                     }
                     body.addLine(CodeGen.DIR.B, "</td>\n");
                     body.addLine(CodeGen.DIR.B, "</tr>\n");
@@ -605,7 +534,7 @@ public class MainServlet extends HttpServlet {
                     body.addLine(CodeGen.DIR.B, "</form>\n");
                     body.addLine(CodeGen.DIR.B, "</body>\n");
                     body.addLine(CodeGen.DIR.B, "</html>");
-                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\Page" + pageCount + ".jsp"));
+                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\Page" + pageCount + ".txt"));
                     bw.write(body.code);
                     bw.flush();
                     bw.close();

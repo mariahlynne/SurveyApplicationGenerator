@@ -424,7 +424,7 @@ function validate() {
                 $("#questionErrorMessages").html(json.errorMessage);
                 $("#questionErrorSection").show();
             }
-            validated = invalidNodes.length == 0;
+            validated = json.invalidNodes.length == 0;
         }
     });
     //returns whether or not ANY errors are present
