@@ -194,7 +194,6 @@ function setSettingsFromJSON(json) {
                 }
             }
             if (json.otherChoice == "") {
-                $("#multipleChoiceOtherAnswerText").val("Other");
                 $("#multipleChoiceAddOther").prop('checked', false);
             } else {
                 $("#multipleChoiceOtherAnswerText").val(json.otherChoice);

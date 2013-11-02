@@ -446,7 +446,7 @@ public class MainServlet extends HttpServlet {
                                         } else if (Integer.parseInt(q.max) == 0) {
                                             errorMessage += "<li>Character maximum must be greater than 0</li>";
                                         } else if (Integer.parseInt(q.min) == 0 && q.isRequired) {
-                                            errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
+                                            errorMessage += "<li>Character minimum cannot be 0</li>";
                                         }
                                     } catch (Exception ex) {
                                     }
@@ -505,7 +505,11 @@ public class MainServlet extends HttpServlet {
                         body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
                         body.spaceCount += 4;
                         if (q.isRequired) {
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "', true);\n");
+                            String type = q.questionType;
+                            if (type.equals("multipleChoice")) {
+                                type = q.displayType;
+                            }
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + type + "', true);\n");
                             partialJS.addLine(CodeGen.DIR.S, "result = v" + validationCount + " && result;\n");
                             partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
@@ -516,7 +520,7 @@ public class MainServlet extends HttpServlet {
                         }
                         switch (q.questionType) {
                             case "text":
-                                body.getTextBoxCode(q.questionID, Integer.parseInt(q.max));
+                                body.getTextBoxCode(q.questionID, Integer.parseInt(q.max), true);
                                 partialJS.getMeetsLengthRequirementsCode(q.questionID, q.min, q.max);
                                 partialJS.getTextValidationCode(q);
                                 break;
@@ -527,8 +531,8 @@ public class MainServlet extends HttpServlet {
                                         answers.add(answer);
                                     }
                                 }
-                                body.getMultipleChoiceCode(answers, q.questionID, q.displayType, q.otherChoice);
-                                partialJS.getTextValidationCode(q);
+                                body.getMultipleChoiceCode(answers, q);
+                                partialJS.getMultipleChoiceValidationCode(q);
                                 break;
                             case "wholeNumber":
                                 body.getWholeNumberCode(q.questionID);

@@ -40,86 +40,90 @@ public class CodeGen {
 
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="HTML Elements (with bootstrap)">
-    public void getMultipleChoiceCode(ArrayList<String> answers, String id, String type, String otherChoice) {
+    public void getMultipleChoiceCode(ArrayList<String> answers, Question q) {
         //incorporate the "other" answer & its validation
-        switch (type) {
+        switch (q.displayType) {
             case "radio":
-                getRadioButtonListCode(answers, id, otherChoice);
+                getRadioButtonListCode(answers, q);
                 break;
             case "dropdown":
-                getDropDownListCode(answers, id, otherChoice);
+                getDropDownListCode(answers, q);
                 break;
             case "checkbox":
-                getCheckBoxListCode(answers, id, otherChoice);
+                getCheckBoxListCode(answers, q);
                 break;
         }
     }
 
-    public void getRadioButtonListCode(ArrayList<String> answers, String id, String otherChoice) {
+    public void getRadioButtonListCode(ArrayList<String> answers, Question q) {
         int ndx = 0;
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"radio\">\n");
             addLine(DIR.F, "<label>\n");
-            if (otherChoice.length() > 0) {
-                addLine(DIR.F, "<input type=\"radio\" id=\"" + id + "_" + ndx++ + "\" name=\"" + id + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "', '" + id + "OtherChoice', 'radio');\" />\n");
+            if (q.otherChoice.length() > 0) {
+                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "_" + ndx++ + "\" name=\"" + q.questionID + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'radio');\" />\n");
             } else {
-                addLine(DIR.F, "<input type=\"radio\" id=\"" + id + "_" + ndx++ + "\" name=\"" + id + "\" value=\"" + answer + "\" />\n");
+                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "_" + ndx++ + "\" name=\"" + q.questionID + "\" value=\"" + answer + "\" />\n");
             }
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
         }
-        if (otherChoice.length() > 0) {
+        if (q.otherChoice.length() > 0) {
             addLine(DIR.S, "<div class=\"radio\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"radio\" id=\"" + id + "OtherChoiceSpecify\" name=\"" + id + "\" value=\"" + otherChoice + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "', '" + id + "OtherChoice', 'radio');\">\n");
-            addLine(DIR.S, otherChoice + "\n");
+            addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "OtherChoiceSpecify\" name=\"" + q.questionID + "\" value=\"" + q.otherChoice + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'radio');\">\n");
+            addLine(DIR.S, q.otherChoice + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
-            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
         }
     }
 
-    public void getDropDownListCode(ArrayList<String> answers, String id, String otherChoice) {
-        addLine(DIR.S, "<select class=\"form-control\" id=\"" + id + "\" onchange=\"showHideOtherChoiceTextbox('" + id + "', '" + id + "OtherChoice', 'dropdown');\">\n");
+    public void getDropDownListCode(ArrayList<String> answers, Question q) {
+        addLine(DIR.S, "<select class=\"form-control\" id=\"" + q.questionID + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'dropdown');\">\n");
         for (String answer : answers) {
             addLine(DIR.FB, "<option>" + answer + "</option>\n");
         }
-        if (otherChoice.length() > 0) {
-            addLine(DIR.FB, "<option value=\"otherChoiceSpecify\">" + otherChoice + "</option>");
+        if (q.otherChoice.length() > 0) {
+            addLine(DIR.FB, "<option value=\"otherChoiceSpecify\">" + q.otherChoice + "</option>\n");
         }
         addLine(DIR.S, "</select><br />\n");
-        if (otherChoice.length() > 0) {
-            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+        if (q.otherChoice.length() > 0) {
+            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
         }
     }
 
-    public void getCheckBoxListCode(ArrayList<String> answers, String id, String otherChoice) {
+    public void getCheckBoxListCode(ArrayList<String> answers, Question q) {
         int ndx = 0;
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"checkbox\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + id + "_" + ndx++ + "\" value=\"" + answer + "\">\n");
+            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.questionID + "_" + ndx++ + "\" value=\"" + answer + "\">\n");
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
         }
-        if (otherChoice.length() > 0) {
+        if (q.otherChoice.length() > 0) {
             addLine(DIR.S, "<div class=\"checkbox\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + id + "OtherChoiceSpecify\" value=\"otherChoice\" onchange=\"showHideOtherChoiceTextbox('" + id + "OtherChoiceSpecify', '" + id + "OtherChoice', 'checkbox');\">\n");
-            addLine(DIR.S, otherChoice + "\n");
+            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.questionID + "OtherChoiceSpecify\" value=\"otherChoice\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "OtherChoiceSpecify', '" + q.questionID + "OtherChoice', 'checkbox');\">\n");
+            addLine(DIR.S, q.otherChoice + "\n");
             addLine(DIR.B, "</label>\n");
-            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "OtherChoice\" style=\"display: none;\" />\n");
+            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
             addLine(DIR.B, "</div>\n");
         }
     }
 
-    public void getTextBoxCode(String id, int maxlength) {
+    public void getTextBoxCode(String id, int maxlength, boolean display) {
+        String style = display ? "" : " style=\"display: none;\"";
         if (maxlength > 100) {
-            addLine(DIR.S, "<textarea id=\"" + id + "\" rows=\"3\" maxlength=\"" + maxlength + "\" style=\"width: 100%\"></textarea>\n");
+            addLine(DIR.S, "<textarea id=\"" + id + "\" rows=\"3\" class=\"textarea\" maxlength=\"" + maxlength + "\"" + style + "></textarea>\n");
         } else {
-            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "\" class=\"form-control\" maxlength=\"" + maxlength + "\" />\n");
+            addLine(DIR.S, "<input type=\"text\" id=\"" + id + "\" class=\"form-control\" maxlength=\"" + maxlength + "\"" + style + " />\n");
         }
     }
 
@@ -129,10 +133,6 @@ public class CodeGen {
 
     public void getDecimalNumberCode(String id, int decimalPlaces) {
         addLine(DIR.S, "<input type=\"text\" id=\"" + id + "\" class=\"form-control onlyAllowDecimalNumbers\" onblur=\"padDecimalPointPlaces('" + id + "', " + decimalPlaces + ")\" />\n");
-    }
-
-    public void getTextAreaCode(String id) {
-        addLine(DIR.S, "<textarea id=\"" + id + "\" class=\"form-control\" rows=\"3\"></textarea>\n");
     }
 
     // </editor-fold>
@@ -157,7 +157,9 @@ public class CodeGen {
             if (allowTypes[3].equals("true")) {
                 validChars += q.validSpecialCharacters.replace("\\", "\\\\").replace("'", "\\'");
             }
-            //TODO need to use specific multiple choice type instead of text, unless it is text
+            if (q.questionType.equals("multipleChoice")) {
+                q.questionID += "OtherChoice";
+            }
             addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
         }
     }
@@ -187,6 +189,25 @@ public class CodeGen {
             case "setMinMax":
                 addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
                 break;
+        }
+    }
+
+    public void getMultipleChoiceValidationCode(Question q) {
+        if (q.otherChoice.length() > 0) {
+            switch (q.displayType) {
+                case "checkbox":
+                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.questionID + "', " + q.numberOfAnswers + ") && result;\n");
+                case "radio":
+                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.questionID + "OtherChoiceSpecify\").is(':checked')) {\n");
+                    break;
+                case "dropdown":
+                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.questionID + "\").val() == \"otherChoiceSpecify\") {\n");
+                    break;
+            }
+            spaceCount += 4;
+            getMeetsLengthRequirementsCode(q.questionID + "OtherChoice", q.min, q.max);
+            getTextValidationCode(q);
+            addLine(CodeGen.DIR.B, "}\n");
         }
     }
 

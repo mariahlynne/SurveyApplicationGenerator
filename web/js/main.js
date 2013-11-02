@@ -148,7 +148,7 @@ function showCorrectMultipleChoiceAmount() {
     if (type == "1" && $("#multipleChoiceDisplayType option[value='checkbox']").length > 0) {
         document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"radio\">Radio Buttons</option><option value=\"dropdown\">Drop-down List</option>"
     } else if (type != "1" && $("#multipleChoiceDisplayType option[value='radio']").length > 0) {
-        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"dropdown\">Drop-down List</option><option value=\"checkbox\">Checkboxes</option>"
+        document.getElementById('multipleChoiceDisplayType').innerHTML = "<option value=\"checkbox\">Checkboxes</option>"
     }
 }
 
