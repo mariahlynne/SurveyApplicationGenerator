@@ -150,12 +150,16 @@ public class MainServlet extends HttpServlet {
                             case "multipleChoice":
                                 question.answerChoices = o.get("answerChoices").toString();
                                 question.displayType = o.get("displayType").toString();
-                                question.otherChoice = o.get("otherChoice").toString();
                                 question.numberOfAnswers = o.get("numberOfAnswers").toString();
-                                question.validateText = (Boolean) o.get("validateText");
-                                if (question.validateText) {
-                                    question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
-                                    question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                question.otherChoice = o.get("otherChoice").toString();
+                                if (question.otherChoice.length() > 0) {
+                                    question.min = o.get("min").toString();
+                                    question.max = o.get("max").toString();
+                                    question.validateText = (Boolean) o.get("validateText");
+                                    if (question.validateText) {
+                                        question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
+                                        question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                    }
                                 }
                         }
                         DatabaseAccess.UpdateQuestion(question);
@@ -288,7 +292,6 @@ public class MainServlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Validate">
             case "validate":
-                System.out.println("validating");
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
@@ -426,11 +429,33 @@ public class MainServlet extends HttpServlet {
                                 if (q.answerChoices.length() == 0) {
                                     errorMessage += "<li>There must be at least one answer choice</li>";
                                 }
-                                if (q.otherChoice.length() > 0 && q.validateText) {
-                                    if (!q.allowTypes.contains("true")) {
-                                        errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
-                                    } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
-                                        errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                                if (q.otherChoice.length() > 0) {
+                                    if (q.min.length() == 0) {
+                                        errorMessage += "<li>Character minimum is required</li>";
+                                    } else if (!q.min.matches("^[0-9]+$")) {
+                                        errorMessage += "<li>Character minimum must be a whole number</li>";
+                                    }
+                                    if (q.max.length() == 0) {
+                                        errorMessage += "<li>Character maximum is required</li>";
+                                    } else if (!q.max.matches("^[0-9]+$")) {
+                                        errorMessage += "<li>Character maximum must be a whole number</li>";
+                                    }
+                                    try {
+                                        if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                            errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
+                                        } else if (Integer.parseInt(q.max) == 0) {
+                                            errorMessage += "<li>Character maximum must be greater than 0</li>";
+                                        } else if (Integer.parseInt(q.min) == 0 && q.isRequired) {
+                                            errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
+                                        }
+                                    } catch (Exception ex) {
+                                    }
+                                    if (q.validateText) {
+                                        if (!q.allowTypes.contains("true")) {
+                                            errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
+                                        } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
+                                            errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                                        }
                                     }
                                 }
                                 break;
@@ -455,7 +480,6 @@ public class MainServlet extends HttpServlet {
             // <editor-fold defaultstate="collapsed" desc="Generate Application">
 
             case "generateApplication":
-                System.out.println("generating application");
                 String javascript = "";
                 int pageCount = 1;
                 int questionCount = 1;
@@ -469,7 +493,8 @@ public class MainServlet extends HttpServlet {
                     partialJS = new CodeGen();
                     body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
                     partialJS.addLine(CodeGen.DIR.S, "function validatePage" + pageCount + "() {\n");
-                    partialJS.addLine(CodeGen.DIR.F, "var result = true;\n");
+                    partialJS.addLine(CodeGen.DIR.F, "$(\".errorText\").hide();\n");
+                    partialJS.addLine(CodeGen.DIR.S, "var result = true;\n");
                     body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
                     body.spaceCount += 4;
                     for (Question q : p.questions) {
@@ -480,9 +505,12 @@ public class MainServlet extends HttpServlet {
                         body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
                         body.spaceCount += 4;
                         if (q.isRequired) {
-                            validationCount++;
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "');\n");
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "', true);\n");
                             partialJS.addLine(CodeGen.DIR.S, "result = v" + validationCount + " && result;\n");
+                            partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
+                            partialJS.spaceCount += 4;
+                        } else {
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "', false);\n");
                             partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
                         }
@@ -511,9 +539,7 @@ public class MainServlet extends HttpServlet {
                                 partialJS.getDecimalValidationCode(q);
                                 break;
                         }
-                        if (q.isRequired) {
-                            partialJS.addLine(CodeGen.DIR.B, "}\n");
-                        }
+                        partialJS.addLine(CodeGen.DIR.B, "}\n");
                         body.addLine(CodeGen.DIR.B, "</div>\n");
                         body.addLine(CodeGen.DIR.B, "</td>\n");
                         body.addLine(CodeGen.DIR.B, "</tr>\n");
@@ -534,13 +560,13 @@ public class MainServlet extends HttpServlet {
                     body.addLine(CodeGen.DIR.B, "</form>\n");
                     body.addLine(CodeGen.DIR.B, "</body>\n");
                     body.addLine(CodeGen.DIR.B, "</html>");
-                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\Page" + pageCount + ".txt"));
+                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\Page" + pageCount + ".jsp"));
                     bw.write(body.code);
                     bw.flush();
                     bw.close();
                     pageCount++;
                 }
-                bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\desktop\\javascript.txt"));
+                bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\js\\main.js"));
                 bw.write(javascript);
                 bw.flush();
                 bw.close();

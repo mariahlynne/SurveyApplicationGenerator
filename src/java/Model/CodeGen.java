@@ -117,7 +117,7 @@ public class CodeGen {
 
     public void getTextBoxCode(String id, int maxlength) {
         if (maxlength > 100) {
-            addLine(DIR.S, "<textarea id=\"" + id + "\" rows=\"3\" maxlength=\"" + maxlength + "\"></textarea>\n");
+            addLine(DIR.S, "<textarea id=\"" + id + "\" rows=\"3\" maxlength=\"" + maxlength + "\" style=\"width: 100%\"></textarea>\n");
         } else {
             addLine(DIR.S, "<input type=\"text\" id=\"" + id + "\" class=\"form-control\" maxlength=\"" + maxlength + "\" />\n");
         }
@@ -164,13 +164,13 @@ public class CodeGen {
 
     public void getDecimalValidationCode(Question q) {
         switch (q.validationType) {
-            case "min":
+            case "setMin":
                 addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
                 break;
-            case "max":
+            case "setMax":
                 addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
                 break;
-            case "minMax":
+            case "setMinMax":
                 addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
                 break;
         }
@@ -178,13 +178,13 @@ public class CodeGen {
 
     public void getWholeNumberValidationCode(Question q) {
         switch (q.validationType) {
-            case "min":
+            case "setMin":
                 addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
                 break;
-            case "max":
+            case "setMax":
                 addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
                 break;
-            case "minMax":
+            case "setMinMax":
                 addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
                 break;
         }

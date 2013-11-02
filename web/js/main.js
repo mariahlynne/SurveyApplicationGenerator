@@ -79,6 +79,7 @@ function showHideDecimalNumberValidation() {
         $("#decimalNumberMinSection").show();
         $("#decimalNumberMaxSection").show();
     }
+    changeDecimalPlacePadding();
 }
 
 function showCorrectMultipleChoice() {
@@ -211,5 +212,23 @@ function selectProject() {
             $("#txtNewProject").val("");
             $('#myModal').modal('hide');
         }
+    }
+}
+
+function changeDecimalPlacePadding() {
+    $("#txtDecimalNumberMin").blur(function () {
+        padDecimalPointPlaces("txtDecimalNumberMin", $("#decimalPlaces").val());
+    });
+    $("#txtDecimalNumberMax").blur(function () {
+        padDecimalPointPlaces("txtDecimalNumberMax", $("#decimalPlaces").val());
+    });
+}
+
+function padDecimalPointPlaces(id, places) {
+    var padded = parseFloat($("#" + id).val());
+    if (!isNaN(padded)) {
+        $("#" + id).val(padded.toFixed(places));
+    } else {
+        $("#" + id).val("");
     }
 }

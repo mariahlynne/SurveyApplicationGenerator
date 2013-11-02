@@ -135,15 +135,17 @@ function getSettingsJSON() {
             });
             if ($("#multipleChoiceAddOther").is(":checked")) {
                 json.otherChoice = $("#multipleChoiceOtherAnswerText").val();
+                json.min = $("#textValidateSpecificLengthMinMC").val();
+                json.max = $("#textValidateSpecificLengthMaxMC").val();
+                json.validateText = $("#validateTextMC").is(":checked");
+                json.allowUpper = $("#validCharsUppercaseMC").is(":checked");
+                json.allowLower = $("#validCharsLowercaseMC").is(":checked");
+                json.allowDigits = $("#validCharsDigitsMC").is(":checked");
+                json.allowSpecial = $("#validCharsSpecialMC").is(":checked");
+                json.validSpecialCharacters = $("#validCharsSpecialTextMC").val();
             } else {
                 json.otherChoice = "";
             }
-            json.validateText = $("#validateTextMC").is(":checked");
-            json.allowUpper = $("#validCharsUppercaseMC").is(":checked");
-            json.allowLower = $("#validCharsLowercaseMC").is(":checked");
-            json.allowDigits = $("#validCharsDigitsMC").is(":checked");
-            json.allowSpecial = $("#validCharsSpecialMC").is(":checked");
-            json.validSpecialCharacters = $("#validCharsSpecialTextMC").val();
             break;
     }
 
@@ -197,14 +199,16 @@ function setSettingsFromJSON(json) {
             } else {
                 $("#multipleChoiceOtherAnswerText").val(json.otherChoice);
                 $("#multipleChoiceAddOther").prop('checked', true);
+                $("#textValidateSpecificLengthMinMC").val(json.min);
+                $("#textValidateSpecificLengthMaxMC").val(json.max);
+                $("#validateTextMC").prop('checked', json.validateText);
+                showHideValidateTextMCSection();
+                $("#validCharsUppercaseMC").prop('checked', json.allowUpper == 'true');
+                $("#validCharsLowercaseMC").prop('checked', json.allowLower == 'true');
+                $("#validCharsDigitsMC").prop('checked', json.allowDigits == 'true');
+                $("#validCharsSpecialMC").prop('checked', json.allowSpecial == 'true');
+                $("#validCharsSpecialTextMC").val(json.validSpecialCharacters);
             }
-            $("#validateTextMC").prop('checked', json.validateText);
-            showHideValidateTextMCSection();
-            $("#validCharsUppercaseMC").prop('checked', json.allowUpper == 'true');
-            $("#validCharsLowercaseMC").prop('checked', json.allowLower == 'true');
-            $("#validCharsDigitsMC").prop('checked', json.allowDigits == 'true');
-            $("#validCharsSpecialMC").prop('checked', json.allowSpecial == 'true');
-            $("#validCharsSpecialTextMC").val(json.validSpecialCharacters);
             break;
     }
 
@@ -246,6 +250,8 @@ function clearAllFields() {
     $("#multipleChoiceDisplayType").val("radio");
     $("#multipleChoiceAddOther").prop('checked', false);
     $("#multipleChoiceOtherAnswerText").val("Other (please specify)");
+    $("#textValidateSpecificLengthMinMC").val("");
+    $("#textValidateSpecificLengthMaxMC").val("");
     $("#validateTextMC").prop("checked", false);
     $("#validCharsUppercaseMC").prop('checked', true);
     $("#validCharsLowercaseMC").prop('checked', true);

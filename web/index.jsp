@@ -221,7 +221,7 @@
                     <div id="decimalNumberSection">
                         <br />
                         <label for="decimalPlaces" class="boldLabel">Number of Decimal Places:</label>
-                        <select id="decimalPlaces" style="width: 50px;">
+                        <select id="decimalPlaces" style="width: 50px;" onchange="changeDecimalPlacePadding();">
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -308,6 +308,15 @@
                                 <div id="multipleChoiceAddOtherFieldSection">
                                     <label id="multipleChoiceOtherAnswerTextLabel" for="multipleChoiceOtherAnswerText" class="boldLabel">Answer Label:</label>
                                     <input type="text" id="multipleChoiceOtherAnswerText" value="Other (please specify)" style="width: 97%" />
+                                    <table>
+                                        <tr>
+                                            <td><label class ="boldLabel" style="margin-right: 10px">At least </label></td>
+                                            <td><input type="text" id="textValidateSpecificLengthMinMC"style="width: 40px" maxlength="5" /></td>
+                                            <td><label class="boldLabel" style="margin-right: 10px; margin-left: 10px"> characters but no more than </label></td>
+                                            <td><input type="text" id="textValidateSpecificLengthMaxMC" style="width: 40px" maxlength="5" /></td>
+                                            <td><label class="boldLabel" style="margin-left: 10px"> characters</label></td>
+                                        </tr>
+                                    </table>
                                     <div class="checkbox">
                                         <label for="validateTextMC" class="boldLabel">
                                             <input type="checkbox" id="validateTextMC" onchange="showHideValidateTextMCSection()" />
