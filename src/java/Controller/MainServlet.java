@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -488,6 +489,7 @@ public class MainServlet extends HttpServlet {
                 BufferedWriter bw;
                 CodeGen body;
                 CodeGen partialJS;
+                HashMap<String, String> dbColumns = new HashMap<String, String>();
                 for (Page p : pages) {
                     body = new CodeGen();
                     partialJS = new CodeGen();
@@ -498,6 +500,7 @@ public class MainServlet extends HttpServlet {
                     body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
                     body.spaceCount += 4;
                     for (Question q : p.questions) {
+                        CodeGen.getSQLColumnDeclaration(q, dbColumns);
                         body.addLine(CodeGen.DIR.S, "<tr>\n");
                         body.addLine(CodeGen.DIR.F, "<td>\n");
                         body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionID + "ErrorMessage\" class=\"errorText\"></p>\n");
@@ -574,6 +577,7 @@ public class MainServlet extends HttpServlet {
                 bw.write(javascript);
                 bw.flush();
                 bw.close();
+                DatabaseAccess.CreateTable(session.getAttribute("sProjectTitle").toString(), dbColumns);
                 break;
             //</editor-fold>
         }

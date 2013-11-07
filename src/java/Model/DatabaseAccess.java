@@ -6,6 +6,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseAccess {
 
@@ -65,6 +68,22 @@ public class DatabaseAccess {
         } catch (Exception ex) {
             ex.printStackTrace();
             return -1;
+        }
+    }
+
+    public static void CreateTable(String sName, HashMap<String, String> columns) {
+        try {
+            Initialize();
+            st = con.createStatement();
+            String sql = "CREATE TABLE `" + sName + "` (iEntryID INT NOT NULL AUTO_INCREMENT, ";
+            for (Map.Entry<String, String> entry : columns.entrySet()) {
+                sql += "`" + entry.getKey() + "` " + entry.getValue() + ", ";
+            }
+            sql += "PRIMARY KEY (`iEntryID`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;";
+            System.out.println(sql);
+            st.execute(sql);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
     // </editor-fold>

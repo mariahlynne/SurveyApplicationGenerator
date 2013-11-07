@@ -6,7 +6,6 @@ public class Question implements Serializable {
 
     public String name = "";
     public int ID, questionIndex;
-
     public String questionID = "";
     public String questionText = "";//all
     public boolean isRequired = false;//all
@@ -46,5 +45,22 @@ public class Question implements Serializable {
         otherChoice = "";
         displayType = "radioButtons";
         numberOfAnswers = "1";
+    }
+
+    public int longestAnswerChoiceLength() {
+        int iLongest = 0;
+        if (displayType.equals("checkbox")) {
+            return answerChoices.length() + otherChoice.length() + 2;
+        } else {
+            for (String s : answerChoices.split(";;")) {
+                if (s.length() > iLongest) {
+                    iLongest = s.length();
+                }
+            }
+            if (otherChoice.length() > iLongest) {
+                iLongest = otherChoice.length();
+            }
+        }
+        return iLongest;
     }
 }

@@ -1,6 +1,8 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class CodeGen {
 
@@ -222,6 +224,50 @@ public class CodeGen {
     }
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Database">
+
+    public static void getSQLColumnDeclaration(Question q, HashMap<String, String> dbColumns) {
+        String colName = q.questionID;
+        String colDec = "";
+        switch (q.questionType) {
+            case "text":
+                colDec += "VARCHAR(" + q.max + ")";
+                break;
+            case "wholeNumber":
+                switch (q.validationType) {
+                    case "setMax":
+                    case "setMinMax":
+                        colDec += "DECIMAL(" + q.min.replace("-", "").length() + ", 0)";
+                        break;
+                    case "setMin":
+                    default:
+                        colDec += "DECIMAL(64, 0)";
+                        break;
+                }
+                break;
+            case "decimalNumber":
+                switch (q.validationType) {
+                    case "setMax":
+                    case "setMinMax":
+                        colDec += "DECIMAL(" + q.min.replace("-", "").length() + ", " + q.decimalPlaces + ")";
+                        break;
+                    case "setMin":
+                    default:
+                        colDec += "DECIMAL(64, " + q.decimalPlaces + ")";
+                        break;
+                }
+                break;
+            case "multipleChoice":
+                colDec += "VARCHAR(" + q.longestAnswerChoiceLength() + ")";
+                if (q.otherChoice.length() > 0) {
+                    dbColumns.put(q.questionID + "OtherChoice", "VARCHAR(" + q.max + ")");
+                }
+                break;
+        }
+        if (q.isRequired) {
+            colDec += " NOT NULL";
+        }
+        dbColumns.put(colName, colDec);
+    }
     // </editor-fold>
 
     public void addLine(DIR direction, String newHTML) {
