@@ -489,10 +489,15 @@ public class MainServlet extends HttpServlet {
                 BufferedWriter bw;
                 CodeGen body;
                 CodeGen partialJS;
+                CodeGen json;
                 HashMap<String, String> dbColumns = new HashMap<String, String>();
                 for (Page p : pages) {
                     body = new CodeGen();
                     partialJS = new CodeGen();
+                    json = new CodeGen();
+                    json.spaceCount -= 4;
+                    json.addLine(CodeGen.DIR.F, "var json = new Object();\n");
+                    json.spaceCount += 8;
                     body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
                     partialJS.addLine(CodeGen.DIR.S, "function validatePage" + pageCount + "() {\n");
                     partialJS.addLine(CodeGen.DIR.F, "$(\".errorText\").hide();\n");
@@ -501,6 +506,7 @@ public class MainServlet extends HttpServlet {
                     body.spaceCount += 4;
                     for (Question q : p.questions) {
                         CodeGen.getSQLColumnDeclaration(q, dbColumns);
+                        json.getSaveColumnsCode(q);
                         body.addLine(CodeGen.DIR.S, "<tr>\n");
                         body.addLine(CodeGen.DIR.F, "<td>\n");
                         body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionID + "ErrorMessage\" class=\"errorText\"></p>\n");
@@ -551,7 +557,10 @@ public class MainServlet extends HttpServlet {
                         body.addLine(CodeGen.DIR.B, "</td>\n");
                         body.addLine(CodeGen.DIR.B, "</tr>\n");
                     }
-                    partialJS.addLine(CodeGen.DIR.S, "return result;\n");
+                    partialJS.addLine(CodeGen.DIR.S, "if (result) {\n");
+                    partialJS.getAJAX(json, pageCount == pages.size());
+                    partialJS.addLine(CodeGen.DIR.B, "}\n");
+                    partialJS.addLine(CodeGen.DIR.S, "return false;\n");
                     partialJS.addLine(CodeGen.DIR.B, "}\n");
                     javascript += partialJS.code + "\n";
                     body.addLine(CodeGen.DIR.S, "<tr>\n");

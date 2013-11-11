@@ -2,7 +2,6 @@ package Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class CodeGen {
 
@@ -198,7 +197,7 @@ public class CodeGen {
         if (q.otherChoice.length() > 0) {
             switch (q.displayType) {
                 case "checkbox":
-                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.questionID + "', " + q.numberOfAnswers + ") && result;\n");
+                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.questionID + "', '" + q.numberOfAnswers + "') && result;\n");
                 case "radio":
                     addLine(CodeGen.DIR.S, "if ($(\"#" + q.questionID + "OtherChoiceSpecify\").is(':checked')) {\n");
                     break;
@@ -222,8 +221,36 @@ public class CodeGen {
     public void getSubmitButtonCode() {
         addLine(CodeGen.DIR.F, "<button id=\"submitButton\" type=\"submit\" class=\"btn btn-info\" style=\"margin-bottom: 50px\">Submit</button>\n");
     }
+
+    public void getAJAX(CodeGen json, boolean last) {
+        addLine(CodeGen.DIR.F, json.code);
+        addLine(CodeGen.DIR.S, "$.ajax({\n");
+        addLine(CodeGen.DIR.F, "async: false,\n");
+        addLine(CodeGen.DIR.S, "url: \"Servlet\",\n");
+        addLine(CodeGen.DIR.S, "data: {\n");
+        addLine(CodeGen.DIR.F, "requestType:\"" + (last ? "submit" : "nextPage") + "\",\n");
+        addLine(CodeGen.DIR.F, "appName:$(\"header#primary > h1\").text(),\n");
+        addLine(CodeGen.DIR.S, "columnsJSON:JSON.stringify(json)\n");
+        addLine(CodeGen.DIR.B, "},\n");
+        addLine(CodeGen.DIR.S, "success: function(json) {\n");
+        spaceCount += 4;
+        if (last) {
+            addLine(CodeGen.DIR.S, "alert('Your answers have been recorded successfully.');\n");
+        }
+        addLine(CodeGen.DIR.S, "window.location.assign(json.redirect);\n");
+        addLine(CodeGen.DIR.B, "}\n");
+        addLine(CodeGen.DIR.B, "});\n");
+    }
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Database">
+
+    public void getSaveColumnsCode(Question q) {
+        String type = q.questionType;
+        if (type.equals("multipleChoice")) {
+            type = q.displayType;
+        }
+        addLine(CodeGen.DIR.S, "json." + q.questionID + " = getValueByTypeAndIDForDB('" + q.questionID + "', '" + type + "');\n");
+    }
 
     public static void getSQLColumnDeclaration(Question q, HashMap<String, String> dbColumns) {
         String colName = q.questionID;
@@ -248,7 +275,9 @@ public class CodeGen {
                 switch (q.validationType) {
                     case "setMax":
                     case "setMinMax":
-                        colDec += "DECIMAL(" + q.min.replace("-", "").length() + ", " + q.decimalPlaces + ")";
+                        int decimalPlaces = Integer.parseInt(q.decimalPlaces);
+                        int max = Math.max(q.min.replace("-", "").length(), q.max.replace("-", "").length()) - 1;
+                        colDec += "DECIMAL(" + max + ", " + decimalPlaces + ")";
                         break;
                     case "setMin":
                     default:

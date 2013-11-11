@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,6 +85,7 @@ public class DatabaseAccess {
             ex.printStackTrace();
         }
     }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Get/List">
