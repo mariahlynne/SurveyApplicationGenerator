@@ -1,0 +1,12 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertPage`(IN iApplicationID INT, IN iIndex INT,
+														 IN vchName VARCHAR(100), OUT iPageID INT)
+BEGIN
+	INSERT INTO page (page.iApplicationID, page.iIndex, page.vchName) VALUES (iApplicationID, iIndex, vchName);
+	SET iPageID = last_insert_id();
+END

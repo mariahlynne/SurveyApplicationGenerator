@@ -155,6 +155,30 @@ public class DatabaseAccess {
             ex.printStackTrace();
         }
     }
+
+    public static void renameProject(int iProjectID, String newName) {
+        try {
+            Initialize();
+            cStmt = con.prepareCall("{call renameApplication(?,?)}");
+            cStmt.setInt("iApplicationID", iProjectID);
+            cStmt.setString("vchTitle", newName);
+            cStmt.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void copyProject(int iProjectID, String newName) {
+        try {
+            Initialize();
+            cStmt = con.prepareCall("{call copyApplication(?,?)}");
+            cStmt.setInt("iApplicationID", iProjectID);
+            cStmt.setString("vchTitle", newName);
+            cStmt.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Delete">

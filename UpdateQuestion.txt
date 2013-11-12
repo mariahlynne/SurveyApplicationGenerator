@@ -1,0 +1,37 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateQuestion`(IN iQuestionID INT, IN iIndex INT,
+								   IN vchQuestionText VARCHAR(1000), IN vchQuestionID VARCHAR(50),
+								   IN vchQuestionType VARCHAR(45), IN bRequired BIT, IN vchMin VARCHAR(45),
+								   IN vchMax VARCHAR(45), IN bValidateText BIT, IN vchAllowTypes VARCHAR(100),
+								   IN vchValidSpecialCharacters VARCHAR(100),
+								   IN vchDecimalPlaces VARCHAR(2), IN vchValidationType VARCHAR(45),
+                                   IN vchAnswerChoices VARCHAR(10000), IN vchOtherChoice VARCHAR(1000),
+                                   IN vchDisplayType VARCHAR(45), IN vchNumberOfAnswers VARCHAR(10))
+BEGIN
+	UPDATE
+		question
+	SET
+		question.iIndex = iIndex,
+		question.vchQuestionText = vchQuestionText,
+		question.vchQuestionID = vchQuestionID,
+		question.vchQuestionType = vchQuestionType,
+		question.bRequired = bRequired,
+		question.vchMin = vchMin,
+		question.vchMax = vchMax,
+		question.bValidateText = bValidateText,
+		question.vchAllowTypes = vchAllowTypes,
+		question.vchValidSpecialCharacters = vchValidSpecialCharacters,
+		question.vchDecimalPlaces = vchDecimalPlaces,
+		question.vchValidationType = vchValidationType,
+		question.vchAnswerChoices = vchAnswerChoices,
+		question.vchOtherChoice = vchOtherChoice,
+		question.vchDisplayType = vchDisplayType,
+		question.vchNumberOfAnswers = vchNumberOfAnswers
+	WHERE
+		question.iQuestionID = iQuestionID;
+END

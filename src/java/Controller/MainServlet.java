@@ -589,6 +589,16 @@ public class MainServlet extends HttpServlet {
                 DatabaseAccess.CreateTable(session.getAttribute("sProjectTitle").toString(), dbColumns);
                 break;
             //</editor-fold>
+
+            // <editor-fold defaultstate="collapsed" desc="Rename Project">
+            case "renameProject":
+                break;
+            //</editor-fold>
+
+            // <editor-fold defaultstate="collapsed" desc="Copy Project">
+            case "copyProject":
+                break;
+            //</editor-fold>
         }
     }
 //                jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());

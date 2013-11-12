@@ -1,0 +1,11 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeletePage`(IN iPageID INT)
+BEGIN
+	DELETE FROM question WHERE question.iPageID = iPageID;
+	DELETE FROM page WHERE page.iPageID = iPageID;
+END

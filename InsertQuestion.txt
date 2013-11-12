@@ -1,0 +1,12 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertQuestion`(IN iPageID INT, IN vchName VARCHAR(100),
+															 IN iIndex INT, OUT iQuestionID INT)
+BEGIN
+	INSERT INTO question (question.iPageID, question.vchName, question.iIndex) VALUES (iPageID, vchName, iIndex);
+	SET iQuestionID = last_insert_id();
+END

@@ -1,0 +1,12 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteEverything`()
+BEGIN
+	DELETE FROM question;
+	DELETE FROM page;
+	DELETE FROM surveyapplication;
+END

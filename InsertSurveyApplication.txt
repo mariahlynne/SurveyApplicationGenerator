@@ -1,0 +1,11 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertSurveyApplication`(IN vchTitle VARCHAR(255), OUT iApplicationID INT)
+BEGIN
+	INSERT INTO surveyapplication (surveyapplication.vchTitle) VALUES (vchTitle);
+    SET iApplicationID = last_insert_id();
+END

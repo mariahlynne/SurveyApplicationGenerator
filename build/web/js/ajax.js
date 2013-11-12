@@ -439,3 +439,27 @@ function validate() {
 function clearAllErrorIcons() {
     $(".nodeErrorIcon").remove();
 }
+
+function launchRenameModal() {
+    $('#projectNameModal').modal({
+        backdrop: "static"
+    });
+    $("#btnCopyProject").hide();
+    $("#btnRenameProject").show();
+}
+
+function launchCopyModal() {
+    $('#projectNameModal').modal({
+        backdrop: "static"
+    });
+    $("#btnRenameProject").hide();
+    $("#btnCopyProject").show();
+}
+
+function renameProject() {
+
+}
+
+function copyProject() {
+
+}
