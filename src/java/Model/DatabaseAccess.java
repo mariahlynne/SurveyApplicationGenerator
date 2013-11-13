@@ -85,7 +85,6 @@ public class DatabaseAccess {
             ex.printStackTrace();
         }
     }
-
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Get/List">
@@ -168,15 +167,18 @@ public class DatabaseAccess {
         }
     }
 
-    public static void copyProject(int iProjectID, String newName) {
+    public static int copyProject(int iProjectID, String newName) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call copyApplication(?,?)}");
+            cStmt = con.prepareCall("{call copyApplication(?,?,?)}");
             cStmt.setInt("iApplicationID", iProjectID);
             cStmt.setString("vchTitle", newName);
+            cStmt.registerOutParameter("iNewApplicationID", Types.INTEGER);
             cStmt.execute();
+            return cStmt.getInt("iNewApplicationID");
         } catch (Exception ex) {
             ex.printStackTrace();
+            return -1;
         }
     }
     // </editor-fold>

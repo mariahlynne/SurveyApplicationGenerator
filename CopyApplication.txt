@@ -1,0 +1,52 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `CopyApplication`(IN iApplicationID INT, IN vchTitle VARCHAR(255), OUT iNewApplicationID INT)
+BEGIN
+	DECLARE iPages INT; 
+	DECLARE iQuestions INT;
+	DECLARE ndx INT DEFAULT -1;
+	DECLARE qNdx INT DEFAULT -1;
+	DECLARE iPageID INT;
+	DECLARE iOldPageID INT;
+
+	INSERT INTO mydb.surveyapplication (surveyapplication.vchTitle) VALUES (vchTitle);
+    SET iNewApplicationID = last_insert_id();
+	SELECT count(*) INTO iPages FROM mydb.page WHERE page.iApplicationID = iApplicationID;
+		BEGIN
+		pages: LOOP
+		SET ndx = ndx + 1;
+		IF ndx = iPages THEN
+			LEAVE pages;
+		END IF;		
+		SELECT page.iPageID INTO iOldPageID FROM mydb.page 
+			WHERE page.iApplicationID = iApplicationID
+			ORDER BY page.iPageID ASC
+			LIMIT 1 OFFSET ndx;
+		INSERT INTO mydb.page 
+			SELECT NULL iPageID, iNewApplicationID, iIndex, vchName 
+			FROM page 
+			WHERE page.iPageID = iOldPageID;
+		SET iPageID = last_insert_id();
+		SET qNdx = -1;
+		SELECT count(*) INTO iQuestions FROM mydb.question WHERE question.iPageID = iOldPageID;
+		BEGIN
+			questions: LOOP
+			SET qNdx = qNdx + 1;
+			IF qNdx = iQuestions THEN
+				LEAVE questions;
+			END IF;		
+			INSERT INTO mydb.question 
+				SELECT NULL iquestionID, iPageID, vchName, iIndex, vchQuestionText, vchQuestionID, vchQuestionType, bRequired, vchMin, vchMax, bValidateText, vchAllowTypes, vchValidSpecialCharacters, vchDecimalPlaces, vchValidationType, vchAnswerChoices, vchOtherChoice, vchDisplayType, vchNumberOfAnswers
+				FROM mydb.question 
+				WHERE question.iPageID = iOldPageID
+				ORDER BY question.iQuestionID ASC
+				LIMIT 1 OFFSET qNdx;
+			END LOOP questions;
+		END;	
+		END LOOP pages;
+	END;
+END

@@ -46,13 +46,17 @@
         <header id="primary">
             <button type="button" onclick="generateApplication();" style="float: right; height: 30px; margin: 35px;"
                     class="btn btn-info ">Generate Survey</button>
-            <button type="button" onclick="switchApplication(false);" style="float: right; height: 30px; margin: 35px 0px;"
-                    class="btn btn-info ">Switch Project</button>
+            <div class="btn-toolbar" style="float: right; height: 30px; margin-top: 35px;">
+                <div class="btn-group">
+                    <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">Project <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:switchApplication(false)">Switch Project</a></li>
+                        <li><a href="javascript:launchRenameModal()">Rename Project</a></li>
+                        <li><a href="javascript:launchCopyModal()">Copy Project</a></li>
+                    </ul>
+                </div>
+            </div>
             <h1 id="projectName" style="width: 500px; float: left;"></h1>
-            <button type="button" onclick="launchRenameModal();" style="float: left; height: 30px; margin: 35px 0px;"
-                    class="btn btn-info ">Rename Project</button>
-            <button type="button" onclick="launchCopyModal();" style="float: left; height: 30px; margin: 35px 0px;"
-                    class="btn btn-info ">Copy Project</button>
         </header>
         <!--Sidebar content-->
         <div id="sidebar">
@@ -405,7 +409,7 @@
                     <div class="modal-body">
                         <p>New Project Name:</p>
                         <input type="text" id="txtNewProjectName" maxlength="100" style="margin-left: 15px;" />
-                        <p id="lblSelectProjectError" style="color: red; font-weight: bold; text-align: center; margin: 10px 0;"></p>
+                        <p id="lblNewProjectNameError" style="color: red; font-weight: bold; text-align: center; margin: 10px 0; display: none;">You must enter the New Project Name</p>
                     </div>
                     <div class="modal-footer">
                         <button id="btnRenameProject" type="button" class="btn btn-primary" onclick="renameProject()">Rename Project</button>

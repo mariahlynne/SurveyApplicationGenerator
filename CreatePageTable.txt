@@ -1,0 +1,9 @@
+CREATE TABLE `page` (
+  `iPageID` int(11) NOT NULL AUTO_INCREMENT,
+  `iApplicationID` int(11) NOT NULL,
+  `iIndex` int(11) NOT NULL,
+  `vchName` varchar(100) NOT NULL,
+  PRIMARY KEY (`iPageID`),
+  KEY `iApplicationID_idx` (`iApplicationID`),
+  CONSTRAINT `iApplicationID` FOREIGN KEY (`iApplicationID`) REFERENCES `surveyapplication` (`iApplicationID`) ON DELETE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=latin1;

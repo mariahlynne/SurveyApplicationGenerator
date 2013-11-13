@@ -441,6 +441,7 @@ function clearAllErrorIcons() {
 }
 
 function launchRenameModal() {
+    $("#txtNewProjectName").val($("#projectName").text());
     $('#projectNameModal').modal({
         backdrop: "static"
     });
@@ -449,6 +450,7 @@ function launchRenameModal() {
 }
 
 function launchCopyModal() {
+    $("#txtNewProjectName").val($("#projectName").text());
     $('#projectNameModal').modal({
         backdrop: "static"
     });
@@ -457,9 +459,49 @@ function launchCopyModal() {
 }
 
 function renameProject() {
-
+    var newName = $("#txtNewProjectName").val();
+    var oldName = $("#projectName").text();
+    if (newName == "") {
+        $("#lblNewProjectNameError").show();
+    } else {
+        $("#lblNewProjectNameError").hide();
+        $.ajax({
+            async: false,
+            url: "MainServlet",
+            data: {
+                func:"renameProject",
+                newProjectName:newName
+            },
+            success: function() {
+                var projectID = $("#ddlProject option:contains(" + oldName + ")").val();
+                $("#ddlProject option:contains(" + oldName + ")").remove();
+                $("#ddlProject").append('<option value="' + projectID + '">' + newName + '</option>');
+                $("#projectName").text(newName);
+                $("#txtNewProjectName").val("");
+                $('#projectNameModal').modal('hide');
+            }
+        });
+    }
 }
 
 function copyProject() {
-
+    var newName = $("#txtNewProjectName").val();
+    if (newName == "") {
+        $("#lblNewProjectNameError").show();
+    } else {
+        $("#lblNewProjectNameError").hide();
+        $.ajax({
+            async: false,
+            url: "MainServlet",
+            data: {
+                func:"copyProject",
+                newProjectName:newName
+            },
+            success: function(json) {
+                $("#ddlProject").append('<option value="' + json.projectID + '">' + newName + '</option>');
+                $('#projectNameModal').modal('hide');
+                alert('Your project has been copied. To edit the new copy, select \'Switch Project\' from the Project drop down list.')
+            }
+        });
+    }
 }

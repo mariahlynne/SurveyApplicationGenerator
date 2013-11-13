@@ -1,0 +1,6 @@
+CREATE TABLE `surveyapplication` (
+  `iApplicationID` int(11) NOT NULL AUTO_INCREMENT,
+  `vchTitle` varchar(100) NOT NULL,
+  PRIMARY KEY (`iApplicationID`),
+  UNIQUE KEY `vchTitle_UNIQUE` (`vchTitle`)
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=latin1;

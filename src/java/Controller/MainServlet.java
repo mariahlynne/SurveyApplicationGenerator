@@ -592,11 +592,20 @@ public class MainServlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Rename Project">
             case "renameProject":
+                DatabaseAccess.renameProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                        request.getParameter("newProjectName").toString());
+                session.setAttribute("sProjectTitle", request.getParameter("newProjectName").toString());
                 break;
             //</editor-fold>
 
             // <editor-fold defaultstate="collapsed" desc="Copy Project">
             case "copyProject":
+                iProjectID = DatabaseAccess.copyProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                        request.getParameter("newProjectName").toString());
+                o = new JSONObject();
+                o.put("projectID", iProjectID);
+                response.setContentType("application/json");
+                response.getWriter().write(o.toJSONString());
                 break;
             //</editor-fold>
         }
