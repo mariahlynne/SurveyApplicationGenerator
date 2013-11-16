@@ -3,7 +3,7 @@ package Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CodeGen {
+public class CodeGenerator {
 
     public static String spaces = "                                                                                                                       ";
     public int spaceCount = 0;
@@ -16,27 +16,27 @@ public class CodeGen {
 
     // <editor-fold defaultstate="collapsed" desc="MISC">
     public void getPageHeader(int pageCount, String surveyTitle) {
-        addLine(CodeGen.DIR.S, "<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\n");
-        addLine(CodeGen.DIR.S, "<!DOCTYPE html>\n");
-        addLine(CodeGen.DIR.S, "<html>\n");
-        addLine(CodeGen.DIR.F, "<head>\n");
-        addLine(CodeGen.DIR.F, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
-        addLine(CodeGen.DIR.S, "<title>" + surveyTitle + "</title>\n");
-        addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/bootstrap.css\"/>\n");
-        addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/font-awesome.css\"/>\n");
-        addLine(CodeGen.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/main.css\"/>\n");
-        addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/jquery-1.10.1.js\"></script>\n");
-        addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/bootstrap.js\"></script>\n");
-        addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/static.js\"></script>\n");
-        addLine(CodeGen.DIR.S, "<script type=\"text/javascript\" src=\"js/main.js\"></script>\n");
-        addLine(CodeGen.DIR.B, "</head>\n");
-        addLine(CodeGen.DIR.S, "<body>\n");
-        addLine(CodeGen.DIR.F, "<header id=\"primary\">\n");
-        addLine(CodeGen.DIR.F, "<h1>\n");
-        addLine(CodeGen.DIR.F, surveyTitle + "\n");
-        addLine(CodeGen.DIR.B, "</h1>\n");
-        addLine(CodeGen.DIR.B, "</header>\n");
-        addLine(CodeGen.DIR.S, "<form action=\"Servlet?Page=Page" + pageCount + "\" id=\"form\" onsubmit=\"return validatePage" + pageCount + "()\" method=\"POST\">\n");
+        addLine(CodeGenerator.DIR.S, "<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\n");
+        addLine(CodeGenerator.DIR.S, "<!DOCTYPE html>\n");
+        addLine(CodeGenerator.DIR.S, "<html>\n");
+        addLine(CodeGenerator.DIR.F, "<head>\n");
+        addLine(CodeGenerator.DIR.F, "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
+        addLine(CodeGenerator.DIR.S, "<title>" + surveyTitle + "</title>\n");
+        addLine(CodeGenerator.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/bootstrap.css\"/>\n");
+        addLine(CodeGenerator.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/font-awesome.css\"/>\n");
+        addLine(CodeGenerator.DIR.S, "<link type=\"text/css\" rel=\"stylesheet\" href=\"css/main.css\"/>\n");
+        addLine(CodeGenerator.DIR.S, "<script type=\"text/javascript\" src=\"js/jquery-1.10.1.js\"></script>\n");
+        addLine(CodeGenerator.DIR.S, "<script type=\"text/javascript\" src=\"js/bootstrap.js\"></script>\n");
+        addLine(CodeGenerator.DIR.S, "<script type=\"text/javascript\" src=\"js/static.js\"></script>\n");
+        addLine(CodeGenerator.DIR.S, "<script type=\"text/javascript\" src=\"js/main.js\"></script>\n");
+        addLine(CodeGenerator.DIR.B, "</head>\n");
+        addLine(CodeGenerator.DIR.S, "<body>\n");
+        addLine(CodeGenerator.DIR.F, "<header id=\"primary\">\n");
+        addLine(CodeGenerator.DIR.F, "<h1>\n");
+        addLine(CodeGenerator.DIR.F, surveyTitle + "\n");
+        addLine(CodeGenerator.DIR.B, "</h1>\n");
+        addLine(CodeGenerator.DIR.B, "</header>\n");
+        addLine(CodeGenerator.DIR.S, "<form action=\"Servlet?Page=Page" + pageCount + "\" id=\"form\" onsubmit=\"return validatePage" + pageCount + "()\" method=\"POST\">\n");
     }
 
     // </editor-fold>
@@ -139,7 +139,7 @@ public class CodeGen {
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Validation">
     public void getMeetsLengthRequirementsCode(String id, String min, String max) {
-        addLine(CodeGen.DIR.S, "result = meetsLengthRequirements('" + id + "', 'text', " + min + ", " + max + ") && result;\n");
+        addLine(CodeGenerator.DIR.S, "result = meetsLengthRequirements('" + id + "', 'text', " + min + ", " + max + ") && result;\n");
     }
 
     public void getTextValidationCode(Question q) {
@@ -161,20 +161,20 @@ public class CodeGen {
             if (q.getQuestionType().equals("multipleChoice")) {
                 q.setQuestionID(q.getQuestionID() + "OtherChoice");
             }
-            addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.getQuestionID() + "', 'text', '" + validChars + "') && result;\n");
+            addLine(CodeGenerator.DIR.S, "result = containsOnlyValidChars('" + q.getQuestionID() + "', 'text', '" + validChars + "') && result;\n");
         }
     }
 
     public void getDecimalValidationCode(Question q) {
         switch (q.getValidationType()) {
             case "setMin":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
                 break;
             case "setMax":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
                 break;
             case "setMinMax":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
         }
     }
@@ -182,13 +182,13 @@ public class CodeGen {
     public void getWholeNumberValidationCode(Question q) {
         switch (q.getValidationType()) {
             case "setMin":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
                 break;
             case "setMax":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
                 break;
             case "setMinMax":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
+                addLine(CodeGenerator.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
         }
     }
@@ -197,49 +197,49 @@ public class CodeGen {
         if (q.getOtherChoice().length() > 0) {
             switch (q.getDisplayType()) {
                 case "checkbox":
-                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.getQuestionID() + "', '" + q.getNumberOfAnswers() + "') && result;\n");
+                    addLine(CodeGenerator.DIR.S, "result = validateAnswerLimit('" + q.getQuestionID() + "', '" + q.getNumberOfAnswers() + "') && result;\n");
                 case "radio":
-                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.getQuestionID() + "OtherChoiceSpecify\").is(':checked')) {\n");
+                    addLine(CodeGenerator.DIR.S, "if ($(\"#" + q.getQuestionID() + "OtherChoiceSpecify\").is(':checked')) {\n");
                     break;
                 case "dropdown":
-                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.getQuestionID() + "\").val() == \"otherChoiceSpecify\") {\n");
+                    addLine(CodeGenerator.DIR.S, "if ($(\"#" + q.getQuestionID() + "\").val() == \"otherChoiceSpecify\") {\n");
                     break;
             }
             spaceCount += 4;
             getMeetsLengthRequirementsCode(q.getQuestionID() + "OtherChoice", q.getMin(), q.getMax());
             getTextValidationCode(q);
-            addLine(CodeGen.DIR.B, "}\n");
+            addLine(CodeGenerator.DIR.B, "}\n");
         }
     }
 
 // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Navigation">
     public void getNextButtonCode() {
-        addLine(CodeGen.DIR.F, "<button id=\"nextButton\" type=\"submit\" class=\"btn btn-info\" style=\"margin-bottom: 50px\">Next</button>\n");
+        addLine(CodeGenerator.DIR.F, "<button id=\"nextButton\" type=\"submit\" class=\"btn btn-info\" style=\"margin-bottom: 50px\">Next</button>\n");
     }
 
     public void getSubmitButtonCode() {
-        addLine(CodeGen.DIR.F, "<button id=\"submitButton\" type=\"submit\" class=\"btn btn-info\" style=\"margin-bottom: 50px\">Submit</button>\n");
+        addLine(CodeGenerator.DIR.F, "<button id=\"submitButton\" type=\"submit\" class=\"btn btn-info\" style=\"margin-bottom: 50px\">Submit</button>\n");
     }
 
-    public void getAJAX(CodeGen json, boolean last) {
-        addLine(CodeGen.DIR.F, json.code);
-        addLine(CodeGen.DIR.S, "$.ajax({\n");
-        addLine(CodeGen.DIR.F, "async: false,\n");
-        addLine(CodeGen.DIR.S, "url: \"Servlet\",\n");
-        addLine(CodeGen.DIR.S, "data: {\n");
-        addLine(CodeGen.DIR.F, "requestType:\"" + (last ? "submit" : "nextPage") + "\",\n");
-        addLine(CodeGen.DIR.F, "appName:$(\"header#primary > h1\").text(),\n");
-        addLine(CodeGen.DIR.S, "columnsJSON:JSON.stringify(json)\n");
-        addLine(CodeGen.DIR.B, "},\n");
-        addLine(CodeGen.DIR.S, "success: function(json) {\n");
+    public void getAJAX(CodeGenerator json, boolean last) {
+        addLine(CodeGenerator.DIR.F, json.code);
+        addLine(CodeGenerator.DIR.S, "$.ajax({\n");
+        addLine(CodeGenerator.DIR.F, "async: false,\n");
+        addLine(CodeGenerator.DIR.S, "url: \"Servlet\",\n");
+        addLine(CodeGenerator.DIR.S, "data: {\n");
+        addLine(CodeGenerator.DIR.F, "requestType:\"" + (last ? "submit" : "nextPage") + "\",\n");
+        addLine(CodeGenerator.DIR.F, "appName:$(\"header#primary > h1\").text(),\n");
+        addLine(CodeGenerator.DIR.S, "columnsJSON:JSON.stringify(json)\n");
+        addLine(CodeGenerator.DIR.B, "},\n");
+        addLine(CodeGenerator.DIR.S, "success: function(json) {\n");
         spaceCount += 4;
         if (last) {
-            addLine(CodeGen.DIR.S, "alert('Your answers have been recorded successfully.');\n");
+            addLine(CodeGenerator.DIR.S, "alert('Your answers have been recorded successfully.');\n");
         }
-        addLine(CodeGen.DIR.S, "window.location.assign(json.redirect);\n");
-        addLine(CodeGen.DIR.B, "}\n");
-        addLine(CodeGen.DIR.B, "});\n");
+        addLine(CodeGenerator.DIR.S, "window.location.assign(json.redirect);\n");
+        addLine(CodeGenerator.DIR.B, "}\n");
+        addLine(CodeGenerator.DIR.B, "});\n");
     }
     // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Database">
@@ -249,7 +249,7 @@ public class CodeGen {
         if (type.equals("multipleChoice")) {
             type = q.getDisplayType();
         }
-        addLine(CodeGen.DIR.S, "json." + q.getQuestionID() + " = getValueByTypeAndIDForDB('" + q.getQuestionID() + "', '" + type + "');\n");
+        addLine(CodeGenerator.DIR.S, "json." + q.getQuestionID() + " = getValueByTypeAndIDForDB('" + q.getQuestionID() + "', '" + type + "');\n");
     }
 
     public static void getSQLColumnDeclaration(Question q, HashMap<String, String> dbColumns) {

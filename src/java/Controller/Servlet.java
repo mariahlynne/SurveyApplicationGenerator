@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.CodeGen;
+import Model.CodeGenerator;
 import Model.DatabaseAccess;
 import Model.Page;
 import Model.Question;
@@ -20,7 +20,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class MainServlet extends HttpServlet {
+public class Servlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException {
         String sFunction = request.getParameter("func");
@@ -483,44 +483,44 @@ public class MainServlet extends HttpServlet {
                 int validationCount = 0;
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 BufferedWriter bw;
-                CodeGen body;
-                CodeGen partialJS;
-                CodeGen json;
+                CodeGenerator body;
+                CodeGenerator partialJS;
+                CodeGenerator json;
                 HashMap<String, String> dbColumns = new HashMap<String, String>();
                 for (Page p : pages) {
-                    body = new CodeGen();
-                    partialJS = new CodeGen();
-                    json = new CodeGen();
+                    body = new CodeGenerator();
+                    partialJS = new CodeGenerator();
+                    json = new CodeGenerator();
                     json.spaceCount -= 4;
-                    json.addLine(CodeGen.DIR.F, "var json = new Object();\n");
+                    json.addLine(CodeGenerator.DIR.F, "var json = new Object();\n");
                     json.spaceCount += 8;
                     body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
-                    partialJS.addLine(CodeGen.DIR.S, "function validatePage" + pageCount + "() {\n");
-                    partialJS.addLine(CodeGen.DIR.F, "$(\".errorText\").hide();\n");
-                    partialJS.addLine(CodeGen.DIR.S, "var result = true;\n");
-                    body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
+                    partialJS.addLine(CodeGenerator.DIR.S, "function validatePage" + pageCount + "() {\n");
+                    partialJS.addLine(CodeGenerator.DIR.F, "$(\".errorText\").hide();\n");
+                    partialJS.addLine(CodeGenerator.DIR.S, "var result = true;\n");
+                    body.addLine(CodeGenerator.DIR.F, "<table id=\"mainContent\">\n");
                     body.spaceCount += 4;
                     for (Question q : p.getQuestions()) {
-                        CodeGen.getSQLColumnDeclaration(q, dbColumns);
+                        CodeGenerator.getSQLColumnDeclaration(q, dbColumns);
                         json.getSaveColumnsCode(q);
-                        body.addLine(CodeGen.DIR.S, "<tr>\n");
-                        body.addLine(CodeGen.DIR.F, "<td>\n");
-                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.getQuestionID() + "ErrorMessage\" class=\"errorText\"></p>\n");
-                        body.addLine(CodeGen.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.getQuestionText() + "</span>\n");
-                        body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
+                        body.addLine(CodeGenerator.DIR.S, "<tr>\n");
+                        body.addLine(CodeGenerator.DIR.F, "<td>\n");
+                        body.addLine(CodeGenerator.DIR.F, "<p id=\"" + q.getQuestionID() + "ErrorMessage\" class=\"errorText\"></p>\n");
+                        body.addLine(CodeGenerator.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.getQuestionText() + "</span>\n");
+                        body.addLine(CodeGenerator.DIR.S, "<div class=\"question\">\n");
                         body.spaceCount += 4;
                         if (q.isRequired()) {
                             String type = q.getQuestionType();
                             if (type.equals("multipleChoice")) {
                                 type = q.getDisplayType();
                             }
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + type + "', true);\n");
-                            partialJS.addLine(CodeGen.DIR.S, "result = v" + validationCount + " && result;\n");
-                            partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
+                            partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + type + "', true);\n");
+                            partialJS.addLine(CodeGenerator.DIR.S, "result = v" + validationCount + " && result;\n");
+                            partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
                         } else {
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + q.getQuestionType() + "', false);\n");
-                            partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
+                            partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + q.getQuestionType() + "', false);\n");
+                            partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
                         }
                         switch (q.getQuestionType()) {
@@ -548,30 +548,30 @@ public class MainServlet extends HttpServlet {
                                 partialJS.getDecimalValidationCode(q);
                                 break;
                         }
-                        partialJS.addLine(CodeGen.DIR.B, "}\n");
-                        body.addLine(CodeGen.DIR.B, "</div>\n");
-                        body.addLine(CodeGen.DIR.B, "</td>\n");
-                        body.addLine(CodeGen.DIR.B, "</tr>\n");
+                        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+                        body.addLine(CodeGenerator.DIR.B, "</div>\n");
+                        body.addLine(CodeGenerator.DIR.B, "</td>\n");
+                        body.addLine(CodeGenerator.DIR.B, "</tr>\n");
                     }
-                    partialJS.addLine(CodeGen.DIR.S, "if (result) {\n");
+                    partialJS.addLine(CodeGenerator.DIR.S, "if (result) {\n");
                     partialJS.getAJAX(json, pageCount == pages.size());
-                    partialJS.addLine(CodeGen.DIR.B, "}\n");
-                    partialJS.addLine(CodeGen.DIR.S, "return false;\n");
-                    partialJS.addLine(CodeGen.DIR.B, "}\n");
+                    partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+                    partialJS.addLine(CodeGenerator.DIR.S, "return false;\n");
+                    partialJS.addLine(CodeGenerator.DIR.B, "}\n");
                     javascript += partialJS.code + "\n";
-                    body.addLine(CodeGen.DIR.S, "<tr>\n");
-                    body.addLine(CodeGen.DIR.F, "<td align=\"center\">\n");
+                    body.addLine(CodeGenerator.DIR.S, "<tr>\n");
+                    body.addLine(CodeGenerator.DIR.F, "<td align=\"center\">\n");
                     if (pageCount < pages.size()) {
                         body.getNextButtonCode();
                     } else {
                         body.getSubmitButtonCode();
                     }
-                    body.addLine(CodeGen.DIR.B, "</td>\n");
-                    body.addLine(CodeGen.DIR.B, "</tr>\n");
-                    body.addLine(CodeGen.DIR.B, "</table>\n");
-                    body.addLine(CodeGen.DIR.B, "</form>\n");
-                    body.addLine(CodeGen.DIR.B, "</body>\n");
-                    body.addLine(CodeGen.DIR.B, "</html>");
+                    body.addLine(CodeGenerator.DIR.B, "</td>\n");
+                    body.addLine(CodeGenerator.DIR.B, "</tr>\n");
+                    body.addLine(CodeGenerator.DIR.B, "</table>\n");
+                    body.addLine(CodeGenerator.DIR.B, "</form>\n");
+                    body.addLine(CodeGenerator.DIR.B, "</body>\n");
+                    body.addLine(CodeGenerator.DIR.B, "</html>");
                     bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\Page" + pageCount + ".jsp"));
                     bw.write(body.code);
                     bw.flush();
@@ -618,10 +618,10 @@ public class MainServlet extends HttpServlet {
 //            /* TODO output your page here. You may use following sample code. */
 //            out.println("<html>");
 //            out.println("<head>");
-//            out.println("<title>Servlet MainServlet</title>");
+//            out.println("<title>Servlet Servlet</title>");
 //            out.println("</head>");
 //            out.println("<body>");
-//            out.println("<h1>Servlet MainServlet at " + request.getContextPath() + "</h1>");
+//            out.println("<h1>Servlet Servlet at " + request.getContextPath() + "</h1>");
 //            out.println("</body>");
 //            out.println("</html>");
 //        } finally {

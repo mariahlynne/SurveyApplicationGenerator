@@ -5,7 +5,7 @@ function switchProject(projectID, title) {
     }
     $.ajax({
         async: false,
-        url: "MainServlet",
+        url: "Servlet",
         data: {
             func:"switchProject",
             projectID:projectID,
@@ -54,7 +54,7 @@ function switchNode(pageIndex, questionIndex) {
     var validated = false;
     $.ajax({
         async: false,
-        url: "MainServlet",
+        url: "Servlet",
         data: {
             func:"switch",
             pageIndex:pageIndex,
@@ -263,7 +263,7 @@ function clearAllFields() {
 function addPage() {
     $.ajax({
         async: false,
-        url: 'MainServlet',
+        url: 'Servlet',
         data: {
             func:"addPage"
         },
@@ -294,7 +294,7 @@ function addQuestion() {
     } else {
         $.ajax({
             async: false,
-            url: 'MainServlet',
+            url: 'Servlet',
             data: {
                 func:"addQuestion",
                 pageIndex:currentPageIndex
@@ -354,7 +354,7 @@ function removeNode() {
     if (confirm(confirmationText)) {
         $.ajax({
             async: false,
-            url: 'MainServlet',
+            url: 'Servlet',
             data: {
                 func:"remove",
                 pageIndex:currentPageIndex.val(),
@@ -380,7 +380,7 @@ function generateApplication() {
     var validated = switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
     if (validated) {
         $.ajax({
-            url:'MainServlet',
+            url:'Servlet',
             data: {
                 func:"generateApplication"
             },
@@ -400,7 +400,7 @@ function validate() {
     var validated = false;
     $.ajax({
         async: false,
-        url: "MainServlet",
+        url: "Servlet",
         data: {
             func:"validate",
             currentPageIndex:currentPageIndex.val(),
@@ -467,7 +467,7 @@ function renameProject() {
         $("#lblNewProjectNameError").hide();
         $.ajax({
             async: false,
-            url: "MainServlet",
+            url: "Servlet",
             data: {
                 func:"renameProject",
                 newProjectName:newName
@@ -492,7 +492,7 @@ function copyProject() {
         $("#lblNewProjectNameError").hide();
         $.ajax({
             async: false,
-            url: "MainServlet",
+            url: "Servlet",
             data: {
                 func:"copyProject",
                 newProjectName:newName
