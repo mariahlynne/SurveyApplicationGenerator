@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class DatabaseAccess {
 
-    static Connection con;
-    static Statement st;
-    static CallableStatement cStmt;
-    static ResultSet rs;
+    private static Connection con;
+    private static Statement st;
+    private static CallableStatement cStmt;
+    private static ResultSet rs;
 
     private static void Initialize() throws Exception {
         if (con == null) {
@@ -132,23 +132,23 @@ public class DatabaseAccess {
         try {
             Initialize();
             cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
-            cStmt.setInt("iQuestionID", q.ID);
-            cStmt.setInt("iIndex", q.questionIndex);
-            cStmt.setString("vchQuestionText", q.questionText);
-            cStmt.setString("vchQuestionID", q.questionID);
-            cStmt.setString("vchQuestionType", q.questionType);
-            cStmt.setBoolean("bRequired", q.isRequired);
-            cStmt.setString("vchMin", q.min);
-            cStmt.setString("vchMax", q.max);
-            cStmt.setBoolean("bValidateText", q.validateText);
-            cStmt.setString("vchAllowTypes", q.allowTypes);
-            cStmt.setString("vchValidSpecialCharacters", q.validSpecialCharacters);
-            cStmt.setString("vchDecimalPlaces", q.decimalPlaces);
-            cStmt.setString("vchValidationType", q.validationType);
-            cStmt.setString("vchAnswerChoices", q.answerChoices);
-            cStmt.setString("vchOtherChoice", q.otherChoice);
-            cStmt.setString("vchDisplayType", q.displayType);
-            cStmt.setString("vchNumberOfAnswers", q.numberOfAnswers);
+            cStmt.setInt("iQuestionID", q.getID());
+            cStmt.setInt("iIndex", q.getQuestionIndex());
+            cStmt.setString("vchQuestionText", q.getQuestionText());
+            cStmt.setString("vchQuestionID", q.getQuestionID());
+            cStmt.setString("vchQuestionType", q.getQuestionType());
+            cStmt.setBoolean("bRequired", q.isRequired());
+            cStmt.setString("vchMin", q.getMin());
+            cStmt.setString("vchMax", q.getMax());
+            cStmt.setBoolean("bValidateText", q.isValidateText());
+            cStmt.setString("vchAllowTypes", q.getAllowTypes());
+            cStmt.setString("vchValidSpecialCharacters", q.getValidSpecialCharacters());
+            cStmt.setString("vchDecimalPlaces", q.getDecimalPlaces());
+            cStmt.setString("vchValidationType", q.getValidationType());
+            cStmt.setString("vchAnswerChoices", q.getAnswerChoices());
+            cStmt.setString("vchOtherChoice", q.getOtherChoice());
+            cStmt.setString("vchDisplayType", q.getDisplayType());
+            cStmt.setString("vchNumberOfAnswers", q.getNumberOfAnswers());
             cStmt.execute();
         } catch (Exception ex) {
             ex.printStackTrace();

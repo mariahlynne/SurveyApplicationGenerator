@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 public class Page implements Serializable {
 
-    public String name;
-    public ArrayList<Question> questions;
-    public int pageIndex, ID;
+    private String name;
+    private ArrayList<Question> questions;
+    private int pageIndex, ID;
 
     public Page(int id, String name, int pageIndex) {
         this.ID = id;
@@ -21,15 +21,47 @@ public class Page implements Serializable {
     }
 
     public int getQuestionIDByIndex(int index) {
-        return questions.get(index).ID;
+        return questions.get(index).getID();
     }
 
     public Question getQuestion(String name) {
         for (Question q : questions) {
-            if (q.name.equals(name)) {
+            if (q.getName().equals(name)) {
                 return q;
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ArrayList<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(ArrayList<Question> questions) {
+        this.questions = questions;
+    }
+
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 }

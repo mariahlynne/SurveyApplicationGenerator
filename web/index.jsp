@@ -82,15 +82,15 @@
                 <ul class="icons-ul tree" id="navigationTree">
                     <%  int pageIndex = -1;
                         for (Page p : pages) {
-                            pageIndex = p.pageIndex;
+                            pageIndex = p.getPageIndex();
                     %>
                     <li>
                         <i class="icon-li icon-minus collapsible clickable"></i>
                         <a href="javascript:switchNode(<%= pageIndex%>, -1);"> Page <%= pageIndex + 1%></a>
                         <ul>
                             <% int questionIndex;
-                                for (Question q : p.questions) {
-                                    questionIndex = q.questionIndex;
+                                for (Question q : p.getQuestions()) {
+                                    questionIndex = q.getQuestionIndex();
                             %>
                             <li><a href="javascript:switchNode(<%= pageIndex%>, <%= questionIndex%>);">Question <%= questionIndex + 1%></a></li>
                             <%}%>

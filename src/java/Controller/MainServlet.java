@@ -53,8 +53,8 @@ public class MainServlet extends HttpServlet {
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 page = pages.get(pageIndex);
-                count = page.questions.size();
-                iQuestionID = DatabaseAccess.InsertQuestion(page.ID, "Question " + (count + 1), count);
+                count = page.getQuestions().size();
+                iQuestionID = DatabaseAccess.InsertQuestion(page.getID(), "Question " + (count + 1), count);
                 page.addQuestion(iQuestionID, "Question " + (count + 1), count);
                 session.setAttribute("pages", pages);
                 break;
@@ -66,12 +66,12 @@ public class MainServlet extends HttpServlet {
                 pageIndex = Integer.parseInt(request.getParameter("pageIndex"));
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 page = pages.get(pageIndex);
-                if ((questionIndex == -1) || (page.questions.size() == 1)) {
-                    DatabaseAccess.DeletePage(page.ID);
+                if ((questionIndex == -1) || (page.getQuestions().size() == 1)) {
+                    DatabaseAccess.DeletePage(page.getID());
                     pages.remove(pageIndex);
                 } else {
                     DatabaseAccess.DeleteQuestion(page.getQuestionIDByIndex(questionIndex));
-                    page.questions.remove(questionIndex);
+                    page.getQuestions().remove(questionIndex);
                     pages.set(pageIndex, page);
                 }
                 reindex(pages);
@@ -81,11 +81,11 @@ public class MainServlet extends HttpServlet {
                 response.setContentType("text/html;charset=UTF-8");
                 out = response.getWriter();
                 for (Page p : pages) {
-                    pageIndex = p.pageIndex;
+                    pageIndex = p.getPageIndex();
                     out.println("<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>");
                     out.println("<ul>");
-                    for (Question q : p.questions) {
-                        questionIndex = q.questionIndex;
+                    for (Question q : p.getQuestions()) {
+                        questionIndex = q.getQuestionIndex();
                         out.println("<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>");
                     }
                     out.println("</ul>");
@@ -114,52 +114,48 @@ public class MainServlet extends HttpServlet {
 
                 if (currentQuestionIndex != -1) {
                     page = pages.get(currentPageIndex);
-                    question = page.questions.get(currentQuestionIndex);
-                    if (page.ID != -1 && question.ID != -1) {
+                    question = page.getQuestions().get(currentQuestionIndex);
+                    if (page.getID() != -1 && question.getID() != -1) {
                         Question oldQuestion = question;
                         JSONParser p = new JSONParser();
                         o = (JSONObject) p.parse(request.getParameter("settingsJSON").toString());
                         question.clearAll();
-                        question.ID = oldQuestion.ID;
-                        question.name = oldQuestion.name;
-                        question.questionIndex = oldQuestion.questionIndex;
-                        question.questionText = o.get("questionText").toString();
-                        question.questionID = o.get("questionName").toString();
-                        question.isRequired = (Boolean) o.get("isRequired");
-                        question.questionType = o.get("questionType").toString();
-                        switch (question.questionType) {
+                        question.setID(oldQuestion.getID());
+                        question.setName(oldQuestion.getName());
+                        question.setQuestionIndex(oldQuestion.getQuestionIndex());
+                        question.setQuestionText(o.get("questionText").toString());
+                        question.setQuestionID(o.get("questionName").toString());
+                        question.setRequired((Boolean) o.get("isRequired"));
+                        question.setQuestionType(o.get("questionType").toString());
+                        switch (question.getQuestionType()) {
                             case "text":
-                                question.min = o.get("min").toString();
-                                question.max = o.get("max").toString();
-                                question.validateText = (Boolean) o.get("validateText");
-                                if (question.validateText) {
-                                    question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
-                                    question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                question.setMin(o.get("min").toString());
+                                question.setMax(o.get("max").toString());
+                                question.setValidateText((Boolean) o.get("validateText"));
+                                if (question.isValidateText()) {
+                                    question.setAllowTypes(o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString());
+                                    question.setValidSpecialCharacters(o.get("validSpecialCharacters").toString());
                                 }
                                 break;
-                            case "wholeNumber":
-                                question.min = o.get("min").toString();
-                                question.max = o.get("max").toString();
-                                question.validationType = o.get("validationType").toString();
-                                break;
                             case "decimalNumber":
-                                question.min = o.get("min").toString();
-                                question.max = o.get("max").toString();
-                                question.decimalPlaces = o.get("decimalPlaces").toString();
-                                question.validationType = o.get("validationType").toString();
+                                question.setDecimalPlaces(o.get("decimalPlaces").toString());
+                                case "wholeNumber":
+                                question.setValidationType(o.get("validationType").toString());
+                                question.setMin(o.get("min").toString());
+                                question.setMax(o.get("max").toString());
                                 break;
                             case "multipleChoice":
-                                question.answerChoices = o.get("answerChoices").toString();
-                                question.displayType = o.get("displayType").toString();
-                                question.numberOfAnswers = o.get("numberOfAnswers").toString();
-                                question.otherChoice = o.get("otherChoice").toString();
-                                if (question.otherChoice.length() > 0) {
-                                    question.min = o.get("min").toString();
-                                    question.max = o.get("max").toString();
-                                    question.validateText = (Boolean) o.get("validateText");
-                                    if (question.validateText) {
-                                        question.allowTypes = o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString();
-                                        question.validSpecialCharacters = o.get("validSpecialCharacters").toString();
+                                question.setAnswerChoices(o.get("answerChoices").toString());
+                                question.setDisplayType(o.get("displayType").toString());
+                                question.setNumberOfAnswers(o.get("numberOfAnswers").toString());
+                                question.setOtherChoice(o.get("otherChoice").toString());
+                                if (question.getOtherChoice().length() > 0) {
+                                    question.setMin(o.get("min").toString());
+                                    question.setMax(o.get("max").toString());
+                                    question.setValidateText((Boolean) o.get("validateText"));
+                                    if (question.isValidateText()) {
+                                        question.setAllowTypes(o.get("allowUpper").toString() + ", " + o.get("allowLower").toString() + ", " + o.get("allowDigits").toString() + ", " + o.get("allowSpecial").toString());
+                                        question.setValidSpecialCharacters(o.get("validSpecialCharacters").toString());
                                     }
                                 }
                         }
@@ -170,26 +166,26 @@ public class MainServlet extends HttpServlet {
 
                 if (questionIndex != -1) {
                     page = pages.get(pageIndex);
-                    question = page.questions.get(questionIndex);
+                    question = page.getQuestions().get(questionIndex);
                     o = new JSONObject();
-                    o.put("questionText", question.questionText);
-                    o.put("questionName", question.questionID);
-                    o.put("isRequired", question.isRequired);
-                    o.put("questionType", question.questionType);
-                    o.put("min", question.min);
-                    o.put("max", question.max);
-                    o.put("validateText", question.validateText);
-                    o.put("allowUpper", question.allowTypes.split(", ")[0]);
-                    o.put("allowLower", question.allowTypes.split(", ")[1]);
-                    o.put("allowDigits", question.allowTypes.split(", ")[2]);
-                    o.put("allowSpecial", question.allowTypes.split(", ")[3]);
-                    o.put("validSpecialCharacters", question.validSpecialCharacters);
-                    o.put("validationType", question.validationType);
-                    o.put("decimalPlaces", question.decimalPlaces);
-                    o.put("answerChoices", question.answerChoices);
-                    o.put("displayType", question.displayType);
-                    o.put("numberOfAnswers", question.numberOfAnswers);
-                    o.put("otherChoice", question.otherChoice);
+                    o.put("questionText", question.getQuestionText());
+                    o.put("questionName", question.getQuestionID());
+                    o.put("isRequired", question.isRequired());
+                    o.put("questionType", question.getQuestionType());
+                    o.put("min", question.getMin());
+                    o.put("max", question.getMax());
+                    o.put("validateText", question.isValidateText());
+                    o.put("allowUpper", question.getAllowTypes().split(", ")[0]);
+                    o.put("allowLower", question.getAllowTypes().split(", ")[1]);
+                    o.put("allowDigits", question.getAllowTypes().split(", ")[2]);
+                    o.put("allowSpecial", question.getAllowTypes().split(", ")[3]);
+                    o.put("validSpecialCharacters", question.getValidSpecialCharacters());
+                    o.put("validationType", question.getValidationType());
+                    o.put("decimalPlaces", question.getDecimalPlaces());
+                    o.put("answerChoices", question.getAnswerChoices());
+                    o.put("displayType", question.getDisplayType());
+                    o.put("numberOfAnswers", question.getNumberOfAnswers());
+                    o.put("otherChoice", question.getOtherChoice());
 
                     response.setContentType("application/json");
                     response.getWriter().write(o.toJSONString());
@@ -216,26 +212,26 @@ public class MainServlet extends HttpServlet {
                     try {
                         while (rs.next()) {
                             page = new Page(rs.getInt("iPageID"), getNullSafeString(rs.getString("vchName")), rs.getInt("iIndex"));
-                            rsQuestions = DatabaseAccess.ListQuestions(page.ID);
+                            rsQuestions = DatabaseAccess.ListQuestions(page.getID());
                             while (rsQuestions.next()) {
                                 question = new Question(rsQuestions.getInt("iQuestionID"), getNullSafeString(rsQuestions.getString("vchName")),
                                         rsQuestions.getInt("iIndex"));
-                                question.questionText = getNullSafeString(rsQuestions.getString("vchQuestionText"));
-                                question.questionID = getNullSafeString(rsQuestions.getString("vchQuestionID"));
-                                question.questionType = getNullSafeString(rsQuestions.getString("vchQuestionType"));
-                                question.isRequired = rsQuestions.getBoolean("bRequired");
-                                question.min = getNullSafeString(rsQuestions.getString("vchMin"));
-                                question.max = getNullSafeString(rsQuestions.getString("vchMax"));
-                                question.validateText = rsQuestions.getBoolean("bValidateText");
-                                question.allowTypes = rsQuestions.getString("vchAllowTypes");
-                                question.validSpecialCharacters = getNullSafeString(rsQuestions.getString("vchValidSpecialCharacters"));
-                                question.decimalPlaces = getNullSafeString(rsQuestions.getString("vchDecimalPlaces"));
-                                question.validationType = getNullSafeString(rsQuestions.getString("vchValidationType"));
-                                question.answerChoices = getNullSafeString(rsQuestions.getString("vchAnswerChoices"));
-                                question.otherChoice = getNullSafeString(rsQuestions.getString("vchOtherChoice"));
-                                question.displayType = getNullSafeString(rsQuestions.getString("vchDisplayType"));
-                                question.numberOfAnswers = getNullSafeString(rsQuestions.getString("vchNumberOfAnswers"));
-                                page.questions.add(question);
+                                question.setQuestionText(getNullSafeString(rsQuestions.getString("vchQuestionText")));
+                                question.setQuestionID(getNullSafeString(rsQuestions.getString("vchQuestionID")));
+                                question.setQuestionType(getNullSafeString(rsQuestions.getString("vchQuestionType")));
+                                question.setRequired(rsQuestions.getBoolean("bRequired"));
+                                question.setMin(getNullSafeString(rsQuestions.getString("vchMin")));
+                                question.setMax(getNullSafeString(rsQuestions.getString("vchMax")));
+                                question.setValidateText(rsQuestions.getBoolean("bValidateText"));
+                                question.setAllowTypes(rsQuestions.getString("vchAllowTypes"));
+                                question.setValidSpecialCharacters(getNullSafeString(rsQuestions.getString("vchValidSpecialCharacters")));
+                                question.setDecimalPlaces(getNullSafeString(rsQuestions.getString("vchDecimalPlaces")));
+                                question.setValidationType(getNullSafeString(rsQuestions.getString("vchValidationType")));
+                                question.setAnswerChoices(getNullSafeString(rsQuestions.getString("vchAnswerChoices")));
+                                question.setOtherChoice(getNullSafeString(rsQuestions.getString("vchOtherChoice")));
+                                question.setDisplayType(getNullSafeString(rsQuestions.getString("vchDisplayType")));
+                                question.setNumberOfAnswers(getNullSafeString(rsQuestions.getString("vchNumberOfAnswers")));
+                                page.getQuestions().add(question);
                             }
                             pages.add(page);
                         }
@@ -250,34 +246,34 @@ public class MainServlet extends HttpServlet {
                 o.put("projectTitle", title);
                 o.put("projectID", iProjectID);
                 page = pages.get(0);
-                question = page.questions.get(0);
-                o.put("questionText", question.questionText);
-                o.put("questionName", question.questionID);
-                o.put("isRequired", question.isRequired);
-                o.put("questionType", question.questionType);
-                o.put("min", question.min);
-                o.put("max", question.max);
-                o.put("validateText", question.validateText);
-                o.put("allowUpper", question.allowTypes.split(", ")[0]);
-                o.put("allowLower", question.allowTypes.split(", ")[1]);
-                o.put("allowDigits", question.allowTypes.split(", ")[2]);
-                o.put("allowSpecial", question.allowTypes.split(", ")[3]);
-                o.put("validSpecialCharacters", question.validSpecialCharacters);
-                o.put("validationType", question.validationType);
-                o.put("decimalPlaces", question.decimalPlaces);
-                o.put("answerChoices", question.answerChoices);
-                o.put("displayType", question.displayType);
-                o.put("numberOfAnswers", question.numberOfAnswers);
-                o.put("otherChoice", question.otherChoice);
+                question = page.getQuestions().get(0);
+                o.put("questionText", question.getQuestionText());
+                o.put("questionName", question.getQuestionID());
+                o.put("isRequired", question.isRequired());
+                o.put("questionType", question.getQuestionType());
+                o.put("min", question.getMin());
+                o.put("max", question.getMax());
+                o.put("validateText", question.isValidateText());
+                o.put("allowUpper", question.getAllowTypes().split(", ")[0]);
+                o.put("allowLower", question.getAllowTypes().split(", ")[1]);
+                o.put("allowDigits", question.getAllowTypes().split(", ")[2]);
+                o.put("allowSpecial", question.getAllowTypes().split(", ")[3]);
+                o.put("validSpecialCharacters", question.getValidSpecialCharacters());
+                o.put("validationType", question.getValidationType());
+                o.put("decimalPlaces", question.getDecimalPlaces());
+                o.put("answerChoices", question.getAnswerChoices());
+                o.put("displayType", question.getDisplayType());
+                o.put("numberOfAnswers", question.getNumberOfAnswers());
+                o.put("otherChoice", question.getOtherChoice());
 
                 //send back full (inner) html of tree
                 String treeHTML = "";
                 for (Page p : pages) {
-                    pageIndex = p.pageIndex;
+                    pageIndex = p.getPageIndex();
                     treeHTML += "<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>\n";
                     treeHTML += "<ul>\n";
-                    for (Question q : p.questions) {
-                        questionIndex = q.questionIndex;
+                    for (Question q : p.getQuestions()) {
+                        questionIndex = q.getQuestionIndex();
                         treeHTML += "<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>\n";
                     }
                     treeHTML += "</ul>\n";
@@ -300,86 +296,86 @@ public class MainServlet extends HttpServlet {
                 String errorMessage = "";
                 o = new JSONObject();
                 for (Page p : pages) {
-                    for (Question q : p.questions) {
-                        if (q.questionText.trim().length() == 0) {
+                    for (Question q : p.getQuestions()) {
+                        if (q.getQuestionText().trim().length() == 0) {
                             errorMessage += "<li>Question Text is required</li>";
                         }
-                        if (q.questionID.trim().length() == 0) {
+                        if (q.getQuestionID().trim().length() == 0) {
                             errorMessage += "<li>Question ID is required</li>";
-                        } else if (!q.questionID.matches("^[a-zA-Z0-9_]+$")) {
+                        } else if (!q.getQuestionID().matches("^[a-zA-Z0-9_]+$")) {
                             errorMessage += "<li>Question ID can only contain letters, digits, and underscores</li>";
                         }
-                        switch (q.questionType) {
+                        switch (q.getQuestionType()) {
                             case "none":
                                 errorMessage += "<li>Question Type is required</li>";
                                 break;
                             case "text":
-                                if (q.min.length() == 0) {
+                                if (q.getMin().length() == 0) {
                                     errorMessage += "<li>Character minimum is required</li>";
-                                } else if (!q.min.matches("^[0-9]+$")) {
+                                } else if (!q.getMin().matches("^[0-9]+$")) {
                                     errorMessage += "<li>Character minimum must be a whole number</li>";
                                 }
-                                if (q.max.length() == 0) {
+                                if (q.getMax().length() == 0) {
                                     errorMessage += "<li>Character maximum is required</li>";
-                                } else if (!q.max.matches("^[0-9]+$")) {
+                                } else if (!q.getMax().matches("^[0-9]+$")) {
                                     errorMessage += "<li>Character maximum must be a whole number</li>";
                                 }
                                 try {
-                                    if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                    if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
                                         errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
-                                    } else if (Integer.parseInt(q.max) == 0) {
+                                    } else if (Integer.parseInt(q.getMax()) == 0) {
                                         errorMessage += "<li>Character maximum must be greater than 0</li>";
-                                    } else if (Integer.parseInt(q.min) == 0 && q.isRequired) {
+                                    } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
                                         errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
                                     }
                                 } catch (Exception ex) {
                                 }
-                                if (q.validateText) {
-                                    if (!q.allowTypes.contains("true")) {
+                                if (q.isValidateText()) {
+                                    if (!q.getAllowTypes().contains("true")) {
                                         errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
-                                    } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
+                                    } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
                                         errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
                                     }
                                 }
                                 break;
                             case "wholeNumber":
-                                switch (q.validationType) {
+                                switch (q.getValidationType()) {
                                     case "none":
                                         break;
                                     case "setMin":
-                                        if (q.min.length() == 0) {
+                                        if (q.getMin().length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^-?[0-9]+$")) {
+                                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Minimum must be a whole number</li>";
                                         }
 
                                         break;
                                     case "setMax":
-                                        if (q.max.length() == 0) {
+                                        if (q.getMax().length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^-?[0-9]+$")) {
+                                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Maximum must be a whole number</li>";
                                         }
                                         try {
-                                            if (Integer.parseInt(q.max) == 0) {
+                                            if (Integer.parseInt(q.getMax()) == 0) {
                                                 errorMessage += "<li>Maximum must be greater than 0</li>";
                                             }
                                         } catch (Exception ex) {
                                         }
                                         break;
                                     case "setMinMax":
-                                        if (q.min.length() == 0) {
+                                        if (q.getMin().length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^-?[0-9]+$")) {
+                                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Minimum must be a whole number</li>";
                                         }
-                                        if (q.max.length() == 0) {
+                                        if (q.getMax().length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^-?[0-9]+$")) {
+                                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
                                             errorMessage += "<li>Maximum must be a whole number</li>";
                                         }
                                         try {
-                                            if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                            if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
                                                 errorMessage += "<li>Minimum cannot be more than maximum</li>";
                                             }
                                         } catch (Exception ex) {
@@ -388,37 +384,37 @@ public class MainServlet extends HttpServlet {
                                 }
                                 break;
                             case "decimalNumber":
-                                switch (q.validationType) {
+                                switch (q.getValidationType()) {
                                     case "none":
                                         break;
                                     case "setMin":
-                                        if (q.min.length() == 0) {
+                                        if (q.getMin().length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Minimum must be a decimal number</li>";
                                         }
 
                                         break;
                                     case "setMax":
-                                        if (q.max.length() == 0) {
+                                        if (q.getMax().length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Maximum must be a decimal number</li>";
                                         }
                                         break;
                                     case "setMinMax":
-                                        if (q.min.length() == 0) {
+                                        if (q.getMin().length() == 0) {
                                             errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.min.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Minimum must be a decimal number</li>";
                                         }
-                                        if (q.max.length() == 0) {
+                                        if (q.getMax().length() == 0) {
                                             errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.max.matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
                                             errorMessage += "<li>Maximum must be a decimal number</li>";
                                         }
                                         try {
-                                            if (Double.parseDouble(q.min) > Double.parseDouble(q.max)) {
+                                            if (Double.parseDouble(q.getMin()) > Double.parseDouble(q.getMax())) {
                                                 errorMessage += "<li>Minimum cannot be more than maximum</li>";
                                             }
                                         } catch (Exception ex) {
@@ -427,34 +423,34 @@ public class MainServlet extends HttpServlet {
                                 }
                                 break;
                             case "multipleChoice":
-                                if (q.answerChoices.length() == 0) {
+                                if (q.getAnswerChoices().length() == 0) {
                                     errorMessage += "<li>There must be at least one answer choice</li>";
                                 }
-                                if (q.otherChoice.length() > 0) {
-                                    if (q.min.length() == 0) {
+                                if (q.getOtherChoice().length() > 0) {
+                                    if (q.getMin().length() == 0) {
                                         errorMessage += "<li>Character minimum is required</li>";
-                                    } else if (!q.min.matches("^[0-9]+$")) {
+                                    } else if (!q.getMin().matches("^[0-9]+$")) {
                                         errorMessage += "<li>Character minimum must be a whole number</li>";
                                     }
-                                    if (q.max.length() == 0) {
+                                    if (q.getMax().length() == 0) {
                                         errorMessage += "<li>Character maximum is required</li>";
-                                    } else if (!q.max.matches("^[0-9]+$")) {
+                                    } else if (!q.getMax().matches("^[0-9]+$")) {
                                         errorMessage += "<li>Character maximum must be a whole number</li>";
                                     }
                                     try {
-                                        if (Integer.parseInt(q.min) > Integer.parseInt(q.max)) {
+                                        if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
                                             errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
-                                        } else if (Integer.parseInt(q.max) == 0) {
+                                        } else if (Integer.parseInt(q.getMax()) == 0) {
                                             errorMessage += "<li>Character maximum must be greater than 0</li>";
-                                        } else if (Integer.parseInt(q.min) == 0 && q.isRequired) {
+                                        } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
                                             errorMessage += "<li>Character minimum cannot be 0</li>";
                                         }
                                     } catch (Exception ex) {
                                     }
-                                    if (q.validateText) {
-                                        if (!q.allowTypes.contains("true")) {
+                                    if (q.isValidateText()) {
+                                        if (!q.getAllowTypes().contains("true")) {
                                             errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
-                                        } else if (q.allowTypes.split(", ")[3].equals("true") && q.validSpecialCharacters.length() == 0) {
+                                        } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
                                             errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
                                         }
                                     }
@@ -462,9 +458,9 @@ public class MainServlet extends HttpServlet {
                                 break;
                         }
                         if (errorMessage.length() > 0) {
-                            invalidNodes += p.pageIndex + "," + q.questionIndex + ";";
+                            invalidNodes += p.getPageIndex() + "," + q.getQuestionIndex() + ";";
                         }
-                        if (currentQuestionIndex == q.questionIndex && currentPageIndex == p.pageIndex) {
+                        if (currentQuestionIndex == q.getQuestionIndex() && currentPageIndex == p.getPageIndex()) {
                             o.put("errorMessage", errorMessage);
 
                         }
@@ -504,38 +500,38 @@ public class MainServlet extends HttpServlet {
                     partialJS.addLine(CodeGen.DIR.S, "var result = true;\n");
                     body.addLine(CodeGen.DIR.F, "<table id=\"mainContent\">\n");
                     body.spaceCount += 4;
-                    for (Question q : p.questions) {
+                    for (Question q : p.getQuestions()) {
                         CodeGen.getSQLColumnDeclaration(q, dbColumns);
                         json.getSaveColumnsCode(q);
                         body.addLine(CodeGen.DIR.S, "<tr>\n");
                         body.addLine(CodeGen.DIR.F, "<td>\n");
-                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.questionID + "ErrorMessage\" class=\"errorText\"></p>\n");
-                        body.addLine(CodeGen.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.questionText + "</span>\n");
+                        body.addLine(CodeGen.DIR.F, "<p id=\"" + q.getQuestionID() + "ErrorMessage\" class=\"errorText\"></p>\n");
+                        body.addLine(CodeGen.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.getQuestionText() + "</span>\n");
                         body.addLine(CodeGen.DIR.S, "<div class=\"question\">\n");
                         body.spaceCount += 4;
-                        if (q.isRequired) {
-                            String type = q.questionType;
+                        if (q.isRequired()) {
+                            String type = q.getQuestionType();
                             if (type.equals("multipleChoice")) {
-                                type = q.displayType;
+                                type = q.getDisplayType();
                             }
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + type + "', true);\n");
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + type + "', true);\n");
                             partialJS.addLine(CodeGen.DIR.S, "result = v" + validationCount + " && result;\n");
                             partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
                         } else {
-                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.questionID + "', '" + q.questionType + "', false);\n");
+                            partialJS.addLine(CodeGen.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + q.getQuestionType() + "', false);\n");
                             partialJS.addLine(CodeGen.DIR.S, "if (v" + validationCount + ") {\n");
                             partialJS.spaceCount += 4;
                         }
-                        switch (q.questionType) {
+                        switch (q.getQuestionType()) {
                             case "text":
-                                body.getTextBoxCode(q.questionID, Integer.parseInt(q.max), true);
-                                partialJS.getMeetsLengthRequirementsCode(q.questionID, q.min, q.max);
+                                body.getTextBoxCode(q.getQuestionID(), Integer.parseInt(q.getMax()), true);
+                                partialJS.getMeetsLengthRequirementsCode(q.getQuestionID(), q.getMin(), q.getMax());
                                 partialJS.getTextValidationCode(q);
                                 break;
                             case "multipleChoice":
                                 ArrayList<String> answers = new ArrayList<String>();
-                                for (String answer : q.answerChoices.split(";;")) {
+                                for (String answer : q.getAnswerChoices().split(";;")) {
                                     if (!answer.equals("")) {
                                         answers.add(answer);
                                     }
@@ -544,11 +540,11 @@ public class MainServlet extends HttpServlet {
                                 partialJS.getMultipleChoiceValidationCode(q);
                                 break;
                             case "wholeNumber":
-                                body.getWholeNumberCode(q.questionID);
+                                body.getWholeNumberCode(q.getQuestionID());
                                 partialJS.getWholeNumberValidationCode(q);
                                 break;
                             case "decimalNumber":
-                                body.getDecimalNumberCode(q.questionID, Integer.parseInt(q.decimalPlaces));
+                                body.getDecimalNumberCode(q.getQuestionID(), Integer.parseInt(q.getDecimalPlaces()));
                                 partialJS.getDecimalValidationCode(q);
                                 break;
                         }
@@ -665,10 +661,10 @@ public class MainServlet extends HttpServlet {
         int pageIndex = 0;
         int questionIndex;
         for (Page p : pages) {
-            p.pageIndex = pageIndex++;
+            p.setPageIndex(pageIndex++);
             questionIndex = 0;
-            for (Question q : p.questions) {
-                q.questionIndex = questionIndex++;
+            for (Question q : p.getQuestions()) {
+                q.setQuestionIndex(questionIndex++);
             }
         }
     }

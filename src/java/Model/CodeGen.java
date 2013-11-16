@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class CodeGen {
 
-    static String spaces = "                                                                                                                       ";
+    public static String spaces = "                                                                                                                       ";
     public int spaceCount = 0;
     public String code = "";
 
@@ -43,7 +43,7 @@ public class CodeGen {
     // <editor-fold defaultstate="collapsed" desc="HTML Elements (with bootstrap)">
     public void getMultipleChoiceCode(ArrayList<String> answers, Question q) {
         //incorporate the "other" answer & its validation
-        switch (q.displayType) {
+        switch (q.getDisplayType()) {
             case "radio":
                 getRadioButtonListCode(answers, q);
                 break;
@@ -61,39 +61,39 @@ public class CodeGen {
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"radio\">\n");
             addLine(DIR.F, "<label>\n");
-            if (q.otherChoice.length() > 0) {
-                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "_" + ndx++ + "\" name=\"" + q.questionID + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'radio');\" />\n");
+            if (q.getOtherChoice().length() > 0) {
+                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.getQuestionID() + "_" + ndx++ + "\" name=\"" + q.getQuestionID() + "\" value=\"" + answer + "\" onchange=\"showHideOtherChoiceTextbox('" + q.getQuestionID() + "', '" + q.getQuestionID() + "OtherChoice', 'radio');\" />\n");
             } else {
-                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "_" + ndx++ + "\" name=\"" + q.questionID + "\" value=\"" + answer + "\" />\n");
+                addLine(DIR.F, "<input type=\"radio\" id=\"" + q.getQuestionID() + "_" + ndx++ + "\" name=\"" + q.getQuestionID() + "\" value=\"" + answer + "\" />\n");
             }
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
         }
-        if (q.otherChoice.length() > 0) {
+        if (q.getOtherChoice().length() > 0) {
             addLine(DIR.S, "<div class=\"radio\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"radio\" id=\"" + q.questionID + "OtherChoiceSpecify\" name=\"" + q.questionID + "\" value=\"" + q.otherChoice + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'radio');\">\n");
-            addLine(DIR.S, q.otherChoice + "\n");
+            addLine(DIR.F, "<input type=\"radio\" id=\"" + q.getQuestionID() + "OtherChoiceSpecify\" name=\"" + q.getQuestionID() + "\" value=\"" + q.getOtherChoice() + "\" onchange=\"showHideOtherChoiceTextbox('" + q.getQuestionID() + "', '" + q.getQuestionID() + "OtherChoice', 'radio');\">\n");
+            addLine(DIR.S, q.getOtherChoice() + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
-            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
-            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
+            addLine(DIR.S, "<p id=\"" + q.getQuestionID() + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.getQuestionID() + "OtherChoice", Integer.parseInt(q.getMax()), false);
         }
     }
 
     public void getDropDownListCode(ArrayList<String> answers, Question q) {
-        addLine(DIR.S, "<select class=\"form-control\" id=\"" + q.questionID + "\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "', '" + q.questionID + "OtherChoice', 'dropdown');\">\n");
+        addLine(DIR.S, "<select class=\"form-control\" id=\"" + q.getQuestionID() + "\" onchange=\"showHideOtherChoiceTextbox('" + q.getQuestionID() + "', '" + q.getQuestionID() + "OtherChoice', 'dropdown');\">\n");
         for (String answer : answers) {
             addLine(DIR.FB, "<option>" + answer + "</option>\n");
         }
-        if (q.otherChoice.length() > 0) {
-            addLine(DIR.FB, "<option value=\"otherChoiceSpecify\">" + q.otherChoice + "</option>\n");
+        if (q.getOtherChoice().length() > 0) {
+            addLine(DIR.FB, "<option value=\"otherChoiceSpecify\">" + q.getOtherChoice() + "</option>\n");
         }
         addLine(DIR.S, "</select><br />\n");
-        if (q.otherChoice.length() > 0) {
-            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
-            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
+        if (q.getOtherChoice().length() > 0) {
+            addLine(DIR.S, "<p id=\"" + q.getQuestionID() + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.getQuestionID() + "OtherChoice", Integer.parseInt(q.getMax()), false);
         }
     }
 
@@ -102,19 +102,19 @@ public class CodeGen {
         for (String answer : answers) {
             addLine(DIR.S, "<div class=\"checkbox\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.questionID + "_" + ndx++ + "\" value=\"" + answer + "\">\n");
+            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.getQuestionID() + "_" + ndx++ + "\" value=\"" + answer + "\">\n");
             addLine(DIR.S, answer + "\n");
             addLine(DIR.B, "</label>\n");
             addLine(DIR.B, "</div>\n");
         }
-        if (q.otherChoice.length() > 0) {
+        if (q.getOtherChoice().length() > 0) {
             addLine(DIR.S, "<div class=\"checkbox\">\n");
             addLine(DIR.F, "<label>\n");
-            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.questionID + "OtherChoiceSpecify\" value=\"otherChoice\" onchange=\"showHideOtherChoiceTextbox('" + q.questionID + "OtherChoiceSpecify', '" + q.questionID + "OtherChoice', 'checkbox');\">\n");
-            addLine(DIR.S, q.otherChoice + "\n");
+            addLine(DIR.F, "<input type=\"checkbox\" id=\"" + q.getQuestionID() + "OtherChoiceSpecify\" value=\"otherChoice\" onchange=\"showHideOtherChoiceTextbox('" + q.getQuestionID() + "OtherChoiceSpecify', '" + q.getQuestionID() + "OtherChoice', 'checkbox');\">\n");
+            addLine(DIR.S, q.getOtherChoice() + "\n");
             addLine(DIR.B, "</label>\n");
-            addLine(DIR.S, "<p id=\"" + q.questionID + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
-            getTextBoxCode(q.questionID + "OtherChoice", Integer.parseInt(q.max), false);
+            addLine(DIR.S, "<p id=\"" + q.getQuestionID() + "OtherChoiceErrorMessage\" class=\"errorText\"></p>\n");
+            getTextBoxCode(q.getQuestionID() + "OtherChoice", Integer.parseInt(q.getMax()), false);
             addLine(DIR.B, "</div>\n");
         }
     }
@@ -143,9 +143,9 @@ public class CodeGen {
     }
 
     public void getTextValidationCode(Question q) {
-        if (q.validateText) {
+        if (q.isValidateText()) {
             String validChars = "";
-            String[] allowTypes = q.allowTypes.split(", ");
+            String[] allowTypes = q.getAllowTypes().split(", ");
             if (allowTypes[0].equals("true")) {
                 validChars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             }
@@ -156,57 +156,57 @@ public class CodeGen {
                 validChars += "0123456789";
             }
             if (allowTypes[3].equals("true")) {
-                validChars += q.validSpecialCharacters.replace("\\", "\\\\").replace("'", "\\'");
+                validChars += q.getValidSpecialCharacters().replace("\\", "\\\\").replace("'", "\\'");
             }
-            if (q.questionType.equals("multipleChoice")) {
-                q.questionID += "OtherChoice";
+            if (q.getQuestionType().equals("multipleChoice")) {
+                q.setQuestionID(q.getQuestionID() + "OtherChoice");
             }
-            addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.questionID + "', 'text', '" + validChars + "') && result;\n");
+            addLine(CodeGen.DIR.S, "result = containsOnlyValidChars('" + q.getQuestionID() + "', 'text', '" + validChars + "') && result;\n");
         }
     }
 
     public void getDecimalValidationCode(Question q) {
-        switch (q.validationType) {
+        switch (q.getValidationType()) {
             case "setMin":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
                 break;
             case "setMax":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
                 break;
             case "setMinMax":
-                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
         }
     }
 
     public void getWholeNumberValidationCode(Question q) {
-        switch (q.validationType) {
+        switch (q.getValidationType()) {
             case "setMin":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", '') && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", '') && result;\n");
                 break;
             case "setMax":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', '', " + q.max + ") && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', '', " + q.getMax() + ") && result;\n");
                 break;
             case "setMinMax":
-                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.questionID + "', " + q.min + ", " + q.max + ") && result;\n");
+                addLine(CodeGen.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
         }
     }
 
     public void getMultipleChoiceValidationCode(Question q) {
-        if (q.otherChoice.length() > 0) {
-            switch (q.displayType) {
+        if (q.getOtherChoice().length() > 0) {
+            switch (q.getDisplayType()) {
                 case "checkbox":
-                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.questionID + "', '" + q.numberOfAnswers + "') && result;\n");
+                    addLine(CodeGen.DIR.S, "result = validateAnswerLimit('" + q.getQuestionID() + "', '" + q.getNumberOfAnswers() + "') && result;\n");
                 case "radio":
-                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.questionID + "OtherChoiceSpecify\").is(':checked')) {\n");
+                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.getQuestionID() + "OtherChoiceSpecify\").is(':checked')) {\n");
                     break;
                 case "dropdown":
-                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.questionID + "\").val() == \"otherChoiceSpecify\") {\n");
+                    addLine(CodeGen.DIR.S, "if ($(\"#" + q.getQuestionID() + "\").val() == \"otherChoiceSpecify\") {\n");
                     break;
             }
             spaceCount += 4;
-            getMeetsLengthRequirementsCode(q.questionID + "OtherChoice", q.min, q.max);
+            getMeetsLengthRequirementsCode(q.getQuestionID() + "OtherChoice", q.getMin(), q.getMax());
             getTextValidationCode(q);
             addLine(CodeGen.DIR.B, "}\n");
         }
@@ -245,25 +245,25 @@ public class CodeGen {
     // <editor-fold defaultstate="collapsed" desc="Database">
 
     public void getSaveColumnsCode(Question q) {
-        String type = q.questionType;
+        String type = q.getQuestionType();
         if (type.equals("multipleChoice")) {
-            type = q.displayType;
+            type = q.getDisplayType();
         }
-        addLine(CodeGen.DIR.S, "json." + q.questionID + " = getValueByTypeAndIDForDB('" + q.questionID + "', '" + type + "');\n");
+        addLine(CodeGen.DIR.S, "json." + q.getQuestionID() + " = getValueByTypeAndIDForDB('" + q.getQuestionID() + "', '" + type + "');\n");
     }
 
     public static void getSQLColumnDeclaration(Question q, HashMap<String, String> dbColumns) {
-        String colName = q.questionID;
+        String colName = q.getQuestionID();
         String colDec = "";
-        switch (q.questionType) {
+        switch (q.getQuestionType()) {
             case "text":
-                colDec += "VARCHAR(" + q.max + ")";
+                colDec += "VARCHAR(" + q.getMax() + ")";
                 break;
             case "wholeNumber":
-                switch (q.validationType) {
+                switch (q.getValidationType()) {
                     case "setMax":
                     case "setMinMax":
-                        colDec += "DECIMAL(" + q.min.replace("-", "").length() + ", 0)";
+                        colDec += "DECIMAL(" + q.getMin().replace("-", "").length() + ", 0)";
                         break;
                     case "setMin":
                     default:
@@ -272,27 +272,27 @@ public class CodeGen {
                 }
                 break;
             case "decimalNumber":
-                switch (q.validationType) {
+                switch (q.getValidationType()) {
                     case "setMax":
                     case "setMinMax":
-                        int decimalPlaces = Integer.parseInt(q.decimalPlaces);
-                        int max = Math.max(q.min.replace("-", "").length(), q.max.replace("-", "").length()) - 1;
+                        int decimalPlaces = Integer.parseInt(q.getDecimalPlaces());
+                        int max = Math.max(q.getMin().replace("-", "").length(), q.getMax().replace("-", "").length()) - 1;
                         colDec += "DECIMAL(" + max + ", " + decimalPlaces + ")";
                         break;
                     case "setMin":
                     default:
-                        colDec += "DECIMAL(64, " + q.decimalPlaces + ")";
+                        colDec += "DECIMAL(64, " + q.getDecimalPlaces() + ")";
                         break;
                 }
                 break;
             case "multipleChoice":
                 colDec += "VARCHAR(" + q.longestAnswerChoiceLength() + ")";
-                if (q.otherChoice.length() > 0) {
-                    dbColumns.put(q.questionID + "OtherChoice", "VARCHAR(" + q.max + ")");
+                if (q.getOtherChoice().length() > 0) {
+                    dbColumns.put(q.getQuestionID() + "OtherChoice", "VARCHAR(" + q.getMax() + ")");
                 }
                 break;
         }
-        if (q.isRequired) {
+        if (q.isRequired()) {
             colDec += " NOT NULL";
         }
         dbColumns.put(colName, colDec);
