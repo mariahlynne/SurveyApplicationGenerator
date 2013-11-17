@@ -40,7 +40,7 @@
         <script type="text/javascript" src="js/bootstrap.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript" src="js/ajax.js"></script>
-
+        <script type="text/javascript" src="js/static.js"></script>
     </head>
     <body>
         <header id="primary">
@@ -69,8 +69,6 @@
                         <li><a href="javascript:addPage()">Add Page</a></li>
                         <li><a href="javascript:addQuestion()">Add Question</a></li>
                         <li><a href="javascript:removeNode()">Delete Selected</a></li>
-                        <!--                        <li><a href="#">Reorder Pages</a></li>
-                                                <li><a href="#">Reorder Questions</a></li>-->
                     </ul>
                 </div>
             </div>
@@ -103,11 +101,8 @@
         <!--Body content-->
         <div id="mainContent" class="well well-small">
             <div id="errorMessages" style="color: red; font-weight: bold;">
-
             </div>
             <div id="pageSection">
-                This will show how all of the questions for this page will appear.
-
             </div>
             <div id="questionSection" style="margin-top: 10px;">
                 <div id="questionErrorSection" style="width: 60%; margin: 20px auto; background-color: transparent; border: 1px solid red; color: red; font-weight: bold;">

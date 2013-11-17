@@ -112,6 +112,7 @@ public class Servlet extends HttpServlet {
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
                 pages = (ArrayList<Page>) session.getAttribute("pages");
 
+                //switching from a question
                 if (currentQuestionIndex != -1) {
                     page = pages.get(currentPageIndex);
                     question = page.getQuestions().get(currentQuestionIndex);
@@ -139,7 +140,7 @@ public class Servlet extends HttpServlet {
                                 break;
                             case "decimalNumber":
                                 question.setDecimalPlaces(o.get("decimalPlaces").toString());
-                                case "wholeNumber":
+                            case "wholeNumber":
                                 question.setValidationType(o.get("validationType").toString());
                                 question.setMin(o.get("min").toString());
                                 question.setMax(o.get("max").toString());
@@ -164,6 +165,7 @@ public class Servlet extends HttpServlet {
                     }
                 }
 
+                //switching to a question
                 if (questionIndex != -1) {
                     page = pages.get(pageIndex);
                     question = page.getQuestions().get(questionIndex);
@@ -187,6 +189,29 @@ public class Servlet extends HttpServlet {
                     o.put("numberOfAnswers", question.getNumberOfAnswers());
                     o.put("otherChoice", question.getOtherChoice());
 
+                    response.setContentType("application/json");
+                    response.getWriter().write(o.toJSONString());
+                } else {
+                    //switching to a page
+                    page = pages.get(pageIndex);
+                    String invalidNodes = "";
+                    String errorMessage = "";
+                    String tempErrorMessage;
+                    o = new JSONObject();
+                    for (Question q : page.getQuestions()) {
+                        tempErrorMessage = validateQuestion(q);
+                        if (tempErrorMessage.length() > 0) {
+                            invalidNodes += page.getPageIndex() + "," + q.getQuestionIndex() + ";";
+                            errorMessage += tempErrorMessage;
+                        }
+                    }
+                    if (errorMessage.length() == 0) {
+
+                    } else {
+                        o.put("pageSectionCode", "When all questions for this page are error-free, a preview of the page will be visible here.");
+                    }
+                    o.put("errorMessage", errorMessage);
+                    o.put("invalidNodes", invalidNodes);
                     response.setContentType("application/json");
                     response.getWriter().write(o.toJSONString());
                 }
@@ -293,178 +318,17 @@ public class Servlet extends HttpServlet {
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
                 currentPageIndex = Integer.parseInt(request.getParameter("currentPageIndex"));
                 String invalidNodes = "";
-                String errorMessage = "";
+                String errorMessage;
                 o = new JSONObject();
                 for (Page p : pages) {
                     for (Question q : p.getQuestions()) {
-                        if (q.getQuestionText().trim().length() == 0) {
-                            errorMessage += "<li>Question Text is required</li>";
-                        }
-                        if (q.getQuestionID().trim().length() == 0) {
-                            errorMessage += "<li>Question ID is required</li>";
-                        } else if (!q.getQuestionID().matches("^[a-zA-Z0-9_]+$")) {
-                            errorMessage += "<li>Question ID can only contain letters, digits, and underscores</li>";
-                        }
-                        switch (q.getQuestionType()) {
-                            case "none":
-                                errorMessage += "<li>Question Type is required</li>";
-                                break;
-                            case "text":
-                                if (q.getMin().length() == 0) {
-                                    errorMessage += "<li>Character minimum is required</li>";
-                                } else if (!q.getMin().matches("^[0-9]+$")) {
-                                    errorMessage += "<li>Character minimum must be a whole number</li>";
-                                }
-                                if (q.getMax().length() == 0) {
-                                    errorMessage += "<li>Character maximum is required</li>";
-                                } else if (!q.getMax().matches("^[0-9]+$")) {
-                                    errorMessage += "<li>Character maximum must be a whole number</li>";
-                                }
-                                try {
-                                    if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
-                                        errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
-                                    } else if (Integer.parseInt(q.getMax()) == 0) {
-                                        errorMessage += "<li>Character maximum must be greater than 0</li>";
-                                    } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
-                                        errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
-                                    }
-                                } catch (Exception ex) {
-                                }
-                                if (q.isValidateText()) {
-                                    if (!q.getAllowTypes().contains("true")) {
-                                        errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
-                                    } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
-                                        errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
-                                    }
-                                }
-                                break;
-                            case "wholeNumber":
-                                switch (q.getValidationType()) {
-                                    case "none":
-                                        break;
-                                    case "setMin":
-                                        if (q.getMin().length() == 0) {
-                                            errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
-                                            errorMessage += "<li>Minimum must be a whole number</li>";
-                                        }
-
-                                        break;
-                                    case "setMax":
-                                        if (q.getMax().length() == 0) {
-                                            errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
-                                            errorMessage += "<li>Maximum must be a whole number</li>";
-                                        }
-                                        try {
-                                            if (Integer.parseInt(q.getMax()) == 0) {
-                                                errorMessage += "<li>Maximum must be greater than 0</li>";
-                                            }
-                                        } catch (Exception ex) {
-                                        }
-                                        break;
-                                    case "setMinMax":
-                                        if (q.getMin().length() == 0) {
-                                            errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
-                                            errorMessage += "<li>Minimum must be a whole number</li>";
-                                        }
-                                        if (q.getMax().length() == 0) {
-                                            errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
-                                            errorMessage += "<li>Maximum must be a whole number</li>";
-                                        }
-                                        try {
-                                            if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
-                                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
-                                            }
-                                        } catch (Exception ex) {
-                                        }
-                                        break;
-                                }
-                                break;
-                            case "decimalNumber":
-                                switch (q.getValidationType()) {
-                                    case "none":
-                                        break;
-                                    case "setMin":
-                                        if (q.getMin().length() == 0) {
-                                            errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
-                                            errorMessage += "<li>Minimum must be a decimal number</li>";
-                                        }
-
-                                        break;
-                                    case "setMax":
-                                        if (q.getMax().length() == 0) {
-                                            errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
-                                            errorMessage += "<li>Maximum must be a decimal number</li>";
-                                        }
-                                        break;
-                                    case "setMinMax":
-                                        if (q.getMin().length() == 0) {
-                                            errorMessage += "<li>Minimum is required</li>";
-                                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
-                                            errorMessage += "<li>Minimum must be a decimal number</li>";
-                                        }
-                                        if (q.getMax().length() == 0) {
-                                            errorMessage += "<li>Maximum is required</li>";
-                                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
-                                            errorMessage += "<li>Maximum must be a decimal number</li>";
-                                        }
-                                        try {
-                                            if (Double.parseDouble(q.getMin()) > Double.parseDouble(q.getMax())) {
-                                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
-                                            }
-                                        } catch (Exception ex) {
-                                        }
-                                        break;
-                                }
-                                break;
-                            case "multipleChoice":
-                                if (q.getAnswerChoices().length() == 0) {
-                                    errorMessage += "<li>There must be at least one answer choice</li>";
-                                }
-                                if (q.getOtherChoice().length() > 0) {
-                                    if (q.getMin().length() == 0) {
-                                        errorMessage += "<li>Character minimum is required</li>";
-                                    } else if (!q.getMin().matches("^[0-9]+$")) {
-                                        errorMessage += "<li>Character minimum must be a whole number</li>";
-                                    }
-                                    if (q.getMax().length() == 0) {
-                                        errorMessage += "<li>Character maximum is required</li>";
-                                    } else if (!q.getMax().matches("^[0-9]+$")) {
-                                        errorMessage += "<li>Character maximum must be a whole number</li>";
-                                    }
-                                    try {
-                                        if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
-                                            errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
-                                        } else if (Integer.parseInt(q.getMax()) == 0) {
-                                            errorMessage += "<li>Character maximum must be greater than 0</li>";
-                                        } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
-                                            errorMessage += "<li>Character minimum cannot be 0</li>";
-                                        }
-                                    } catch (Exception ex) {
-                                    }
-                                    if (q.isValidateText()) {
-                                        if (!q.getAllowTypes().contains("true")) {
-                                            errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
-                                        } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
-                                            errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
-                                        }
-                                    }
-                                }
-                                break;
-                        }
+                        errorMessage = validateQuestion(q);
                         if (errorMessage.length() > 0) {
                             invalidNodes += p.getPageIndex() + "," + q.getQuestionIndex() + ";";
                         }
                         if (currentQuestionIndex == q.getQuestionIndex() && currentPageIndex == p.getPageIndex()) {
                             o.put("errorMessage", errorMessage);
-
                         }
-                        errorMessage = "";
                     }
                 }
 
@@ -606,27 +470,7 @@ public class Servlet extends HttpServlet {
             //</editor-fold>
         }
     }
-//                jObject.put("previousNodeType", session.getAttribute("currentNodeType").toString());
-//                jObject.put("previousPageIndex", new Integer(session.getAttribute("currentPageIndex").toString()));
-//                jObject.put("previousQuestionIndex", new Integer(session.getAttribute("currentQuestionIndex").toString()));
 
-//                System.out.println("switching from page: " + session.getAttribute("currentPageIndex").toString() + ", question: " + session.getAttribute("currentQuestionIndex").toString());
-//                System.out.println("to page: " + request.getParameter("pageIndex") + ", question: " + request.getParameter("questionIndex"));
-    //        response.setContentType("text/html;charset=UTF-8");
-//        PrintWriter out = response.getWriter();
-//        try {
-//            /* TODO output your page here. You may use following sample code. */
-//            out.println("<html>");
-//            out.println("<head>");
-//            out.println("<title>Servlet Servlet</title>");
-//            out.println("</head>");
-//            out.println("<body>");
-//            out.println("<h1>Servlet Servlet at " + request.getContextPath() + "</h1>");
-//            out.println("</body>");
-//            out.println("</html>");
-//        } finally {
-//            out.close();
-//        }
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -675,5 +519,170 @@ public class Servlet extends HttpServlet {
         } else {
             return s;
         }
+    }
+
+    private String validateQuestion(Question q) {
+        String errorMessage = "";
+        if (q.getQuestionText().trim().length() == 0) {
+            errorMessage += "<li>Question Text is required</li>";
+        }
+        if (q.getQuestionID().trim().length() == 0) {
+            errorMessage += "<li>Question ID is required</li>";
+        } else if (!q.getQuestionID().matches("^[a-zA-Z0-9_]+$")) {
+            errorMessage += "<li>Question ID can only contain letters, digits, and underscores</li>";
+        }
+        switch (q.getQuestionType()) {
+            case "none":
+                errorMessage += "<li>Question Type is required</li>";
+                break;
+            case "text":
+                if (q.getMin().length() == 0) {
+                    errorMessage += "<li>Character minimum is required</li>";
+                } else if (!q.getMin().matches("^[0-9]+$")) {
+                    errorMessage += "<li>Character minimum must be a whole number</li>";
+                }
+                if (q.getMax().length() == 0) {
+                    errorMessage += "<li>Character maximum is required</li>";
+                } else if (!q.getMax().matches("^[0-9]+$")) {
+                    errorMessage += "<li>Character maximum must be a whole number</li>";
+                }
+                try {
+                    if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
+                        errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
+                    } else if (Integer.parseInt(q.getMax()) == 0) {
+                        errorMessage += "<li>Character maximum must be greater than 0</li>";
+                    } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
+                        errorMessage += "<li>Character minimum cannot be 0 when the question is required</li>";
+                    }
+                } catch (Exception ex) {
+                }
+                if (q.isValidateText()) {
+                    if (!q.getAllowTypes().contains("true")) {
+                        errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
+                    } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
+                        errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                    }
+                }
+                break;
+            case "wholeNumber":
+                switch (q.getValidationType()) {
+                    case "none":
+                        break;
+                    case "setMin":
+                        if (q.getMin().length() == 0) {
+                            errorMessage += "<li>Minimum is required</li>";
+                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
+                            errorMessage += "<li>Minimum must be a whole number</li>";
+                        }
+
+                        break;
+                    case "setMax":
+                        if (q.getMax().length() == 0) {
+                            errorMessage += "<li>Maximum is required</li>";
+                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
+                            errorMessage += "<li>Maximum must be a whole number</li>";
+                        }
+                        try {
+                            if (Integer.parseInt(q.getMax()) == 0) {
+                                errorMessage += "<li>Maximum must be greater than 0</li>";
+                            }
+                        } catch (Exception ex) {
+                        }
+                        break;
+                    case "setMinMax":
+                        if (q.getMin().length() == 0) {
+                            errorMessage += "<li>Minimum is required</li>";
+                        } else if (!q.getMin().matches("^-?[0-9]+$")) {
+                            errorMessage += "<li>Minimum must be a whole number</li>";
+                        }
+                        if (q.getMax().length() == 0) {
+                            errorMessage += "<li>Maximum is required</li>";
+                        } else if (!q.getMax().matches("^-?[0-9]+$")) {
+                            errorMessage += "<li>Maximum must be a whole number</li>";
+                        }
+                        try {
+                            if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
+                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
+                            }
+                        } catch (Exception ex) {
+                        }
+                        break;
+                }
+                break;
+            case "decimalNumber":
+                switch (q.getValidationType()) {
+                    case "none":
+                        break;
+                    case "setMin":
+                        if (q.getMin().length() == 0) {
+                            errorMessage += "<li>Minimum is required</li>";
+                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                            errorMessage += "<li>Minimum must be a decimal number</li>";
+                        }
+
+                        break;
+                    case "setMax":
+                        if (q.getMax().length() == 0) {
+                            errorMessage += "<li>Maximum is required</li>";
+                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                            errorMessage += "<li>Maximum must be a decimal number</li>";
+                        }
+                        break;
+                    case "setMinMax":
+                        if (q.getMin().length() == 0) {
+                            errorMessage += "<li>Minimum is required</li>";
+                        } else if (!q.getMin().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                            errorMessage += "<li>Minimum must be a decimal number</li>";
+                        }
+                        if (q.getMax().length() == 0) {
+                            errorMessage += "<li>Maximum is required</li>";
+                        } else if (!q.getMax().matches("^-?[0-9]+(\\.[0-9]*)?$")) {
+                            errorMessage += "<li>Maximum must be a decimal number</li>";
+                        }
+                        try {
+                            if (Double.parseDouble(q.getMin()) > Double.parseDouble(q.getMax())) {
+                                errorMessage += "<li>Minimum cannot be more than maximum</li>";
+                            }
+                        } catch (Exception ex) {
+                        }
+                        break;
+                }
+                break;
+            case "multipleChoice":
+                if (q.getAnswerChoices().length() == 0) {
+                    errorMessage += "<li>There must be at least one answer choice</li>";
+                }
+                if (q.getOtherChoice().length() > 0) {
+                    if (q.getMin().length() == 0) {
+                        errorMessage += "<li>Character minimum is required</li>";
+                    } else if (!q.getMin().matches("^[0-9]+$")) {
+                        errorMessage += "<li>Character minimum must be a whole number</li>";
+                    }
+                    if (q.getMax().length() == 0) {
+                        errorMessage += "<li>Character maximum is required</li>";
+                    } else if (!q.getMax().matches("^[0-9]+$")) {
+                        errorMessage += "<li>Character maximum must be a whole number</li>";
+                    }
+                    try {
+                        if (Integer.parseInt(q.getMin()) > Integer.parseInt(q.getMax())) {
+                            errorMessage += "<li>Character minimum cannot be more than character maximum</li>";
+                        } else if (Integer.parseInt(q.getMax()) == 0) {
+                            errorMessage += "<li>Character maximum must be greater than 0</li>";
+                        } else if (Integer.parseInt(q.getMin()) == 0 && q.isRequired()) {
+                            errorMessage += "<li>Character minimum cannot be 0</li>";
+                        }
+                    } catch (Exception ex) {
+                    }
+                    if (q.isValidateText()) {
+                        if (!q.getAllowTypes().contains("true")) {
+                            errorMessage += "<li>Because validate text is selected, at least one character type to allow must be selected</li>";
+                        } else if (q.getAllowTypes().split(", ")[3].equals("true") && q.getValidSpecialCharacters().length() == 0) {
+                            errorMessage += "<li>The special characters textbox cannot be empty when allow special characters is checked";
+                        }
+                    }
+                }
+                break;
+        }
+        return errorMessage;
     }
 }
