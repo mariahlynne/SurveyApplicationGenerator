@@ -194,24 +194,24 @@ public class Servlet extends HttpServlet {
                 } else {
                     //switching to a page
                     page = pages.get(pageIndex);
-                    String invalidNodes = "";
                     String errorMessage = "";
                     String tempErrorMessage;
                     o = new JSONObject();
                     for (Question q : page.getQuestions()) {
                         tempErrorMessage = validateQuestion(q);
                         if (tempErrorMessage.length() > 0) {
-                            invalidNodes += page.getPageIndex() + "," + q.getQuestionIndex() + ";";
-                            errorMessage += tempErrorMessage;
+                            errorMessage += tempErrorMessage.replace("<li>", "<li>" + q.getName() + " - ");
                         }
                     }
                     if (errorMessage.length() == 0) {
-
+                        o.put("validated", true);
+                        ArrayList<String> generatedResults = generatePage(page, pages.indexOf(page) + 1, null, pages);
+                        o.put("pagePreviewCode", generatedResults.get(0));
+                        o.put("pagePreviewJavascript", generatedResults.get(1));
                     } else {
-                        //o.put("pageSectionCode", "When all questions for this page are error-free, a preview of the page will be visible here.");
+                        o.put("validated", false);
+                        o.put("errorMessage", errorMessage);
                     }
-                    o.put("errorMessage", errorMessage);
-                    o.put("invalidNodes", invalidNodes);
                     response.setContentType("application/json");
                     response.getWriter().write(o.toJSONString());
                 }
@@ -343,104 +343,21 @@ public class Servlet extends HttpServlet {
             case "generateApplication":
                 String javascript = "";
                 int pageCount = 1;
-                int questionCount = 1;
-                int validationCount = 0;
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 BufferedWriter bw;
-                CodeGenerator body;
-                CodeGenerator partialJS;
-                CodeGenerator json;
                 HashMap<String, String> dbColumns = new HashMap<String, String>();
+                ArrayList<String> generatePageResults;
                 for (Page p : pages) {
-                    body = new CodeGenerator();
-                    partialJS = new CodeGenerator();
-                    json = new CodeGenerator();
-                    json.spaceCount -= 4;
-                    json.addLine(CodeGenerator.DIR.F, "var json = new Object();\n");
-                    json.spaceCount += 8;
-                    body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
-                    partialJS.addLine(CodeGenerator.DIR.S, "function validatePage" + pageCount + "() {\n");
-                    partialJS.addLine(CodeGenerator.DIR.F, "$(\".errorText\").hide();\n");
-                    partialJS.addLine(CodeGenerator.DIR.S, "var result = true;\n");
-                    body.addLine(CodeGenerator.DIR.F, "<table id=\"mainContent\">\n");
-                    body.spaceCount += 4;
-                    for (Question q : p.getQuestions()) {
-                        CodeGenerator.getSQLColumnDeclaration(q, dbColumns);
-                        json.getSaveColumnsCode(q);
-                        body.addLine(CodeGenerator.DIR.S, "<tr>\n");
-                        body.addLine(CodeGenerator.DIR.F, "<td>\n");
-                        body.addLine(CodeGenerator.DIR.F, "<p id=\"" + q.getQuestionID() + "ErrorMessage\" class=\"errorText\"></p>\n");
-                        body.addLine(CodeGenerator.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.getQuestionText() + "</span>\n");
-                        body.addLine(CodeGenerator.DIR.S, "<div class=\"question\">\n");
-                        body.spaceCount += 4;
-                        if (q.isRequired()) {
-                            String type = q.getQuestionType();
-                            if (type.equals("multipleChoice")) {
-                                type = q.getDisplayType();
-                            }
-                            partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + type + "', true);\n");
-                            partialJS.addLine(CodeGenerator.DIR.S, "result = v" + validationCount + " && result;\n");
-                            partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
-                            partialJS.spaceCount += 4;
-                        } else {
-                            partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + q.getQuestionType() + "', false);\n");
-                            partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
-                            partialJS.spaceCount += 4;
-                        }
-                        switch (q.getQuestionType()) {
-                            case "text":
-                                body.getTextBoxCode(q.getQuestionID(), Integer.parseInt(q.getMax()), true);
-                                partialJS.getMeetsLengthRequirementsCode(q.getQuestionID(), q.getMin(), q.getMax());
-                                partialJS.getTextValidationCode(q);
-                                break;
-                            case "multipleChoice":
-                                ArrayList<String> answers = new ArrayList<String>();
-                                for (String answer : q.getAnswerChoices().split(";;")) {
-                                    if (!answer.equals("")) {
-                                        answers.add(answer);
-                                    }
-                                }
-                                body.getMultipleChoiceCode(answers, q);
-                                partialJS.getMultipleChoiceValidationCode(q);
-                                break;
-                            case "wholeNumber":
-                                body.getWholeNumberCode(q.getQuestionID());
-                                partialJS.getWholeNumberValidationCode(q);
-                                break;
-                            case "decimalNumber":
-                                body.getDecimalNumberCode(q.getQuestionID(), Integer.parseInt(q.getDecimalPlaces()));
-                                partialJS.getDecimalValidationCode(q);
-                                break;
-                        }
-                        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
-                        body.addLine(CodeGenerator.DIR.B, "</div>\n");
-                        body.addLine(CodeGenerator.DIR.B, "</td>\n");
-                        body.addLine(CodeGenerator.DIR.B, "</tr>\n");
-                    }
-                    partialJS.addLine(CodeGenerator.DIR.S, "if (result) {\n");
-                    partialJS.getAJAX(json, pageCount == pages.size());
-                    partialJS.addLine(CodeGenerator.DIR.B, "}\n");
-                    partialJS.addLine(CodeGenerator.DIR.S, "return false;\n");
-                    partialJS.addLine(CodeGenerator.DIR.B, "}\n");
-                    javascript += partialJS.code + "\n";
-                    body.addLine(CodeGenerator.DIR.S, "<tr>\n");
-                    body.addLine(CodeGenerator.DIR.F, "<td align=\"center\">\n");
-                    if (pageCount < pages.size()) {
-                        body.getNextButtonCode();
-                    } else {
-                        body.getSubmitButtonCode();
-                    }
-                    body.addLine(CodeGenerator.DIR.B, "</td>\n");
-                    body.addLine(CodeGenerator.DIR.B, "</tr>\n");
-                    body.addLine(CodeGenerator.DIR.B, "</table>\n");
-                    body.addLine(CodeGenerator.DIR.B, "</form>\n");
-                    body.addLine(CodeGenerator.DIR.B, "</body>\n");
-                    body.addLine(CodeGenerator.DIR.B, "</html>");
+                    generatePageResults = generatePage(p, pageCount, session, pages);
                     bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\Page" + pageCount + ".jsp"));
-                    bw.write(body.code);
+                    bw.write(generatePageResults.get(0));
                     bw.flush();
                     bw.close();
                     pageCount++;
+                    javascript += generatePageResults.get(1) + "\n";
+                    for (Question q : p.getQuestions()) {
+                        CodeGenerator.getSQLColumnDeclaration(q, dbColumns);
+                    }
                 }
                 bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\js\\main.js"));
                 bw.write(javascript);
@@ -684,5 +601,105 @@ public class Servlet extends HttpServlet {
                 break;
         }
         return errorMessage;
+    }
+
+    private ArrayList<String> generatePage(Page p, int pageCount, HttpSession session, ArrayList<Page> pages) {
+        CodeGenerator body;
+        CodeGenerator partialJS;
+        CodeGenerator json;
+        int questionCount = 1;
+        int validationCount = 0;
+
+        body = new CodeGenerator();
+        partialJS = new CodeGenerator();
+        json = new CodeGenerator();
+        json.spaceCount -= 4;
+        json.addLine(CodeGenerator.DIR.F, "var json = new Object();\n");
+        json.spaceCount += 8;
+        if (session != null) {
+            body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
+        }
+        partialJS.addLine(CodeGenerator.DIR.S, "function validatePage" + pageCount + "() {\n");
+        partialJS.addLine(CodeGenerator.DIR.F, "$(\".errorText\").hide();\n");
+        partialJS.addLine(CodeGenerator.DIR.S, "var result = true;\n");
+        String tableID = (session == null) ? "previewContent" : "mainContent";
+        body.addLine(CodeGenerator.DIR.F, "<table id=\"" + tableID + "\">\n");
+        body.spaceCount += 4;
+        for (Question q : p.getQuestions()) {
+            json.getSaveColumnsCode(q);
+            body.addLine(CodeGenerator.DIR.S, "<tr>\n");
+            body.addLine(CodeGenerator.DIR.F, "<td>\n");
+            body.addLine(CodeGenerator.DIR.F, "<p id=\"" + q.getQuestionID() + "ErrorMessage\" class=\"errorText\"></p>\n");
+            body.addLine(CodeGenerator.DIR.S, "<span class=\"questionText\">" + questionCount++ + ". " + q.getQuestionText() + "</span>\n");
+            body.addLine(CodeGenerator.DIR.S, "<div class=\"question\">\n");
+            body.spaceCount += 4;
+            if (q.isRequired()) {
+                String type = q.getQuestionType();
+                if (type.equals("multipleChoice")) {
+                    type = q.getDisplayType();
+                }
+                partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + type + "', true);\n");
+                partialJS.addLine(CodeGenerator.DIR.S, "result = v" + validationCount + " && result;\n");
+                partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
+                partialJS.spaceCount += 4;
+            } else {
+                partialJS.addLine(CodeGenerator.DIR.S, "var v" + ++validationCount + " = isNotEmpty('" + q.getQuestionID() + "', '" + q.getQuestionType() + "', false);\n");
+                partialJS.addLine(CodeGenerator.DIR.S, "if (v" + validationCount + ") {\n");
+                partialJS.spaceCount += 4;
+            }
+            switch (q.getQuestionType()) {
+                case "text":
+                    body.getTextBoxCode(q.getQuestionID(), Integer.parseInt(q.getMax()), true);
+                    partialJS.getMeetsLengthRequirementsCode(q.getQuestionID(), q.getMin(), q.getMax());
+                    partialJS.getTextValidationCode(q);
+                    break;
+                case "multipleChoice":
+                    ArrayList<String> answers = new ArrayList<String>();
+                    for (String answer : q.getAnswerChoices().split(";;")) {
+                        if (!answer.equals("")) {
+                            answers.add(answer);
+                        }
+                    }
+                    body.getMultipleChoiceCode(answers, q);
+                    partialJS.getMultipleChoiceValidationCode(q);
+                    break;
+                case "wholeNumber":
+                    body.getWholeNumberCode(q.getQuestionID());
+                    partialJS.getWholeNumberValidationCode(q);
+                    break;
+                case "decimalNumber":
+                    body.getDecimalNumberCode(q.getQuestionID(), Integer.parseInt(q.getDecimalPlaces()));
+                    partialJS.getDecimalValidationCode(q);
+                    break;
+            }
+            partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+            body.addLine(CodeGenerator.DIR.B, "</div>\n");
+            body.addLine(CodeGenerator.DIR.B, "</td>\n");
+            body.addLine(CodeGenerator.DIR.B, "</tr>\n");
+        }
+        partialJS.addLine(CodeGenerator.DIR.S, "if (result) {\n");
+        partialJS.getAJAX(json, pageCount == pages.size());
+        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+        partialJS.addLine(CodeGenerator.DIR.S, "return false;\n");
+        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+        body.addLine(CodeGenerator.DIR.S, "<tr>\n");
+        body.addLine(CodeGenerator.DIR.F, "<td align=\"center\">\n");
+        if (pageCount < pages.size()) {
+            body.getNextButtonCode();
+        } else {
+            body.getSubmitButtonCode();
+        }
+        body.addLine(CodeGenerator.DIR.B, "</td>\n");
+        body.addLine(CodeGenerator.DIR.B, "</tr>\n");
+        body.addLine(CodeGenerator.DIR.B, "</table>\n");
+        if (session != null) {
+            body.addLine(CodeGenerator.DIR.B, "</form>\n");
+            body.addLine(CodeGenerator.DIR.B, "</body>\n");
+            body.addLine(CodeGenerator.DIR.B, "</html>");
+        }
+        ArrayList<String> results = new ArrayList<String>();
+        results.add(body.code);
+        results.add(partialJS.code);
+        return results;
     }
 }

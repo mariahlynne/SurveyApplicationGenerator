@@ -82,16 +82,27 @@ function switchNode(pageIndex, questionIndex) {
             currentQuestionIndex.val(questionIndex);
             if (questionIndex == -1) {
                 currentNodeType.val("page");
-                showPage();
                 currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
+                validated = json.validated;
+                showPage();
+                if (validated) {
+                    $("#pageErrorSection").hide();
+                    $("#pagePreviewPlaceholder").html(json.pagePreviewCode);
+                    $("#pagePreviewPlaceholder").show();
+                } else {
+                    $("#pageErrorMessages").html(json.errorMessage);
+                    $("#pageErrorSection").show();
+                    $("#pagePreviewPlaceholder").hide();
+                }
             } else {
                 showQuestion();
                 currentNodeType.val("question");
                 currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > ul > li:nth-child(" + (questionIndex + 1) + ") > a");
+                validated = validate();
             }
             currentNode.addClass("nodeSelected");
             currentNode.attr('href', "javascript:doNothing()");
-            validated = validate();
+
             enableCollapsibleTree();
         }
     });

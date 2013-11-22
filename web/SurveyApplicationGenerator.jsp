@@ -103,6 +103,28 @@
             <div id="errorMessages" style="color: red; font-weight: bold;">
             </div>
             <div id="pageSection">
+                <div id="pageErrorSection" style="width: 60%; margin: 20px auto; background-color: transparent; border: 1px solid red; color: red; font-weight: bold;">
+                    <table>
+                        <tr>
+                            <td valign="middle">
+                                <i class="icon-warning-sign icon-5x" style="display: inline-block; margin: 7px 10px 0px 10px"></i>
+                            </td>
+                            <td>
+                                <div style="padding: 5px 25px 5px 5px; font-size: 14px;">
+                                    Please correct the following to see a preview of this page:
+                                    <ul id="pageErrorMessages" style="padding-left: 15px; list-style-type: circle !important; padding-bottom: 0; margin-bottom: 0;">
+                                        <li>Question Text is required</li>
+                                        <li>Question ID is required</li>
+                                        <li>Question Type is required</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="pagePreviewPlaceholder" style="width: 100%; background-color: #f5f5f5;">
+
+                </div>
             </div>
             <div id="questionSection" style="margin-top: 10px;">
                 <div id="questionErrorSection" style="width: 60%; margin: 20px auto; background-color: transparent; border: 1px solid red; color: red; font-weight: bold;">
