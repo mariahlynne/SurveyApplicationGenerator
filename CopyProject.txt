@@ -4,49 +4,49 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CopyApplication`(IN iApplicationID INT, IN vchTitle VARCHAR(255), OUT iNewApplicationID INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`CopyProject`(IN iApplicationID INT, IN vchTitle VARCHAR(255), OUT iNewApplicationID INT)
 BEGIN
-	DECLARE iPages INT; 
+	DECLARE iPages INT;
 	DECLARE iQuestions INT;
 	DECLARE ndx INT DEFAULT -1;
 	DECLARE qNdx INT DEFAULT -1;
 	DECLARE iPageID INT;
 	DECLARE iOldPageID INT;
 
-	INSERT INTO mydb.surveyapplication (surveyapplication.vchTitle) VALUES (vchTitle);
+	INSERT INTO survey_application_generator.survey_project (survey_project.vchTitle) VALUES (vchTitle);
     SET iNewApplicationID = last_insert_id();
-	SELECT count(*) INTO iPages FROM mydb.page WHERE page.iApplicationID = iApplicationID;
+	SELECT count(*) INTO iPages FROM survey_application_generator.page WHERE page.iApplicationID = iApplicationID;
 		BEGIN
 		pages: LOOP
 		SET ndx = ndx + 1;
 		IF ndx = iPages THEN
 			LEAVE pages;
-		END IF;		
-		SELECT page.iPageID INTO iOldPageID FROM mydb.page 
+		END IF;
+		SELECT page.iPageID INTO iOldPageID FROM survey_application_generator.page
 			WHERE page.iApplicationID = iApplicationID
 			ORDER BY page.iPageID ASC
 			LIMIT 1 OFFSET ndx;
-		INSERT INTO mydb.page 
-			SELECT NULL iPageID, iNewApplicationID, iIndex, vchName 
-			FROM page 
+		INSERT INTO survey_application_generator.page
+			SELECT NULL iPageID, iNewApplicationID, iIndex, vchName
+			FROM page
 			WHERE page.iPageID = iOldPageID;
 		SET iPageID = last_insert_id();
 		SET qNdx = -1;
-		SELECT count(*) INTO iQuestions FROM mydb.question WHERE question.iPageID = iOldPageID;
+		SELECT count(*) INTO iQuestions FROM survey_application_generator.question WHERE question.iPageID = iOldPageID;
 		BEGIN
 			questions: LOOP
 			SET qNdx = qNdx + 1;
 			IF qNdx = iQuestions THEN
 				LEAVE questions;
-			END IF;		
-			INSERT INTO mydb.question 
+			END IF;
+			INSERT INTO survey_application_generator.question
 				SELECT NULL iquestionID, iPageID, vchName, iIndex, vchQuestionText, vchQuestionID, vchQuestionType, bRequired, vchMin, vchMax, bValidateText, vchAllowTypes, vchValidSpecialCharacters, vchDecimalPlaces, vchValidationType, vchAnswerChoices, vchOtherChoice, vchDisplayType, vchNumberOfAnswers
-				FROM mydb.question 
+				FROM survey_application_generator.question
 				WHERE question.iPageID = iOldPageID
 				ORDER BY question.iQuestionID ASC
 				LIMIT 1 OFFSET qNdx;
 			END LOOP questions;
-		END;	
+		END;
 		END LOOP pages;
 	END;
 END

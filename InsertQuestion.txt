@@ -4,7 +4,7 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertQuestion`(IN iPageID INT, IN vchName VARCHAR(100),
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`InsertQuestion`(IN iPageID INT, IN vchName VARCHAR(100),
 															 IN iIndex INT, OUT iQuestionID INT)
 BEGIN
 	INSERT INTO question (question.iPageID, question.vchName, question.iIndex) VALUES (iPageID, vchName, iIndex);

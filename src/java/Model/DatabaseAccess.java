@@ -19,15 +19,15 @@ public class DatabaseAccess {
     private static void Initialize() throws Exception {
         if (con == null) {
             Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "root", "password");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/survey_application_generator", "root", "password");
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Insert">
-    public static int InsertSurveyApplication(String title) {
+    public static int InsertSurveyProject(String title) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call InsertSurveyApplication(?,?)}");
+            cStmt = con.prepareCall("{call InsertSurveyProject(?,?)}");
             cStmt.setString("vchTitle", title);
             cStmt.registerOutParameter("iApplicationID", Types.INTEGER);
             cStmt.execute();
@@ -88,10 +88,10 @@ public class DatabaseAccess {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Get/List">
-    public static ResultSet ListSurveyApplications() {
+    public static ResultSet ListSurveyProjects() {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call ListSurveyApplications()}");
+            cStmt = con.prepareCall("{call ListSurveyProjects()}");
             rs = cStmt.executeQuery();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -155,10 +155,10 @@ public class DatabaseAccess {
         }
     }
 
-    public static void renameProject(int iProjectID, String newName) {
+    public static void RenameProject(int iProjectID, String newName) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call renameApplication(?,?)}");
+            cStmt = con.prepareCall("{call RenameProject(?,?)}");
             cStmt.setInt("iApplicationID", iProjectID);
             cStmt.setString("vchTitle", newName);
             cStmt.execute();
@@ -167,10 +167,10 @@ public class DatabaseAccess {
         }
     }
 
-    public static int copyProject(int iProjectID, String newName) {
+    public static int CopyProject(int iProjectID, String newName) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call copyApplication(?,?,?)}");
+            cStmt = con.prepareCall("{call CopyProject(?,?,?)}");
             cStmt.setInt("iApplicationID", iProjectID);
             cStmt.setString("vchTitle", newName);
             cStmt.registerOutParameter("iNewApplicationID", Types.INTEGER);

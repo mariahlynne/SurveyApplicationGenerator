@@ -4,8 +4,8 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertSurveyApplication`(IN vchTitle VARCHAR(255), OUT iApplicationID INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`InsertSurveyProject`(IN vchTitle VARCHAR(255), OUT iApplicationID INT)
 BEGIN
-	INSERT INTO surveyapplication (surveyapplication.vchTitle) VALUES (vchTitle);
+	INSERT INTO survey_project (survey_project.vchTitle) VALUES (vchTitle);
     SET iApplicationID = last_insert_id();
 END

@@ -4,7 +4,7 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DeletePage`(IN iPageID INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`DeletePage`(IN iPageID INT)
 BEGIN
 	DELETE FROM question WHERE question.iPageID = iPageID;
 	DELETE FROM page WHERE page.iPageID = iPageID;

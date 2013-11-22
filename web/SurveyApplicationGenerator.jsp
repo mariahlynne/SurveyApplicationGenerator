@@ -11,7 +11,7 @@
     <%  session = request.getSession(true);
         ArrayList<Page> pages = (ArrayList<Page>) session.getAttribute("pages");
         boolean bNoProjects = false;
-        ResultSet rs = DatabaseAccess.ListSurveyApplications();
+        ResultSet rs = DatabaseAccess.ListSurveyProjects();
         HashMap<Integer, String> projects = new HashMap<Integer, String>();
         while (rs.next()) {
             projects.put(rs.getInt("iApplicationID"), rs.getString("vchTitle"));
@@ -422,23 +422,6 @@
             $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").addClass("nodeSelected");
             $("#navigationTree > li:nth-child(1) > ul > li:nth-child(1) > a").attr('href', "javascript:doNothing()");
             showQuestion();
-            $(function () {
-                $('.collapsible').on('click', function (e) {
-                    var parent = $(this).parent();
-                    var children = parent.find('> ul > li');
-                    if (children.is(":visible")) {
-                        children.hide('fast');
-                        $(this).removeClass("icon-minus");
-                        $(this).addClass("icon-plus");
-                    }
-                    else {
-                        children.show('fast');
-                        $(this).removeClass("icon-plus");
-                        $(this).addClass("icon-minus");
-                    }
-                    e.stopPropagation();
-                });
-            });
             showCorrectQuestionSettings();
             showHideMultipleChoiceFieldOther();
             $("#multipleChoiceChoice").keypress(function (event) {

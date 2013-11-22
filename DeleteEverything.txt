@@ -4,9 +4,9 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteEverything`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`DeleteEverything`()
 BEGIN
 	DELETE FROM question;
 	DELETE FROM page;
-	DELETE FROM surveyapplication;
+	DELETE FROM survey_project;
 END

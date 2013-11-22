@@ -4,7 +4,7 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ListPages`(IN iApplicationID INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`ListPages`(IN iApplicationID INT)
 BEGIN
 	SELECT * FROM page WHERE page.iApplicationID = iApplicationID;
 END

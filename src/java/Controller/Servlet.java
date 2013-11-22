@@ -208,7 +208,7 @@ public class Servlet extends HttpServlet {
                     if (errorMessage.length() == 0) {
 
                     } else {
-                        o.put("pageSectionCode", "When all questions for this page are error-free, a preview of the page will be visible here.");
+                        //o.put("pageSectionCode", "When all questions for this page are error-free, a preview of the page will be visible here.");
                     }
                     o.put("errorMessage", errorMessage);
                     o.put("invalidNodes", invalidNodes);
@@ -225,7 +225,7 @@ public class Servlet extends HttpServlet {
                 String title = request.getParameter("title");
                 pages = new ArrayList<Page>();
                 if (iProjectID == -1) {
-                    iProjectID = DatabaseAccess.InsertSurveyApplication(title);
+                    iProjectID = DatabaseAccess.InsertSurveyProject(title);
                     iPageID = DatabaseAccess.InsertPage(iProjectID, "Page 1", 0);
                     page = new Page(iPageID, "Page 1", 0);
                     iQuestionID = DatabaseAccess.InsertQuestion(iPageID, "Question 1", 0);
@@ -452,7 +452,7 @@ public class Servlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Rename Project">
             case "renameProject":
-                DatabaseAccess.renameProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                DatabaseAccess.RenameProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
                         request.getParameter("newProjectName").toString());
                 session.setAttribute("sProjectTitle", request.getParameter("newProjectName").toString());
                 break;
@@ -460,7 +460,7 @@ public class Servlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Copy Project">
             case "copyProject":
-                iProjectID = DatabaseAccess.copyProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                iProjectID = DatabaseAccess.CopyProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
                         request.getParameter("newProjectName").toString());
                 o = new JSONObject();
                 o.put("projectID", iProjectID);

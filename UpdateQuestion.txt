@@ -4,7 +4,7 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateQuestion`(IN iQuestionID INT, IN iIndex INT,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`UpdateQuestion`(IN iQuestionID INT, IN iIndex INT,
 								   IN vchQuestionText VARCHAR(1000), IN vchQuestionID VARCHAR(50),
 								   IN vchQuestionType VARCHAR(45), IN bRequired BIT, IN vchMin VARCHAR(45),
 								   IN vchMax VARCHAR(45), IN bValidateText BIT, IN vchAllowTypes VARCHAR(100),

@@ -232,3 +232,21 @@ function padDecimalPointPlaces(id, places) {
         $("#" + id).val("");
     }
 }
+
+function enableCollapsibleTree() {
+    $('.collapsible').on('click', function (e) {
+        var parent = $(this).parent();
+        var children = parent.find('> ul > li');
+        if (children.is(":visible")) {
+            children.hide('fast');
+            $(this).removeClass("icon-minus");
+            $(this).addClass("icon-plus");
+        }
+        else {
+            children.show('fast');
+            $(this).removeClass("icon-plus");
+            $(this).addClass("icon-minus");
+        }
+        e.stopPropagation();
+    });
+}
