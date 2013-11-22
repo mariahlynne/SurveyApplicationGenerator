@@ -42,6 +42,7 @@ function switchProject(projectID, title) {
             currentNode.addClass("nodeSelected");
             currentNode.attr('href', "javascript:doNothing()");
             validate();
+            enableCollapsibleTree();
         }
     });
 }
@@ -91,6 +92,7 @@ function switchNode(pageIndex, questionIndex) {
             currentNode.addClass("nodeSelected");
             currentNode.attr('href', "javascript:doNothing()");
             validated = validate();
+            enableCollapsibleTree();
         }
     });
     return validated;
@@ -280,6 +282,7 @@ function addPage() {
                 '    </ul>' +
                 '</li>'
                 );
+            enableCollapsibleTree();
         }
     });
 }
@@ -306,6 +309,7 @@ function addQuestion() {
                     '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
                     '</li>'
                     );
+                enableCollapsibleTree();
             }
         });
     }
@@ -366,6 +370,7 @@ function removeNode() {
                 currentPageIndex.val("-1");
                 currentQuestionIndex.val("-1");
                 document.getElementById("navigationTree").innerHTML = treeHTML;
+                enableCollapsibleTree();
             }
         });
     }
