@@ -100,6 +100,19 @@ public class DatabaseAccess {
         return rs;
     }
 
+    public static boolean IsProjectTitleUnique(String title) {
+        try {
+            Initialize();
+            cStmt = con.prepareCall("{call IsProjectTitleUnique(?)}");
+            cStmt.setString("vchTitle", title);
+            rs = cStmt.executeQuery();
+            return !rs.first();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     public static ResultSet ListPages(int iApplicationID) {
         try {
             Initialize();

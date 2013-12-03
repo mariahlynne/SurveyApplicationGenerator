@@ -1,0 +1,10 @@
+-- --------------------------------------------------------------------------------
+-- Routine DDL
+-- Note: comments before and after the routine body will not be stored by the server
+-- --------------------------------------------------------------------------------
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `IsProjectTitleUnique`(IN vchTitle VARCHAR(50))
+BEGIN
+	SELECT iProjectID FROM survey_project WHERE survey_project.vchTitle = vchTitle;
+END
