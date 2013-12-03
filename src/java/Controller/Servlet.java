@@ -207,7 +207,7 @@ public class Servlet extends HttpServlet {
                         o.put("validated", true);
                         ArrayList<String> generatedResults = generatePage(page, pages.indexOf(page) + 1, null, pages);
                         o.put("pagePreviewCode", generatedResults.get(0));
-                        o.put("pagePreviewJavascript", generatedResults.get(1));
+                        o.put("pagePreviewJavascript", "debugger;" + generatedResults.get(1));
                     } else {
                         o.put("validated", false);
                         o.put("errorMessage", errorMessage);
@@ -619,7 +619,9 @@ public class Servlet extends HttpServlet {
         if (session != null) {
             body.getPageHeader(pageCount, session.getAttribute("sProjectTitle").toString());
         }
-        partialJS.addLine(CodeGenerator.DIR.S, "function validatePage" + pageCount + "() {\n");
+        if (session != null) {
+            partialJS.addLine(CodeGenerator.DIR.S, "function validatePage" + pageCount + "() {\n");
+        }
         partialJS.addLine(CodeGenerator.DIR.F, "$(\".errorText\").hide();\n");
         partialJS.addLine(CodeGenerator.DIR.S, "var result = true;\n");
         String tableID = (session == null) ? "previewContent" : "mainContent";
@@ -678,10 +680,15 @@ public class Servlet extends HttpServlet {
             body.addLine(CodeGenerator.DIR.B, "</tr>\n");
         }
         partialJS.addLine(CodeGenerator.DIR.S, "if (result) {\n");
-        partialJS.getAJAX(json, pageCount == pages.size());
-        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
-        partialJS.addLine(CodeGenerator.DIR.S, "return false;\n");
-        partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+        if (session != null) {
+            partialJS.getAJAX(json, pageCount == pages.size());
+            partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+            partialJS.addLine(CodeGenerator.DIR.S, "return false;\n");
+            partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+        } else {
+            partialJS.addLine(CodeGenerator.DIR.S, "alert('validated successfully');\n");
+            partialJS.addLine(CodeGenerator.DIR.B, "}\n");
+        }
         body.addLine(CodeGenerator.DIR.S, "<tr>\n");
         body.addLine(CodeGenerator.DIR.F, "<td align=\"center\">\n");
         if (pageCount < pages.size()) {

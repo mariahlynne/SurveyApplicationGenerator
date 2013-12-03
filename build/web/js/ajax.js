@@ -89,11 +89,21 @@ function switchNode(pageIndex, questionIndex) {
                     $("#pageErrorSection").hide();
                     $("#pagePreviewPlaceholder").html(json.pagePreviewCode);
                     $("#pagePreviewPlaceholder").show();
+                    $("#nextButton").click(function () {
+                        debugger;
+                        eval(json.pagePreviewJavascript);
+                    });
+                    $("#submitButton").click(function () {
+                        debugger;
+                        eval(json.pagePreviewJavascript);
+                    });
                 } else {
                     $("#pageErrorMessages").html(json.errorMessage);
                     $("#pageErrorSection").show();
                     $("#pagePreviewPlaceholder").hide();
                 }
+                onlyAllowNumbers();
+                onlyAllowDecimalNumbers();
             } else {
                 showQuestion();
                 currentNodeType.val("question");

@@ -1,6 +1,8 @@
 function showPage() {
     $("#questionSection").hide();
     $("#pageSection").show();
+    onlyAllowNumbers();
+    onlyAllowDecimalNumbers();
 }
 
 function showQuestion() {

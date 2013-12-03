@@ -203,12 +203,11 @@ function onlyAllowDecimalNumbers() {
             (event.keyCode == 88 && event.ctrlKey === true) ||
             // Allow: home, end, left, right
             (event.keyCode >= 35 && event.keyCode <= 39) ||
-            // Allow: decimal point & -
-            (event.KeyCode == 110) || (event.keyCode == 189)) {
+            // Allow: decimal point, period, & -
+            (event.KeyCode == 110) || (event.keyCode == 190) || (event.keyCode == 189)) {
             // let it happen, don't do anything
             return;
-        }
-        else {
+        } else {
             // Ensure that it is a number and stop the keypress
             if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105)) {
                 event.preventDefault();
