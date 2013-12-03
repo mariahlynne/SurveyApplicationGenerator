@@ -116,3 +116,30 @@ header#primary h1 {
 .icon {
     background: none;
 }
+
+table#previewContent {
+    margin: 50px;
+}
+
+.question {
+    margin: 10px 20px 40px;
+}
+
+span.questionText {
+    font-weight: bold;
+    display: inline-block;
+}
+
+p.errorText {
+    display: none;
+    font-weight: bold;
+    color: red;
+}
+
+p {
+    margin: 0;
+}
+
+.textarea {
+    width: 100%;
+}
