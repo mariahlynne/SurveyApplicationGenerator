@@ -2,6 +2,7 @@ package Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Page implements Serializable {
 
@@ -32,7 +33,7 @@ public class Page implements Serializable {
         }
         return null;
     }
-
+    
     public String getName() {
         return name;
     }

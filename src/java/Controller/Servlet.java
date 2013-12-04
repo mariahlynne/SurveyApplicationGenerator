@@ -22,10 +22,12 @@ import org.json.simple.parser.ParseException;
 
 public class Servlet extends HttpServlet {
 
+    HttpSession session;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException {
         String sFunction = request.getParameter("func");
         PrintWriter out;
-        HttpSession session = request.getSession();
+        session = request.getSession();
         int pageIndex, questionIndex, count, currentQuestionIndex, currentPageIndex, iProjectID, iPageID, iQuestionID;
         ArrayList<Page> pages;
         Page page;
@@ -313,8 +315,6 @@ public class Servlet extends HttpServlet {
             //</editor-fold>
 
             // <editor-fold defaultstate="collapsed" desc="Validate">
-
-
             case "validate":
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
@@ -396,6 +396,7 @@ public class Servlet extends HttpServlet {
                 response.setContentType("application/json");
                 response.getWriter().write(o.toJSONString());
                 break;
+            //</editor-fold>
         }
     }
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -449,6 +450,20 @@ public class Servlet extends HttpServlet {
         }
     }
 
+    private HashMap<String, String> getQuestionIDs(ArrayList<Page> pages) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        for (Page p : pages) {
+            for (Question q : p.getQuestions()) {
+                if (!map.containsKey(q.getQuestionID())) {
+                    map.put(q.getQuestionID(), "(" + ((int)p.getPageIndex() + 1) + "," + ((int)q.getQuestionIndex() + 1) + ")");
+                } else {
+                    map.put(q.getQuestionID(), map.get(q.getQuestionID()) + ";(" + ((int)p.getPageIndex() + 1) + "," + ((int)q.getQuestionIndex() + 1) + ")");
+                }
+            }
+        }
+        return map;
+    }
+
     private String validateQuestion(Question q) {
         String errorMessage = "";
         if (q.getQuestionText().trim().length() == 0) {
@@ -458,6 +473,13 @@ public class Servlet extends HttpServlet {
             errorMessage += "<li>Question ID is required</li>";
         } else if (!q.getQuestionID().matches("^[a-zA-Z0-9_]+$")) {
             errorMessage += "<li>Question ID can only contain letters, digits, and underscores</li>";
+        } else {
+            HashMap<String, String> map = getQuestionIDs((ArrayList<Page>) session.getAttribute("pages"));
+            String value = map.get(q.getQuestionID());
+            if (value.split(";").length > 1) {
+                value = value.replace("(", " Page ").replace(",", " Question ").replace(")", "").replace(";", ",");
+                errorMessage += "<li>Question ID must be unique; the following questions have the same ID:" + value + "</li>";
+            }
         }
         switch (q.getQuestionType()) {
             case "none":
