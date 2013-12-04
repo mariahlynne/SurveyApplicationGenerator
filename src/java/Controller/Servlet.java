@@ -31,7 +31,6 @@ public class Servlet extends HttpServlet {
         Page page;
         Question question;
         ResultSet rs;
-        boolean uniqueName;
         JSONObject o;
 
         switch (sFunction) {
@@ -225,17 +224,13 @@ public class Servlet extends HttpServlet {
                 iProjectID = Integer.parseInt(request.getParameter("projectID"));
                 String title = request.getParameter("title");
                 pages = new ArrayList<Page>();
-                uniqueName = true;
                 if (iProjectID == -1) {
-                    uniqueName = DatabaseAccess.IsProjectTitleUnique(title);
-                    if (uniqueName) {
-                        iProjectID = DatabaseAccess.InsertSurveyProject(title);
-                        iPageID = DatabaseAccess.InsertPage(iProjectID, "Page 1", 0);
-                        page = new Page(iPageID, "Page 1", 0);
-                        iQuestionID = DatabaseAccess.InsertQuestion(iPageID, "Question 1", 0);
-                        page.addQuestion(iQuestionID, "Question 1", 0);
-                        pages.add(page);
-                    }
+                    iProjectID = DatabaseAccess.InsertSurveyProject(title);
+                    iPageID = DatabaseAccess.InsertPage(iProjectID, "Page 1", 0);
+                    page = new Page(iPageID, "Page 1", 0);
+                    iQuestionID = DatabaseAccess.InsertQuestion(iPageID, "Question 1", 0);
+                    page.addQuestion(iQuestionID, "Question 1", 0);
+                    pages.add(page);
                 } else {
                     ResultSet rsQuestions;
                     rs = DatabaseAccess.ListPages(iProjectID);
@@ -270,49 +265,46 @@ public class Servlet extends HttpServlet {
                     }
                 }
                 o = new JSONObject();
-                if (uniqueName) {
-                    session.setAttribute("pages", pages);
-                    session.setAttribute("iProjectID", iProjectID);
-                    session.setAttribute("sProjectTitle", title);
-                    o.put("projectTitle", title);
-                    o.put("projectID", iProjectID);
-                    page = pages.get(0);
-                    question = page.getQuestions().get(0);
-                    o.put("questionText", question.getQuestionText());
-                    o.put("questionName", question.getQuestionID());
-                    o.put("isRequired", question.isRequired());
-                    o.put("questionType", question.getQuestionType());
-                    o.put("min", question.getMin());
-                    o.put("max", question.getMax());
-                    o.put("validateText", question.isValidateText());
-                    o.put("allowUpper", question.getAllowTypes().split(", ")[0]);
-                    o.put("allowLower", question.getAllowTypes().split(", ")[1]);
-                    o.put("allowDigits", question.getAllowTypes().split(", ")[2]);
-                    o.put("allowSpecial", question.getAllowTypes().split(", ")[3]);
-                    o.put("validSpecialCharacters", question.getValidSpecialCharacters());
-                    o.put("validationType", question.getValidationType());
-                    o.put("decimalPlaces", question.getDecimalPlaces());
-                    o.put("answerChoices", question.getAnswerChoices());
-                    o.put("displayType", question.getDisplayType());
-                    o.put("numberOfAnswers", question.getNumberOfAnswers());
-                    o.put("otherChoice", question.getOtherChoice());
+                session.setAttribute("pages", pages);
+                session.setAttribute("iProjectID", iProjectID);
+                session.setAttribute("sProjectTitle", title);
+                o.put("projectTitle", title);
+                o.put("projectID", iProjectID);
+                page = pages.get(0);
+                question = page.getQuestions().get(0);
+                o.put("questionText", question.getQuestionText());
+                o.put("questionName", question.getQuestionID());
+                o.put("isRequired", question.isRequired());
+                o.put("questionType", question.getQuestionType());
+                o.put("min", question.getMin());
+                o.put("max", question.getMax());
+                o.put("validateText", question.isValidateText());
+                o.put("allowUpper", question.getAllowTypes().split(", ")[0]);
+                o.put("allowLower", question.getAllowTypes().split(", ")[1]);
+                o.put("allowDigits", question.getAllowTypes().split(", ")[2]);
+                o.put("allowSpecial", question.getAllowTypes().split(", ")[3]);
+                o.put("validSpecialCharacters", question.getValidSpecialCharacters());
+                o.put("validationType", question.getValidationType());
+                o.put("decimalPlaces", question.getDecimalPlaces());
+                o.put("answerChoices", question.getAnswerChoices());
+                o.put("displayType", question.getDisplayType());
+                o.put("numberOfAnswers", question.getNumberOfAnswers());
+                o.put("otherChoice", question.getOtherChoice());
 
-                    //send back full (inner) html of tree
-                    String treeHTML = "";
-                    for (Page p : pages) {
-                        pageIndex = p.getPageIndex();
-                        treeHTML += "<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>\n";
-                        treeHTML += "<ul>\n";
-                        for (Question q : p.getQuestions()) {
-                            questionIndex = q.getQuestionIndex();
-                            treeHTML += "<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>\n";
-                        }
-                        treeHTML += "</ul>\n";
-                        treeHTML += "</li>\n";
+                //send back full (inner) html of tree
+                String treeHTML = "";
+                for (Page p : pages) {
+                    pageIndex = p.getPageIndex();
+                    treeHTML += "<li><i class=\"icon-li icon-minus collapsible clickable\"></i><a href=\"javascript:switchNode(" + pageIndex + ", -1);\"> Page " + (pageIndex + 1) + "</a>\n";
+                    treeHTML += "<ul>\n";
+                    for (Question q : p.getQuestions()) {
+                        questionIndex = q.getQuestionIndex();
+                        treeHTML += "<li><a href=\"javascript:switchNode(" + pageIndex + ", " + questionIndex + ");\">Question " + (questionIndex + 1) + "</a></li>\n";
                     }
-                    o.put("treeHTML", treeHTML);
+                    treeHTML += "</ul>\n";
+                    treeHTML += "</li>\n";
                 }
-                o.put("uniqueName", uniqueName);
+                o.put("treeHTML", treeHTML);
 
                 response.setContentType("application/json");
                 response.getWriter().write(o.toJSONString());
@@ -321,6 +313,8 @@ public class Servlet extends HttpServlet {
             //</editor-fold>
 
             // <editor-fold defaultstate="collapsed" desc="Validate">
+
+
             case "validate":
                 pages = (ArrayList<Page>) session.getAttribute("pages");
                 currentQuestionIndex = Integer.parseInt(request.getParameter("currentQuestionIndex"));
@@ -377,37 +371,35 @@ public class Servlet extends HttpServlet {
 
             // <editor-fold defaultstate="collapsed" desc="Rename Project">
             case "renameProject":
-                o = new JSONObject();
-                uniqueName = DatabaseAccess.IsProjectTitleUnique(request.getParameter("newProjectName").toString());
-                if (uniqueName) {
-                    DatabaseAccess.RenameProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
-                            request.getParameter("newProjectName").toString());
-                    session.setAttribute("sProjectTitle", request.getParameter("newProjectName").toString());
-                }
-                o.put("uniqueName", uniqueName);
-                response.setContentType("application/json");
-                response.getWriter().write(o.toJSONString());
+                DatabaseAccess.RenameProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                        request.getParameter("newProjectName").toString());
+                session.setAttribute("sProjectTitle", request.getParameter("newProjectName").toString());
                 break;
             //</editor-fold>
 
             // <editor-fold defaultstate="collapsed" desc="Copy Project">
             case "copyProject":
                 o = new JSONObject();
-                uniqueName = DatabaseAccess.IsProjectTitleUnique(request.getParameter("newProjectName").toString());
-                if (uniqueName) {
-                    iProjectID = DatabaseAccess.CopyProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
-                            request.getParameter("newProjectName").toString());
-                    o.put("projectID", iProjectID);
-                }
-                o.put("uniqueName", uniqueName);
+                iProjectID = DatabaseAccess.CopyProject(Integer.parseInt(session.getAttribute("iProjectID").toString()),
+                        request.getParameter("newProjectName").toString());
+                o.put("projectID", iProjectID);
                 response.setContentType("application/json");
                 response.getWriter().write(o.toJSONString());
                 break;
             //</editor-fold>
+
+            // <editor-fold defaultstate="collapsed" desc="Is Project Name Unique">
+            case "isProjectNameUnique":
+                o = new JSONObject();
+                Boolean uniqueName = DatabaseAccess.IsProjectTitleUnique(request.getParameter("projectName").toString());
+                o.put("uniqueName", uniqueName);
+                response.setContentType("application/json");
+                response.getWriter().write(o.toJSONString());
+                break;
         }
     }
-
 // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

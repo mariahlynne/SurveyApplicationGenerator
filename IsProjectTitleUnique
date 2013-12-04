@@ -6,5 +6,5 @@ DELIMITER $$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `IsProjectTitleUnique`(IN vchTitle VARCHAR(50))
 BEGIN
-	SELECT iProjectID FROM survey_project WHERE survey_project.vchTitle = vchTitle;
+	SELECT * FROM survey_project WHERE survey_project.vchTitle = vchTitle;
 END

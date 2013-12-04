@@ -485,10 +485,15 @@ function launchCopyModal() {
 }
 
 function renameProject() {
+    debugger;
     var newName = $("#txtNewProjectName").val();
     var oldName = $("#projectName").text();
     if (newName == "") {
         $("#lblNewProjectNameError").show();
+        $("#lblNewProjectNameError").text("You must enter the New Project Name");
+    } else if (newName != oldName && !isProjectNameUnique(newName)) {
+        $("#lblNewProjectNameError").show();
+        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists");
     } else {
         $("#lblNewProjectNameError").hide();
         $.ajax({
@@ -514,6 +519,10 @@ function copyProject() {
     var newName = $("#txtNewProjectName").val();
     if (newName == "") {
         $("#lblNewProjectNameError").show();
+        $("#lblNewProjectNameError").text("You must enter the New Project Name");
+    } else if (!isProjectNameUnique(newName)) {
+        $("#lblNewProjectNameError").show();
+        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists");
     } else {
         $("#lblNewProjectNameError").hide();
         $.ajax({
@@ -530,4 +539,21 @@ function copyProject() {
             }
         });
     }
+}
+
+function isProjectNameUnique(projectName) {
+    var isUnique = false;
+    $.ajax({
+        async: false,
+        url: 'Servlet',
+        data: {
+            func:"isProjectNameUnique",
+            projectName:projectName
+        },
+        success: function(json) {
+            debugger;
+            isUnique = json.uniqueName;
+        }
+    });
+    return isUnique;
 }

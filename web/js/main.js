@@ -190,12 +190,15 @@ function switchApplication(bForce, bNoProjects) {
 }
 
 function selectProject() {
+    var newName = $("#txtNewProject").val();
     if ($("#ddlProject").val() == "none") {
-        if ($("#txtNewProject").val() == "") {
+        if (newName == "") {
             $("#lblSelectProjectError").text("You must enter the name of the new project").show();
+        } else if (!isProjectNameUnique(newName)) {
+            $("#lblSelectProjectError").text("A project named '" + newName + "' already exists").show();
         } else {
             $("#lblSelectProjectError").hide();
-            switchProject(-1, $("#txtNewProject").val());
+            switchProject(-1, newName);
             $("#txtNewProject").val("");
             $('#myModal').modal('hide');
         }
@@ -205,12 +208,15 @@ function selectProject() {
         $("#txtNewProject").val("");
         $('#myModal').modal('hide');
     } else {
-        if ($("#txtNewProject").val() == "") {
+        if (newName == "") {
             $("#lblSelectProjectError").text("You must enter the name of the new project OR use an existing project").show();
+            return;
+        } else if (!isProjectNameUnique(newName)) {
+            $("#lblSelectProjectError").text("A project named '" + newName + "' already exists").show();
             return;
         } else {
             $("#lblSelectProjectError").hide();
-            switchProject(-1, $("#txtNewProject").val());
+            switchProject(-1, newName);
             $("#txtNewProject").val("");
             $('#myModal').modal('hide');
         }
