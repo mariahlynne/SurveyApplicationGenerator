@@ -365,7 +365,7 @@ public class Servlet extends HttpServlet {
                 bw.write(javascript);
                 bw.flush();
                 bw.close();
-                DatabaseAccess.CreateTable(session.getAttribute("sProjectTitle").toString(), dbColumns);
+                String sql = DatabaseAccess.CreateDatabaseAndTable(session.getAttribute("sProjectTitle").toString(), dbColumns);
                 break;
             //</editor-fold>
 

@@ -70,20 +70,28 @@ public class DatabaseAccess {
         }
     }
 
-    public static void CreateTable(String sName, HashMap<String, String> columns) {
+    public static String CreateDatabaseAndTable(String sName, HashMap<String, String> columns) {
+        String sql1 = "";
+        String sql2 = "";
+        sName = sName.trim().replace(" ", "_");
         try {
             Initialize();
             st = con.createStatement();
-            String sql = "CREATE TABLE `" + sName + "` (iEntryID INT NOT NULL AUTO_INCREMENT, ";
+            sql1 = "CREATE DATABASE `" + sName + "` /*!40100 DEFAULT CHARACTER SET latin1 */;";
+            System.out.println(sql1);
+            st.execute(sql1);
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + sName, "root", "password");
+            sql2 += "CREATE TABLE `" + sName + "`.`" + sName + "` (iEntryID INT NOT NULL AUTO_INCREMENT, ";
             for (Map.Entry<String, String> entry : columns.entrySet()) {
-                sql += "`" + entry.getKey() + "` " + entry.getValue() + ", ";
+                sql2 += "`" + entry.getKey() + "` " + entry.getValue() + ", ";
             }
-            sql += "PRIMARY KEY (`iEntryID`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;";
-            System.out.println(sql);
-            st.execute(sql);
+            sql2 += "PRIMARY KEY (`iEntryID`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;";
+            System.out.println(sql2);
+            st.execute(sql2);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return sql1 + sql2;
     }
     // </editor-fold>
 

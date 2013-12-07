@@ -485,15 +485,14 @@ function launchCopyModal() {
 }
 
 function renameProject() {
-    debugger;
     var newName = $("#txtNewProjectName").val();
     var oldName = $("#projectName").text();
     if (newName == "") {
-        $("#lblNewProjectNameError").show();
-        $("#lblNewProjectNameError").text("You must enter the New Project Name");
+        $("#lblNewProjectNameError").text("You must enter the New Project Name").show();
+    } else if (!/^[a-zA-Z_ 0-9]+$/.test(newName)) {
+        $("#lblNewProjectNameError").text("The project name must contain only alphanumeric characters").show();
     } else if (newName != oldName && !isProjectNameUnique(newName)) {
-        $("#lblNewProjectNameError").show();
-        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists");
+        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists").show();
     } else {
         $("#lblNewProjectNameError").hide();
         $.ajax({
@@ -518,11 +517,11 @@ function renameProject() {
 function copyProject() {
     var newName = $("#txtNewProjectName").val();
     if (newName == "") {
-        $("#lblNewProjectNameError").show();
-        $("#lblNewProjectNameError").text("You must enter the New Project Name");
+        $("#lblNewProjectNameError").text("You must enter the New Project Name").show();
+    } else if (!/^[a-zA-Z_ 0-9]+$/.test(newName)) {
+        $("#lblNewProjectNameError").text("The project name must contain only alphanumeric characters").show();
     } else if (!isProjectNameUnique(newName)) {
-        $("#lblNewProjectNameError").show();
-        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists");
+        $("#lblNewProjectNameError").text("A project named '" + newName + "' already exists").show();
     } else {
         $("#lblNewProjectNameError").hide();
         $.ajax({

@@ -194,6 +194,8 @@ function selectProject() {
     if ($("#ddlProject").val() == "none") {
         if (newName == "") {
             $("#lblSelectProjectError").text("You must enter the name of the new project").show();
+        } else if (!/^[a-zA-Z_ 0-9]+$/.test(newName)) {
+            $("#lblSelectProjectError").text("The project name must contain only alphanumeric characters").show();
         } else if (!isProjectNameUnique(newName)) {
             $("#lblSelectProjectError").text("A project named '" + newName + "' already exists").show();
         } else {
@@ -210,6 +212,9 @@ function selectProject() {
     } else {
         if (newName == "") {
             $("#lblSelectProjectError").text("You must enter the name of the new project OR use an existing project").show();
+            return;
+        } else if (!/^[a-zA-Z_ 0-9]+$/.test(newName)) {
+            $("#lblSelectProjectError").text("The project name must contain only alphanumeric characters").show();
             return;
         } else if (!isProjectNameUnique(newName)) {
             $("#lblSelectProjectError").text("A project named '" + newName + "' already exists").show();
