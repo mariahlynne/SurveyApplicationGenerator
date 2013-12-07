@@ -78,7 +78,6 @@ public class DatabaseAccess {
             Initialize();
             st = con.createStatement();
             sql1 = "CREATE DATABASE `" + sName + "` /*!40100 DEFAULT CHARACTER SET latin1 */;";
-            System.out.println(sql1);
             st.execute(sql1);
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + sName, "root", "password");
             sql2 += "CREATE TABLE `" + sName + "`.`" + sName + "` (iEntryID INT NOT NULL AUTO_INCREMENT, ";
@@ -86,10 +85,11 @@ public class DatabaseAccess {
                 sql2 += "`" + entry.getKey() + "` " + entry.getValue() + ", ";
             }
             sql2 += "PRIMARY KEY (`iEntryID`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;";
-            System.out.println(sql2);
             st.execute(sql2);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            con = null;
         }
         return sql1 + sql2;
     }
