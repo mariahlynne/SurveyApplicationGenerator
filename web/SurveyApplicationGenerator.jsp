@@ -44,7 +44,7 @@
     </head>
     <body>
         <header id="primary">
-            <button type="button" onclick="generateApplication();" style="float: right; height: 30px; margin: 35px;"
+            <button type="button" onclick="generateApplication()" style="float: right; height: 30px; margin: 35px;"
                     class="btn btn-info ">Generate Survey</button>
             <div class="btn-toolbar" style="float: right; height: 30px; margin-top: 35px;">
                 <div class="btn-group">

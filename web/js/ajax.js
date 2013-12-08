@@ -405,16 +405,18 @@ function generateApplication() {
     //calling switch node will effectively save the node they're currently on - all others will already be saved
     var validated = switchNode($("#currentPageIndex").val(), $("#currentQuestionIndex").val());
     if (validated) {
-        $.ajax({
-            url:'Servlet',
-            data: {
-                func:"generateApplication"
-            },
-            success: function() {
-                alert('Your survey has been generated successfully!');
-            },
-            async: false
-        });
+        if(window.confirm('Generating this survey will drop and recreate the database table associated with the survey tool if it already exists. If the project folder already exists, it will be overwritten as well. Are you sure you want to generate this survey?')) {
+            $.ajax({
+                url:'Servlet',
+                data: {
+                    func:"generateApplication"
+                },
+                success: function() {
+                    alert('Your survey has been generated successfully!');
+                },
+                async: false
+            });
+        }
     } else {
         alert('You must resolve all errors before the survey can be generated.')
     }
