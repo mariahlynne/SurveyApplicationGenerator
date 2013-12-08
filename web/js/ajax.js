@@ -83,6 +83,7 @@ function switchNode(pageIndex, questionIndex) {
             if (questionIndex == -1) {
                 currentNodeType.val("page");
                 currentNode = $("#navigationTree > li:nth-child(" + (pageIndex + 1) + ") > a");
+                validate();
                 validated = json.validated;
                 showPage();
                 if (validated) {
@@ -90,11 +91,9 @@ function switchNode(pageIndex, questionIndex) {
                     $("#pagePreviewPlaceholder").html(json.pagePreviewCode);
                     $("#pagePreviewPlaceholder").show();
                     $("#nextButton").click(function () {
-                        debugger;
                         eval(json.pagePreviewJavascript);
                     });
                     $("#submitButton").click(function () {
-                        debugger;
                         eval(json.pagePreviewJavascript);
                     });
                 } else {

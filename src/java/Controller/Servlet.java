@@ -5,9 +5,18 @@ import Model.DatabaseAccess;
 import Model.Page;
 import Model.Question;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -349,9 +358,13 @@ public class Servlet extends HttpServlet {
                 BufferedWriter bw;
                 HashMap<String, String> dbColumns = new HashMap<String, String>();
                 ArrayList<String> generatePageResults;
+                String destPath = "C:\\Users\\Mariah\\Documents\\NetBeansProjects\\" + session.getAttribute("sProjectTitle").toString().replace(" ", "");
+                File srcFolder = new File("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\TemplateApplication");
+                File destFolder = new File(destPath);
+                copyFolder(srcFolder, destFolder);
                 for (Page p : pages) {
                     generatePageResults = generatePage(p, pageCount, session, pages);
-                    bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\Page" + pageCount + ".jsp"));
+                    bw = new BufferedWriter(new FileWriter(destPath + "\\web\\Page" + pageCount + ".jsp"));
                     bw.write(generatePageResults.get(0));
                     bw.flush();
                     bw.close();
@@ -361,11 +374,16 @@ public class Servlet extends HttpServlet {
                         CodeGenerator.getSQLColumnDeclaration(q, dbColumns);
                     }
                 }
-                bw = new BufferedWriter(new FileWriter("C:\\Users\\Mariah\\Documents\\NetBeansProjects\\PracticeApplication\\web\\js\\main.js"));
+                bw = new BufferedWriter(new FileWriter(destPath + "\\web\\js\\main.js"));
                 bw.write(javascript);
                 bw.flush();
                 bw.close();
                 String sql = DatabaseAccess.CreateDatabaseAndTable(session.getAttribute("sProjectTitle").toString(), dbColumns);
+                bw = new BufferedWriter(new FileWriter(destPath + "\\Create DB and Table.sql"));
+                bw.write(sql);
+                bw.flush();
+                bw.close();
+                replaceAllInstancesOfTemplateApplication(new File(destPath), session.getAttribute("sProjectTitle").toString().replace(" ", ""));
                 break;
             //</editor-fold>
 
@@ -455,9 +473,9 @@ public class Servlet extends HttpServlet {
         for (Page p : pages) {
             for (Question q : p.getQuestions()) {
                 if (!map.containsKey(q.getQuestionID())) {
-                    map.put(q.getQuestionID(), "(" + ((int)p.getPageIndex() + 1) + "," + ((int)q.getQuestionIndex() + 1) + ")");
+                    map.put(q.getQuestionID(), "(" + ((int) p.getPageIndex() + 1) + "," + ((int) q.getQuestionIndex() + 1) + ")");
                 } else {
-                    map.put(q.getQuestionID(), map.get(q.getQuestionID()) + ";(" + ((int)p.getPageIndex() + 1) + "," + ((int)q.getQuestionIndex() + 1) + ")");
+                    map.put(q.getQuestionID(), map.get(q.getQuestionID()) + ";(" + ((int) p.getPageIndex() + 1) + "," + ((int) q.getQuestionIndex() + 1) + ")");
                 }
             }
         }
@@ -741,5 +759,71 @@ public class Servlet extends HttpServlet {
         results.add(body.code);
         results.add(partialJS.code);
         return results;
+    }
+
+    private static void copyFolder(File src, File dest) throws IOException {
+        deleteDirectory(dest);
+        if (src.isDirectory()) {
+            //if directory not exists, create it
+            if (!dest.exists()) {
+                dest.mkdir();
+            }
+            //list all the directory contents
+            String files[] = src.list();
+            for (String file : files) {
+                //construct the src and dest file structure
+                File srcFile = new File(src, file);
+                File destFile = new File(dest, file);
+                //recursive copy
+                copyFolder(srcFile, destFile);
+            }
+        } else {
+            //if file, then copy it
+            //Use bytes stream to support all file types
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            //copy the file content in bytes
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+            in.close();
+            out.close();
+        }
+    }
+
+    private static void deleteDirectory(File directory) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (null != files) {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isDirectory()) {
+                        deleteDirectory(files[i]);
+                    } else {
+                        files[i].delete();
+                    }
+                }
+            }
+        }
+        directory.delete();
+    }
+
+    private static void replaceAllInstancesOfTemplateApplication(File file, String appName) throws IOException {
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isDirectory()) {
+                        replaceAllInstancesOfTemplateApplication(files[i], appName);
+                    } else {
+                        Path path = Paths.get(files[i].getAbsolutePath());
+                        String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                        content = content.replaceAll("TemplateApplication", appName);
+                        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+                    }
+                }
+            }
+        }
     }
 }
