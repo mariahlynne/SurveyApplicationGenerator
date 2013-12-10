@@ -158,10 +158,11 @@ public class CodeGenerator {
             if (allowTypes[3].equals("true")) {
                 validChars += q.getValidSpecialCharacters().replace("\\", "\\\\").replace("'", "\\'");
             }
+            String qID = q.getQuestionID();
             if (q.getQuestionType().equals("multipleChoice")) {
-                q.setQuestionID(q.getQuestionID() + "OtherChoice");
+                qID += "OtherChoice";
             }
-            addLine(CodeGenerator.DIR.S, "result = containsOnlyValidChars('" + q.getQuestionID() + "', 'text', '" + validChars + "') && result;\n");
+            addLine(CodeGenerator.DIR.S, "result = containsOnlyValidChars('" + qID + "', 'text', '" + validChars + "') && result;\n");
         }
     }
 

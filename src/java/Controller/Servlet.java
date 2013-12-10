@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -384,6 +386,11 @@ public class Servlet extends HttpServlet {
                 bw.flush();
                 bw.close();
                 replaceAllInstancesOfTemplateApplication(new File(destPath), session.getAttribute("sProjectTitle").toString().replace(" ", ""));
+//                OutputStream compiledClass = new FileOutputStream(destPath + "\\build\\web\\WEB-INF\\classes\\Controller\\Servlet.class");
+//                JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//                compiler.run(null, compiledClass, null, destPath + "\\src\\java\\Controller\\Servlet.java");
+//                compiledClass.flush();
+//                compiledClass.close();
                 break;
             //</editor-fold>
 
