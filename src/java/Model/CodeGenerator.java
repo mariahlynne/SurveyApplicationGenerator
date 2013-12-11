@@ -177,6 +177,8 @@ public class CodeGenerator {
             case "setMinMax":
                 addLine(CodeGenerator.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
+            default:
+                addLine(CodeGenerator.DIR.S, "result = meetsDecimalNumberRequirements('" + q.getQuestionID() + "', '', '') && result;\n");
         }
     }
 
@@ -191,14 +193,19 @@ public class CodeGenerator {
             case "setMinMax":
                 addLine(CodeGenerator.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', " + q.getMin() + ", " + q.getMax() + ") && result;\n");
                 break;
+            default:
+                addLine(CodeGenerator.DIR.S, "result = meetsWholeNumberRequirements('" + q.getQuestionID() + "', '', '') && result;\n");
+                break;
         }
     }
 
     public void getMultipleChoiceValidationCode(Question q) {
+        if (q.getDisplayType().equals("checkbox")) {
+            addLine(CodeGenerator.DIR.S, "result = validateAnswerLimit('" + q.getQuestionID() + "', '" + q.getNumberOfAnswers() + "') && result;\n");
+        }
         if (q.getOtherChoice().length() > 0) {
             switch (q.getDisplayType()) {
                 case "checkbox":
-                    addLine(CodeGenerator.DIR.S, "result = validateAnswerLimit('" + q.getQuestionID() + "', '" + q.getNumberOfAnswers() + "') && result;\n");
                 case "radio":
                     addLine(CodeGenerator.DIR.S, "if ($(\"#" + q.getQuestionID() + "OtherChoiceSpecify\").is(':checked')) {\n");
                     break;
@@ -249,6 +256,9 @@ public class CodeGenerator {
         String type = q.getQuestionType();
         if (type.equals("multipleChoice")) {
             type = q.getDisplayType();
+            if (q.getOtherChoice().length() > 0) {
+                addLine(CodeGenerator.DIR.S, "json." + q.getQuestionID() + "OtherChoice = getValueByTypeAndIDForDB('" + q.getQuestionID() + "OtherChoice', 'text');\n");
+            }
         }
         addLine(CodeGenerator.DIR.S, "json." + q.getQuestionID() + " = getValueByTypeAndIDForDB('" + q.getQuestionID() + "', '" + type + "');\n");
     }

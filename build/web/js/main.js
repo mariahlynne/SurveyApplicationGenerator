@@ -104,7 +104,7 @@ function moveChoiceUp() {
     var index = $("#multipleChoiceChoices option").index(selected);
     if (index != 0) {
         selected.remove();
-        $("#multipleChoiceChoices option:eq(" + (index - 1) + ")").before("<option value='1'>" + text + "</option>");
+        $("#multipleChoiceChoices option:eq(" + (index - 1) + ")").before("<option value='" + text + "'>" + text + "</option>");
         $('#multipleChoiceChoices option')[index - 1].selected = true;
     }
     $('#multipleChoiceChoices').focus();
@@ -117,7 +117,7 @@ function moveChoiceDown() {
     var size = $("#multipleChoiceChoices option").size();
     if (index != size - 1) {
         selected.remove();
-        $("#multipleChoiceChoices option:eq(" + index + ")").after("<option value='1'>" + text + "</option>");
+        $("#multipleChoiceChoices option:eq(" + index + ")").after("<option value='" + text + "'>" + text + "</option>");
         $('#multipleChoiceChoices option')[index + 1].selected = true;
     }
     $('#multipleChoiceChoices').focus();

@@ -4,7 +4,7 @@
 -- --------------------------------------------------------------------------------
 DELIMITER $$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `survey_application_generator`.`UpdatePage`(IN iPageID INT, IN vchName VARCHAR(100), IN iIndex INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdatePage`(IN iPageID INT, IN iIndex INT, IN vchName VARCHAR(100))
 BEGIN
 	UPDATE page SET page.vchName = vchName, page.iIndex = iIndex WHERE page.iPageID = iPageID;
 END

@@ -155,9 +155,10 @@ public class DatabaseAccess {
     public static void UpdateQuestion(Question q) {
         try {
             Initialize();
-            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
+            cStmt = con.prepareCall("{call UpdateQuestion(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cStmt.setInt("iQuestionID", q.getID());
             cStmt.setInt("iIndex", q.getQuestionIndex());
+            cStmt.setString("vchName", q.getName());
             cStmt.setString("vchQuestionText", q.getQuestionText());
             cStmt.setString("vchQuestionID", q.getQuestionID());
             cStmt.setString("vchQuestionType", q.getQuestionType());
@@ -173,6 +174,19 @@ public class DatabaseAccess {
             cStmt.setString("vchOtherChoice", q.getOtherChoice());
             cStmt.setString("vchDisplayType", q.getDisplayType());
             cStmt.setString("vchNumberOfAnswers", q.getNumberOfAnswers());
+            cStmt.execute();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void UpdatePage(Page p) {
+        try {
+            Initialize();
+            cStmt = con.prepareCall("{call UpdatePage(?,?,?)}");
+            cStmt.setInt("iPageID", p.getID());
+            cStmt.setInt("iIndex", p.getPageIndex());
+            cStmt.setString("vchName", p.getName());
             cStmt.execute();
         } catch (Exception ex) {
             ex.printStackTrace();

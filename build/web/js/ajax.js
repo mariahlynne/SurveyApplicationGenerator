@@ -302,6 +302,7 @@ function addPage() {
                 '    </ul>' +
                 '</li>'
                 );
+            validate();
             enableCollapsibleTree();
         }
     });
@@ -329,6 +330,7 @@ function addQuestion() {
                     '    <a href="javascript:switchNode(' + currentPageIndex + ', ' + questionCount + ');">Question ' + (questionCount + 1) + '</a>' +
                     '</li>'
                     );
+                validate();
                 enableCollapsibleTree();
             }
         });
@@ -390,6 +392,7 @@ function removeNode() {
                 currentPageIndex.val("-1");
                 currentQuestionIndex.val("-1");
                 document.getElementById("navigationTree").innerHTML = treeHTML;
+                validate();
                 enableCollapsibleTree();
             }
         });

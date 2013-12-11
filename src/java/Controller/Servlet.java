@@ -460,9 +460,13 @@ public class Servlet extends HttpServlet {
         int questionIndex;
         for (Page p : pages) {
             p.setPageIndex(pageIndex++);
+            p.setName("Page " + pageIndex);
+            DatabaseAccess.UpdatePage(p);
             questionIndex = 0;
             for (Question q : p.getQuestions()) {
                 q.setQuestionIndex(questionIndex++);
+                q.setName("Question " + questionIndex);
+                DatabaseAccess.UpdateQuestion(q);
             }
         }
     }
